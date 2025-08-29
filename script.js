@@ -15,6 +15,8 @@ const App = () => {
   const [email, setEmail] = React.useState('');
   const [emailSent, setEmailSent] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [emailError, setEmailError] = React.useState(''); // New state for email-specific errors
+
   const totalSteps = 9; // Increased total steps to accommodate the new question
 
   React.useEffect(() => {
@@ -59,8 +61,9 @@ const App = () => {
   };
 
   const calculateSystemVolume = (system) => {
-      const topVolume = system.tops.reduce((acc, item) => acc + getVolume(item.dimensions), 0);
-      const subVolume = system.subs.reduce((acc, item) => acc + getVolume(item.dimensions), 0);
+      if (!system || !system.tops || !system.subs) return 0;
+      const topVolume = system.tops.reduce((acc, item) => acc + (item ? getVolume(item.dimensions) : 0), 0);
+      const subVolume = system.subs.reduce((acc, item) => acc + (item ? getVolume(item.dimensions) : 0), 0);
       return (topVolume + subVolume) / 1728; // Convert cubic inches to cubic feet
   };
 
@@ -168,26 +171,30 @@ const App = () => {
     }
 
     const calculateTotal = (system) => {
+        if (!system) return 0;
         const topTotal = system.tops.reduce((acc, item) => acc + (item ? item.price : 0), 0);
         const subTotal = system.subs.reduce((acc, item) => acc + (item ? item.price : 0), 0);
         return topTotal + subTotal;
     };
     
     const calculateAmperage = (system) => {
+        if (!system) return 0;
         const topAmps = system.tops.reduce((acc, item) => acc + (item ? item.amperage : 0), 0);
         const subAmps = system.subs.reduce((acc, item) => acc + (item ? item.amperage : 0), 0);
         return topAmps + subAmps;
     };
 
     const getLowestFreq = (system) => {
-        if (system.subs.length === 0) return 'N/A';
-        const lowestFrequency = Math.min(...system.subs.map(sub => sub.lowest_freq));
-        if (system.subs.length > 2) return lowestFrequency - 3;
+        if (!system || !system.subs || system.subs.length === 0) return 'N/A';
+        const validSubs = system.subs.filter(sub => sub && typeof sub.lowest_freq === 'number');
+        if (validSubs.length === 0) return 'N/A';
+        const lowestFrequency = Math.min(...validSubs.map(sub => sub.lowest_freq));
+        if (validSubs.length > 2) return lowestFrequency - 3;
         return lowestFrequency;
     };
 
     const calculateSpl = (system) => {
-        if (!system.subs || system.subs.length === 0) return 0;
+        if (!system || !system.subs || system.subs.length === 0) return 0;
         const validSubs = system.subs.filter(sub => sub && typeof sub.spl === 'number');
         if (validSubs.length === 0) return 0;
         if (validSubs.length === 1) return validSubs[0].spl;
@@ -208,44 +215,64 @@ const App = () => {
   };
 
   const sendEmail = () => {
+    setEmailError(''); // Reset error on new attempt
     if (!email || !quotes) return;
+
+    // ** SAFER HTML FORMATTING **
     const formatSystemForEmail = (systemData, title) => {
         if (!systemData || !systemData.system) return '';
         let html = `<h2>${title}</h2><ul>`;
-        if (Array.isArray(systemData.system.tops)) {
-            systemData.system.tops.forEach(item => { html += `<li>${item.name} - $${item.price.toLocaleString()}</li>`; });
+
+        const addItems = (items) => {
+            if (Array.isArray(items)) {
+                items.forEach(item => {
+                    // Only add the item if it's a valid object with a name and price
+                    if (item && item.name && typeof item.price === 'number') {
+                        html += `<li>${item.name} - $${item.price.toLocaleString()}</li>`;
+                    }
+                });
+            }
+        };
+
+        addItems(systemData.system.tops);
+        addItems(systemData.system.subs);
+        
+        // This handles the monitor system, which is a flat array
+        if (Array.isArray(systemData.system) && !systemData.system.tops) {
+            addItems(systemData.system);
         }
-        if (Array.isArray(systemData.system.subs)) {
-            systemData.system.subs.forEach(item => { html += `<li>${item.name} - $${item.price.toLocaleString()}</li>`; });
-        }
-        if (Array.isArray(systemData.system) && !systemData.system.tops && !systemData.system.subs) {
-            systemData.system.forEach(item => { html += `<li>${item.name} - $${item.price.toLocaleString()}</li>`; });
-        }
+
         html += `</ul><p><b>Total MSRP:</b> $${systemData.total.toLocaleString()}</p><hr>`;
         return html;
     };
-    const emailBody = `<h1>Your BASSBOSS System Recommendation</h1><p>Here are the custom system quotes you generated based on your requirements.</p><hr>${formatSystemForEmail(quotes.budget, 'Standard System')}${formatSystemForEmail(quotes.premium, 'High-Capability System')}${quotes.monitorRec ? formatSystemForEmail(quotes.monitorRec, 'Booth Monitor Recommendation') : ''}`;
-    const templateParams = { to_email: email, subject: "Your BASSBOSS System Quote", message: emailBody };
-    
-    // ** IMPORTANT: Replace these with your actual EmailJS credentials **
-    const SERVICE_ID = 'service_5asu4to';
-    const TEMPLATE_ID = 'template_h35gw6b';
-    const PUBLIC_KEY = '94e2mXMqvbt_WShp2';
 
-    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
-        .then((response) => {
-            console.log('SUCCESS!', response.status, response.text);
-            setEmailSent(true);
-            setTimeout(() => {
-                setStep(1);
-                setEmail('');
-                setEmailSent(false);
-                setAnswers({ genre: '', crowdSize: '', budget: '', transportation: '', power: '', venueType: '', boothMonitors: '', boothSubs: '' });
-            }, 3000);
-        }, (error) => {
-            console.error('EmailJS FAILED...', error);
-            alert('There was an error sending your quote. Please try again.');
-        });
+    try {
+        const emailBody = `<h1>Your BASSBOSS System Recommendation</h1><p>Here are the custom system quotes you generated based on your requirements.</p><hr>${formatSystemForEmail(quotes.budget, 'Standard System')}${formatSystemForEmail(quotes.premium, 'High-Capability System')}${quotes.monitorRec ? formatSystemForEmail(quotes.monitorRec, 'Booth Monitor Recommendation') : ''}`;
+        const templateParams = { to_email: email, subject: "Your BASSBOSS System Quote", message: emailBody };
+        
+        const SERVICE_ID = 'service_5asu4to';
+        const TEMPLATE_ID = 'template_h35gw6b';
+        const PUBLIC_KEY = '94e2mXMqvbt_WShp2';
+
+        emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+            .then((response) => {
+                console.log('SUCCESS!', response.status, response.text);
+                setEmailSent(true);
+                setTimeout(() => {
+                    setStep(1);
+                    setEmail('');
+                    setEmailSent(false);
+                    setAnswers({ genre: '', crowdSize: '', budget: '', transportation: '', power: '', venueType: '', boothMonitors: '', boothSubs: '' });
+                }, 3000);
+            }, (error) => {
+                console.error('EmailJS FAILED...', error);
+                // Display a more specific error for the user
+                setEmailError('Failed to send. Please check your EmailJS account settings and template variables.');
+            });
+    } catch (error) {
+        console.error('An error occurred while preparing the email:', error);
+        setEmailError('A local error occurred. Could not send the email.');
+    }
   };
 
   const formatAnswerKey = (key) => {
@@ -366,9 +393,12 @@ const App = () => {
                 {emailSent ? (
                     <p className="text-green-400 font-semibold">Email sent successfully! Resetting...</p>
                 ) : (
-                    <div className="flex justify-center items-center">
-                        <input type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} className="p-2 border bg-gray-700 border-gray-600 text-white rounded-l-md w-64 focus:outline-none focus:ring-2 focus:ring-yellow-400"/>
-                        <button onClick={sendEmail} className="bg-yellow-400 text-black font-bold px-4 py-2 rounded-r-md hover:bg-yellow-500">Send</button>
+                    <div className="flex flex-col items-center">
+                        <div className="flex justify-center items-center">
+                            <input type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} className="p-2 border bg-gray-700 border-gray-600 text-white rounded-l-md w-64 focus:outline-none focus:ring-2 focus:ring-yellow-400"/>
+                            <button onClick={sendEmail} className="bg-yellow-400 text-black font-bold px-4 py-2 rounded-r-md hover:bg-yellow-500">Send</button>
+                        </div>
+                        {emailError && <p className="text-red-400 mt-2">{emailError}</p>}
                     </div>
                 )}
                  <button onClick={() => setStep(1)} className="mt-4 text-sm text-gray-400 hover:text-yellow-400 hover:underline">Start Over</button>
