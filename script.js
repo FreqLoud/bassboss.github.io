@@ -390,7 +390,6 @@ const App = () => {
 
   return (
     <div className="bg-gray-900/90 border border-gray-700 p-8 rounded-lg shadow-2xl w-full max-w-4xl relative overflow-hidden">
-        <div className="background-container absolute inset-0 pointer-events-none"></div>
         <div className="relative z-10">
             <img 
                 src="https://cdn.prod.website-files.com/65f2989505d63045bb49388a/65f2989505d63045bb493ac9_0ada5c33b4fc13ca0473237e7f53bd98_BASSBOSS-Logo-Yellow-600px-web.webp" 
@@ -412,3 +411,4 @@ const App = () => {
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 root.render(<App />);
+
