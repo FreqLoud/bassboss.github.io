@@ -1,32 +1,36 @@
-body {
-    font-family: sans-serif;
-    margin: 0;
-    /* Background color is removed from here to let the video show through */
-}
-
-#background-video {
+#video-bg {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-    z-index: -1; /* Sits behind everything */
-    opacity: 1; /* Lowered opacity for a more subtle effect */
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1;
+    opacity: 0.3; /* Adjusted for better visibility */
 }
 
-#content-wrapper {
-    position: relative; /* Establishes a stacking context */
-    z-index: 1; /* Sits on top of the video */
+.background-container {
+    background-image: url('https://cdn.prod.website-files.com/65f2989505d63045bb49388a/65f2989505d63045bb493a80_BB-B-Logo-White-400px-web.webp');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 25%; /* Smaller logo */
+    transform: rotate(45deg);
+    opacity: 0.1;
+    z-index: 0;
+}
+
+body {
+    /* The background-color has been removed from here to allow the video to be visible. */
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+}
+
+#root {
+    position: relative;
+    z-index: 1;
+    width: 100%;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 1rem;
-}
-
-#root {
-    /* The React app will be mounted here. It will be centered by the content-wrapper. */
-    width: 100%;
-    max-width: 56rem; /* equivalent to max-w-4xl */
 }
