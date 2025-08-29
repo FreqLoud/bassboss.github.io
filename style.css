@@ -5,26 +5,27 @@
     min-width: 100%;
     min-height: 100%;
     z-index: -1;
-    opacity: 0.3; /* Adjusted for better visibility */
+    /* opacity: 0.3; has been removed to fix the white haze */
 }
 
+/* The .background-container class is no longer used but is left here for reference */
 .background-container {
     background-image: url('https://cdn.prod.website-files.com/65f2989505d63045bb49388a/65f2989505d63045bb493a80_BB-B-Logo-White-400px-web.webp');
     background-position: center;
     background-repeat: no-repeat;
-    background-size: 25%; /* Smaller logo */
+    background-size: 25%;
     transform: rotate(45deg);
     opacity: 0.1;
     z-index: 0;
 }
 
 body {
-    /* The background-color has been removed from here to allow the video to be visible. */
     color: #fff;
     font-family: 'Inter', sans-serif;
+    margin: 0;
 }
 
-#root {
+#content-wrapper {
     position: relative;
     z-index: 1;
     width: 100%;
@@ -33,4 +34,11 @@ body {
     align-items: center;
     justify-content: center;
     padding: 1rem;
+    box-sizing: border-box;
 }
+
+#root {
+    width: 100%;
+    max-width: 56rem; /* Equivalent to max-w-4xl */
+}
+
