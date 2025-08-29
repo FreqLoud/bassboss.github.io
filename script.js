@@ -226,7 +226,13 @@ const App = () => {
     };
     const emailBody = `<h1>Your BASSBOSS System Recommendation</h1><p>Here are the custom system quotes you generated based on your requirements.</p><hr>${formatSystemForEmail(quotes.budget, 'Standard System')}${formatSystemForEmail(quotes.premium, 'High-Capability System')}${quotes.monitorRec ? formatSystemForEmail(quotes.monitorRec, 'Booth Monitor Recommendation') : ''}`;
     const templateParams = { to_email: email, subject: "Your BASSBOSS System Quote", message: emailBody };
-    emailjs.send('service_6hqukwx', 'template_lznlhid', templateParams, 'j-21O-a05d3y1J9t-')
+    
+    // ** IMPORTANT: Replace these with your actual EmailJS credentials **
+    const SERVICE_ID = 'service_6hqukwx';
+    const TEMPLATE_ID = 'template_lznlhid';
+    const PUBLIC_KEY = 'TV2Z1HnCPye7yY8QQ';
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
         .then((response) => {
             console.log('SUCCESS!', response.status, response.text);
             setEmailSent(true);
@@ -237,7 +243,7 @@ const App = () => {
                 setAnswers({ genre: '', crowdSize: '', budget: '', transportation: '', power: '', venueType: '', boothMonitors: '', boothSubs: '' });
             }, 3000);
         }, (error) => {
-            console.log('FAILED...', error);
+            console.error('EmailJS FAILED...', error);
             alert('There was an error sending your quote. Please try again.');
         });
   };
@@ -406,3 +412,4 @@ const App = () => {
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 root.render(<App />);
+
