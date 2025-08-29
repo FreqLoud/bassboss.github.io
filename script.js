@@ -227,10 +227,10 @@ const App = () => {
     const emailBody = `<h1>Your BASSBOSS System Recommendation</h1><p>Here are the custom system quotes you generated based on your requirements.</p><hr>${formatSystemForEmail(quotes.budget, 'Standard System')}${formatSystemForEmail(quotes.premium, 'High-Capability System')}${quotes.monitorRec ? formatSystemForEmail(quotes.monitorRec, 'Booth Monitor Recommendation') : ''}`;
     const templateParams = { to_email: email, subject: "Your BASSBOSS System Quote", message: emailBody };
     
-    // ** IMPORTANT: Replace these with your actual EmailJS credentials from your dashboard **
+    // ** IMPORTANT: Replace these with your actual EmailJS credentials **
     const SERVICE_ID = 'service_6hqukwx';
     const TEMPLATE_ID = 'template_lznlhid';
-    const PUBLIC_KEY = '94e2mXMqvbt_WShp2';
+    const PUBLIC_KEY = 'TV2Z1HnCPye7yY8QQ';
 
     emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
         .then((response) => {
@@ -412,6 +412,3 @@ const App = () => {
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 root.render(<App />);
-
-"
-
