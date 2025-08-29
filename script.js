@@ -273,12 +273,7 @@ const App = () => {
             .then((response) => {
                 console.log('SUCCESS!', response.status, response.text);
                 setEmailSent(true);
-                setTimeout(() => {
-                    setStep(1);
-                    setEmail('');
-                    setEmailSent(false);
-                    setAnswers({ genre: '', crowdSize: '', budget: '', transportation: '', power: '', venueType: '', boothMonitors: '', boothSubs: '' });
-                }, 3000);
+                // The automatic reset is now removed.
             }, (error) => {
                 console.error('EmailJS FAILED...', error);
                 // Display a more specific error for the user
@@ -406,7 +401,7 @@ const App = () => {
             <div className="mt-8 text-center">
                 <p className="mb-4 text-gray-300">Would you like these quotes emailed to you?</p>
                 {emailSent ? (
-                    <p className="text-green-400 font-semibold">Email sent successfully! Resetting...</p>
+                    <p className="text-green-400 font-semibold">Email sent successfully!</p>
                 ) : (
                     <div className="flex flex-col items-center">
                         <div className="flex justify-center items-center">
@@ -416,7 +411,12 @@ const App = () => {
                         {emailError && <p className="text-red-400 mt-2">{emailError}</p>}
                     </div>
                 )}
-                 <button onClick={() => setStep(1)} className="mt-4 text-sm text-gray-400 hover:text-yellow-400 hover:underline">Start Over</button>
+                 <button onClick={() => {
+                     setStep(1);
+                     setEmail('');
+                     setEmailSent(false);
+                     setAnswers({ genre: '', crowdSize: '', budget: '', transportation: '', power: '', venueType: '', boothMonitors: '', boothSubs: '' });
+                 }} className="mt-4 w-full sm:w-auto p-3 border rounded bg-gray-600 text-white font-bold hover:bg-gray-500 transition-colors duration-300">Start Over</button>
             </div>
           </div>
       );
