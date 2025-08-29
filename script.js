@@ -218,15 +218,14 @@ const App = () => {
     setEmailError(''); // Reset error on new attempt
     if (!email || !quotes) return;
 
-    // ** SAFER HTML FORMATTING **
     const formatSystemForEmail = (systemData, title) => {
         if (!systemData || !systemData.system) return '';
-        let html = `<h2>${title}</h2><ul>`;
-
+        let html = `<h2>${title}</h2>`;
+        
+        html += `<h4>Components:</h4><ul>`;
         const addItems = (items) => {
             if (Array.isArray(items)) {
                 items.forEach(item => {
-                    // Only add the item if it's a valid object with a name and price
                     if (item && item.name && typeof item.price === 'number') {
                         html += `<li>${item.name} - $${item.price.toLocaleString()}</li>`;
                     }
@@ -241,8 +240,24 @@ const App = () => {
         if (Array.isArray(systemData.system) && !systemData.system.tops) {
             addItems(systemData.system);
         }
+        html += `</ul>`;
 
-        html += `</ul><p><b>Total MSRP:</b> $${systemData.total.toLocaleString()}</p><hr>`;
+        html += `<h4>System Estimates:</h4>`;
+        html += `<p><b>Total MSRP:</b> $${systemData.total.toLocaleString()}</p>`;
+        
+        if (systemData.spl) {
+            html += `<p><b>Est. Sustained SPL:</b> ~${systemData.spl} dB</p>`;
+        }
+        if (systemData.lowest_freq && systemData.lowest_freq !== 'N/A') {
+            html += `<p><b>Est. Low End Extension:</b> ~${systemData.lowest_freq} Hz</p>`;
+        }
+        if (systemData.amperage) {
+            html += `<p><b>Est. Amperage:</b> ${systemData.amperage.toFixed(1)}A @ 120V</p>`;
+        }
+        if (systemData.volume) {
+            html += `<p><b>Est. Total Volume:</b> ${systemData.volume.toFixed(1)} ft³</p>`;
+        }
+        html += `<hr>`;
         return html;
     };
 
