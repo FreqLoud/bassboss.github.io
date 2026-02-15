@@ -137,7 +137,7 @@ const App = () => {
   const [catalog, setCatalog] = React.useState(null);
   const [step, setStep] = React.useState(0);
   const [answers, setAnswers] = React.useState({
-    wantsColumn: null,
+    quoteMode: null,  // 'levels' or 'compare'
     genre: null,
     crowdSize: null,
     boothMonitors: null,
@@ -262,6 +262,34 @@ const App = () => {
       }
     });
 
+    // In "levels" mode, beef up Destroys: double the subs, upgrade tops if possible
+    if (answers.quoteMode === 'levels' && tiers.destroys?.system && !tiers.destroys?.isPreset) {
+      const destroysSystem = { ...tiers.destroys.system };
+      
+      // Double the subs
+      if (destroysSystem.subs) {
+        destroysSystem.subs = [...destroysSystem.subs, ...destroysSystem.subs];
+      }
+      
+      // Upgrade tops to next size if available
+      const topUpgrades = {
+        'SV9-MK3': 'DiaMon-MK3',
+        'DiaMon-MK3': 'DV12-MK3',
+        'DV12-MK3': 'AT212-MK3',
+        'AT212-MK3': 'AT312-MK3',
+        'AT312-MK3': 'MFLA-MK3'
+      };
+      
+      if (destroysSystem.tops) {
+        destroysSystem.tops = destroysSystem.tops.map(top => topUpgrades[top] || top);
+      }
+      
+      tiers.destroys = {
+        system: destroysSystem,
+        stats: calculateSystemStats(destroysSystem)
+      };
+    }
+
     // Ensure tiers are ordered by price (Bangs < Knocks < Destroys)
     const tierPrices = {
       bangs: tiers.bangs?.stats?.totalPrice || 0,
@@ -299,11 +327,11 @@ const App = () => {
     let nextStepNum = step + 1;
     
     // Skip booth subs question (step 3) if not needed
-    if (nextStepNum === 3 && !(answers.boothMonitors && answers.genre !== 'less')) {
-      nextStepNum = 4;
+    if (nextStepNum === 4 && !(answers.boothMonitors && answers.genre !== 'less')) {
+      nextStepNum = 5;
     }
     
-    if (nextStepNum === 5) {
+    if (nextStepNum === 6) {
       // Generate recommendation before showing results
       setRecommendation(generateRecommendation());
     }
@@ -314,8 +342,8 @@ const App = () => {
     let prevStepNum = step - 1;
     
     // Skip booth subs question (step 3) going back if not needed
-    if (prevStepNum === 3 && !(answers.boothMonitors && answers.genre !== 'less')) {
-      prevStepNum = 2;
+    if (prevStepNum === 4 && !(answers.boothMonitors && answers.genre !== 'less')) {
+      prevStepNum = 3;
     }
     
     setStep(Math.max(0, prevStepNum));
@@ -342,12 +370,12 @@ const App = () => {
     <div className="w-full max-w-2xl mx-auto mb-8">
       <div className="flex justify-between text-sm text-gray-400 mb-2">
         <span>Build Your System</span>
-        <span>{Math.min(step + 1, 5)} of 5</span>
+        <span>{Math.min(step + 1, 6)} of 6</span>
       </div>
       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
         <div 
           className="h-full bg-bb-orange transition-all duration-500 ease-out"
-          style={{ width: `${Math.min((step + 1) / 5 * 100, 100)}%` }}
+          style={{ width: `${Math.min((step + 1) / 6 * 100, 100)}%` }}
         />
       </div>
     </div>
@@ -386,7 +414,33 @@ const App = () => {
 
   const renderStep = () => {
     switch (step) {
-      case 0: // Genre
+      case 0: // Quote mode
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-2">What kind of quote do you want?</h2>
+              <p className="text-gray-400">Choose how you'd like to see your options</p>
+            </div>
+            <div className="grid gap-4 max-w-xl mx-auto">
+              <OptionCard
+                selected={answers.quoteMode === 'levels'}
+                onClick={() => handleSelect('quoteMode', 'levels')}
+                icon="🚀"
+                title="Show Me Levels"
+                subtitle="Good → Better → Best with wide price range. Dream big!"
+              />
+              <OptionCard
+                selected={answers.quoteMode === 'compare'}
+                onClick={() => handleSelect('quoteMode', 'compare')}
+                icon="🎯"
+                title="Compare Similar"
+                subtitle="Three systems at similar budgets, different approaches"
+              />
+            </div>
+          </div>
+        );
+
+      case 1: // Genre
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -408,7 +462,7 @@ const App = () => {
           </div>
         );
 
-      case 1: // Crowd size
+      case 2: // Crowd size
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -429,7 +483,7 @@ const App = () => {
           </div>
         );
 
-      case 2: // Booth monitors
+      case 3: // Booth monitors
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -455,7 +509,7 @@ const App = () => {
           </div>
         );
 
-      case 3: // Booth subs (conditional)
+      case 4: // Booth subs (conditional)
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -481,7 +535,7 @@ const App = () => {
           </div>
         );
 
-      case 4: // Transport
+      case 5: // Transport
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -502,7 +556,7 @@ const App = () => {
           </div>
         );
 
-      case 5: // Results
+      case 6: // Results
         return renderResults();
 
       default:
@@ -846,11 +900,12 @@ const App = () => {
 
   const canProceed = () => {
     switch (step) {
-      case 0: return answers.genre !== null;
-      case 1: return answers.crowdSize !== null;
-      case 2: return answers.boothMonitors !== null;
-      case 3: return !shouldShowBoothSubs || answers.boothSubs !== null;
-      case 4: return answers.transport !== null;
+      case 0: return answers.quoteMode !== null;
+      case 1: return answers.genre !== null;
+      case 2: return answers.crowdSize !== null;
+      case 3: return answers.boothMonitors !== null;
+      case 4: return !shouldShowBoothSubs || answers.boothSubs !== null;
+      case 5: return answers.transport !== null;
       default: return true;
     }
   };
@@ -867,13 +922,13 @@ const App = () => {
         <p className="text-gray-500 text-sm">System Builder</p>
       </div>
 
-      {step < 5 && renderProgress()}
+      {step < 6 && renderProgress()}
 
       <div className="max-w-4xl mx-auto">
         {renderStep()}
 
         {/* Navigation */}
-        {step < 5 && (
+        {step < 6 && (
           <div className="flex justify-between max-w-xl mx-auto mt-8">
             <button
               onClick={prevStep}
@@ -895,7 +950,7 @@ const App = () => {
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {step === 4 ? 'Show My Systems →' : 'Next →'}
+              {step === 5 ? 'Show My Systems →' : 'Next →'}
             </button>
           </div>
         )}
