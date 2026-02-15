@@ -610,7 +610,7 @@ const App = () => {
               <ul className="space-y-1">
                 {tops.map((item, i) => (
                   <li key={i} className="flex justify-between text-gray-700">
-                    <span>{item.quantity}× {item.name}</span>
+                    <span>{item.quantity}× {item.name} <span className="text-xs text-gray-400 font-normal">{item.shortDesc}</span></span>
                     <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
                   </li>
                 ))}
@@ -624,7 +624,7 @@ const App = () => {
               <ul className="space-y-1">
                 {subs.map((item, i) => (
                   <li key={i} className="flex justify-between text-gray-700">
-                    <span>{item.quantity}× {item.name}</span>
+                    <span>{item.quantity}× {item.name} <span className="text-xs text-gray-400 font-normal">{item.shortDesc}</span></span>
                     <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
                   </li>
                 ))}
@@ -638,7 +638,7 @@ const App = () => {
               <ul className="space-y-1">
                 {columns.map((item, i) => (
                   <li key={i} className="flex justify-between text-gray-700">
-                    <span>{item.quantity}× {item.name}</span>
+                    <span>{item.quantity}× {item.name} <span className="text-xs text-gray-400 font-normal">{item.shortDesc}</span></span>
                     <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
                   </li>
                 ))}
@@ -764,7 +764,7 @@ const App = () => {
               <ul className="space-y-2">
                 {boothRec.stats.items.map((item, i) => (
                   <li key={i} className="flex justify-between">
-                    <span>{item.quantity}× {item.name}</span>
+                    <span>{item.quantity}× {item.name} <span className="text-xs text-gray-400 font-normal">{item.shortDesc}</span></span>
                     <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
                   </li>
                 ))}

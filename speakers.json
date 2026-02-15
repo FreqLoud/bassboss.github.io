@@ -10,8 +10,13 @@
       "dispersion": "90x60",
       "amperage": 1.4,
       "dimensions": "18 x 10 x 15",
-      "subCapacity": { "single": 1, "double": 1, "note": "Balanced 1:1 ratio" },
-      "description": "Compact powerhouse for mobile DJs"
+      "subCapacity": {
+        "single": 1,
+        "double": 1,
+        "note": "Balanced 1:1 ratio"
+      },
+      "description": "Compact powerhouse for mobile DJs",
+      "shortDesc": "Single 9\" powered top"
     },
     {
       "id": "DiaMon-MK3",
@@ -23,8 +28,13 @@
       "dispersion": "90x90",
       "amperage": 1.4,
       "dimensions": "14 x 14 x 11",
-      "subCapacity": { "single": 4, "double": 3, "note": "+3 single or +2 double driver subs beyond your system" },
-      "description": "Compact coaxial with massive sub headroom"
+      "subCapacity": {
+        "single": 4,
+        "double": 3,
+        "note": "+3 single or +2 double driver subs beyond your system"
+      },
+      "description": "Compact coaxial with massive sub headroom",
+      "shortDesc": "Single 12\" coaxial top"
     },
     {
       "id": "DV12-MK3",
@@ -36,8 +46,13 @@
       "dispersion": "120x20",
       "amperage": 4.6,
       "dimensions": "24.6 x 14.5 x 19.1",
-      "subCapacity": { "single": 4, "double": 3, "note": "+3 single or +2 double driver subs beyond your system" },
-      "description": "Wide coverage for medium venues"
+      "subCapacity": {
+        "single": 4,
+        "double": 3,
+        "note": "+3 single or +2 double driver subs beyond your system"
+      },
+      "description": "Wide coverage for medium venues",
+      "shortDesc": "Single 12\" powered top"
     },
     {
       "id": "CCM12-MK3",
@@ -48,8 +63,13 @@
       "topClass": "singleDriver",
       "amperage": 1.4,
       "dimensions": "14 x 14 x 11",
-      "subCapacity": { "single": 4, "double": 3, "note": "+3 single or +2 double driver subs beyond your system" },
-      "description": "Coaxial stage/booth monitor"
+      "subCapacity": {
+        "single": 4,
+        "double": 3,
+        "note": "+3 single or +2 double driver subs beyond your system"
+      },
+      "description": "Coaxial stage/booth monitor",
+      "shortDesc": "Single 12\" coaxial monitor"
     },
     {
       "id": "AT212-MK3",
@@ -61,8 +81,13 @@
       "dispersion": "80x60",
       "amperage": 4.6,
       "dimensions": "47.8 x 14.3 x 17.8",
-      "subCapacity": { "single": 6, "double": 3, "note": "6 single or 3 double driver subs per unit" },
-      "description": "Mid-size workhorse"
+      "subCapacity": {
+        "single": 6,
+        "double": 3,
+        "note": "6 single or 3 double driver subs per unit"
+      },
+      "description": "Mid-size workhorse",
+      "shortDesc": "Dual 12\" powered top"
     },
     {
       "id": "AT312-MK3",
@@ -74,8 +99,13 @@
       "dispersion": "80x80",
       "amperage": 5.4,
       "dimensions": "48 x 16 x 20",
-      "subCapacity": { "single": 8, "double": 4, "note": "8 single or 4 double driver subs per unit" },
-      "description": "Extended throw for large venues"
+      "subCapacity": {
+        "single": 8,
+        "double": 4,
+        "note": "8 single or 4 double driver subs per unit"
+      },
+      "description": "Extended throw for large venues",
+      "shortDesc": "Triple 12\" powered top"
     },
     {
       "id": "MFLA-MK3",
@@ -87,8 +117,13 @@
       "dispersion": "120x10",
       "amperage": 4.6,
       "dimensions": "16.1 x 40.5 x 20.4",
-      "subCapacity": { "single": 10, "double": 6, "note": "10 single or 6 double driver subs per unit" },
-      "description": "Modular line array element"
+      "subCapacity": {
+        "single": 10,
+        "double": 6,
+        "note": "10 single or 6 double driver subs per unit"
+      },
+      "description": "Modular line array element",
+      "shortDesc": "Line array element"
     },
     {
       "id": "Krakatoa-MK3",
@@ -100,8 +135,13 @@
       "dispersion": "N/A",
       "amperage": 15,
       "dimensions": "48 x 48 x 24",
-      "subCapacity": { "single": 24, "double": 12, "note": "We have no freq'ing idea. 12 double 18\" subs per unit would not be impossible." },
-      "description": "Festival flagship top"
+      "subCapacity": {
+        "single": 24,
+        "double": 12,
+        "note": "We have no freq'ing idea. 12 double 18\" subs per unit would not be impossible."
+      },
+      "description": "Festival flagship top",
+      "shortDesc": "Festival point source"
     }
   ],
   "subs": [
@@ -116,7 +156,8 @@
       "lowestFreq": 40,
       "amperage": 4.6,
       "dimensions": "20.5 x 17 x 24",
-      "description": "Compact single 15\""
+      "description": "Compact single 15\"",
+      "shortDesc": "Single 15\" sub"
     },
     {
       "id": "DJ18S-MK3",
@@ -129,7 +170,8 @@
       "lowestFreq": 35,
       "amperage": 4.6,
       "dimensions": "27.5 x 20.5 x 29.5",
-      "description": "Deep single 18\""
+      "description": "Deep single 18\"",
+      "shortDesc": "Single 18\" sub"
     },
     {
       "id": "SSP118-MK3",
@@ -142,7 +184,8 @@
       "lowestFreq": 38,
       "amperage": 4.6,
       "dimensions": "22.5 x 30 x 24",
-      "description": "Efficient single 18\""
+      "description": "Efficient single 18\"",
+      "shortDesc": "Single 18\" sub"
     },
     {
       "id": "SSP215-MK3",
@@ -153,9 +196,10 @@
       "sizeClass": "medium",
       "driverClass": "double",
       "lowestFreq": 38,
-      "amperage": 6.0,
+      "amperage": 6,
       "dimensions": "22 x 36 x 24",
-      "description": "Dual 15\" — 2× output"
+      "description": "Dual 15\" — 2× output",
+      "shortDesc": "Dual 15\" sub"
     },
     {
       "id": "VS21-MK3",
@@ -168,7 +212,8 @@
       "lowestFreq": 32,
       "amperage": 4.6,
       "dimensions": "36 x 24 x 36",
-      "description": "Deep single 21\""
+      "description": "Deep single 21\"",
+      "shortDesc": "Single 21\" sub"
     },
     {
       "id": "SSP218-MK3",
@@ -181,7 +226,8 @@
       "lowestFreq": 35,
       "amperage": 9,
       "dimensions": "22.5 x 48 x 29.5",
-      "description": "Dual 18\" — 2× output"
+      "description": "Dual 18\" — 2× output",
+      "shortDesc": "Dual 18\" sub"
     },
     {
       "id": "ZV28-MK3",
@@ -194,7 +240,8 @@
       "lowestFreq": 28,
       "amperage": 9,
       "dimensions": "22.5 x 42 x 42",
-      "description": "Dual 18\" infrasonic — 2× output"
+      "description": "Dual 18\" infrasonic — 2× output",
+      "shortDesc": "Dual 18\" infra sub"
     },
     {
       "id": "Makara-MK3",
@@ -207,7 +254,8 @@
       "lowestFreq": 28,
       "amperage": 9,
       "dimensions": "28.5 x 45 x 45",
-      "description": "Dual 21\" — 2× output"
+      "description": "Dual 21\" — 2× output",
+      "shortDesc": "Dual 21\" sub"
     },
     {
       "id": "Kraken-MK3",
@@ -220,7 +268,8 @@
       "lowestFreq": 25,
       "amperage": 18,
       "dimensions": "45 x 45 x 45",
-      "description": "Quad 21\" — 4× output"
+      "description": "Quad 21\" — 4× output",
+      "shortDesc": "Quad 21\" sub"
     }
   ],
   "columns": [
@@ -231,11 +280,16 @@
       "type": "column",
       "sizeClass": "medium",
       "builtInSub": "18\"",
-      "amperage": 8.0,
+      "amperage": 8,
       "dimensions": "18 x 18 x 108",
       "height": "9 ft",
-      "subCapacity": { "single": 6, "double": 3, "note": "6 single or 3 double driver subs per unit" },
-      "description": "The Column Crusher - full-range with built-in 18\" sub"
+      "subCapacity": {
+        "single": 6,
+        "double": 3,
+        "note": "6 single or 3 double driver subs per unit"
+      },
+      "description": "The Column Crusher - full-range with built-in 18\" sub",
+      "shortDesc": "Column system w/ 18\" sub"
     }
   ],
   "systems": [
@@ -244,26 +298,126 @@
       "name": "Stackatoa",
       "price": 42985,
       "type": "system",
-      "components": ["Krakatoa-MK3", "Makara-MK3", "Kraken-MK3"],
+      "components": [
+        "Krakatoa-MK3",
+        "Makara-MK3",
+        "Kraken-MK3"
+      ],
       "description": "Ultimate festival stack"
     }
   ],
   "accessories": {
     "carts": [
-      { "id": "BB-CART-SSP118-H", "name": "SSP118 Cart", "price": 295, "forProducts": ["SSP118-MK3"], "description": "Horizontal transport cart" },
-      { "id": "BB-CART-VS21-V", "name": "VS21 Cart (Vertical)", "price": 295, "forProducts": ["VS21-MK3"], "description": "Vertical transport cart" },
-      { "id": "BB-CART-VS21-H", "name": "VS21 Cart (Horizontal)", "price": 395, "forProducts": ["VS21-MK3"], "description": "Horizontal transport cart" },
-      { "id": "BB-CART-SSP218-H", "name": "SSP218 Cart", "price": 395, "forProducts": ["SSP218-MK3"], "description": "Horizontal transport cart" },
-      { "id": "BB-CART-ZV28-V", "name": "ZV28 Cart (Vertical)", "price": 295, "forProducts": ["ZV28-MK3"], "description": "Vertical transport cart" },
-      { "id": "BB-CART-ZV28-H", "name": "ZV28 Cart (Horizontal)", "price": 395, "forProducts": ["ZV28-MK3"], "description": "Horizontal transport cart" },
-      { "id": "BB-CART-MAKARA-V", "name": "Makara Cart", "price": 395, "forProducts": ["Makara-MK3"], "description": "Vertical transport cart" },
-      { "id": "BB-CART-KRKN-H", "name": "Kraken Cart", "price": 395, "forProducts": ["Kraken-MK3"], "description": "Horizontal transport cart" }
+      {
+        "id": "BB-CART-SSP118-H",
+        "name": "SSP118 Cart",
+        "price": 295,
+        "forProducts": [
+          "SSP118-MK3"
+        ],
+        "description": "Horizontal transport cart"
+      },
+      {
+        "id": "BB-CART-VS21-V",
+        "name": "VS21 Cart (Vertical)",
+        "price": 295,
+        "forProducts": [
+          "VS21-MK3"
+        ],
+        "description": "Vertical transport cart"
+      },
+      {
+        "id": "BB-CART-VS21-H",
+        "name": "VS21 Cart (Horizontal)",
+        "price": 395,
+        "forProducts": [
+          "VS21-MK3"
+        ],
+        "description": "Horizontal transport cart"
+      },
+      {
+        "id": "BB-CART-SSP218-H",
+        "name": "SSP218 Cart",
+        "price": 395,
+        "forProducts": [
+          "SSP218-MK3"
+        ],
+        "description": "Horizontal transport cart"
+      },
+      {
+        "id": "BB-CART-ZV28-V",
+        "name": "ZV28 Cart (Vertical)",
+        "price": 295,
+        "forProducts": [
+          "ZV28-MK3"
+        ],
+        "description": "Vertical transport cart"
+      },
+      {
+        "id": "BB-CART-ZV28-H",
+        "name": "ZV28 Cart (Horizontal)",
+        "price": 395,
+        "forProducts": [
+          "ZV28-MK3"
+        ],
+        "description": "Horizontal transport cart"
+      },
+      {
+        "id": "BB-CART-MAKARA-V",
+        "name": "Makara Cart",
+        "price": 395,
+        "forProducts": [
+          "Makara-MK3"
+        ],
+        "description": "Vertical transport cart"
+      },
+      {
+        "id": "BB-CART-KRKN-H",
+        "name": "Kraken Cart",
+        "price": 395,
+        "forProducts": [
+          "Kraken-MK3"
+        ],
+        "description": "Horizontal transport cart"
+      }
     ],
     "stands": [
-      { "id": "BB-PSA-SB-DV12", "name": "DV12 Speaker Bracket", "price": 225, "forProducts": ["DV12-MK3"], "description": "Mounting bracket" },
-      { "id": "BB-PSA-VSLA", "name": "Line Array Stand", "price": 745, "forProducts": ["MFLA-MK3"], "description": "Vertical stand adapter" },
-      { "id": "BB-CART-MFLA-GT", "name": "MFLA Ground Transport", "price": 1895, "forProducts": ["MFLA-MK3"], "description": "Ground transport system" },
-      { "id": "BB-PSA-RMFLA", "name": "MFLA Rigging Frame", "price": 1995, "forProducts": ["MFLA-MK3"], "description": "Rigging frame for flying" }
+      {
+        "id": "BB-PSA-SB-DV12",
+        "name": "DV12 Speaker Bracket",
+        "price": 225,
+        "forProducts": [
+          "DV12-MK3"
+        ],
+        "description": "Mounting bracket"
+      },
+      {
+        "id": "BB-PSA-VSLA",
+        "name": "Line Array Stand",
+        "price": 745,
+        "forProducts": [
+          "MFLA-MK3"
+        ],
+        "description": "Vertical stand adapter"
+      },
+      {
+        "id": "BB-CART-MFLA-GT",
+        "name": "MFLA Ground Transport",
+        "price": 1895,
+        "forProducts": [
+          "MFLA-MK3"
+        ],
+        "description": "Ground transport system"
+      },
+      {
+        "id": "BB-PSA-RMFLA",
+        "name": "MFLA Rigging Frame",
+        "price": 1995,
+        "forProducts": [
+          "MFLA-MK3"
+        ],
+        "description": "Rigging frame for flying"
+      }
     ]
   },
   "meta": {
