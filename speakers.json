@@ -100,7 +100,7 @@
       "dispersion": "N/A",
       "amperage": 15,
       "dimensions": "48 x 48 x 24",
-      "subCapacity": { "single": 16, "double": 8, "note": "Festival-scale capacity" },
+      "subCapacity": { "single": 24, "double": 12, "note": "We have no freq'ing idea. 12 double 18\" subs per unit would not be impossible." },
       "description": "Festival flagship top"
     }
   ],
@@ -234,6 +234,7 @@
       "amperage": 8.0,
       "dimensions": "18 x 18 x 108",
       "height": "9 ft",
+      "subCapacity": { "single": 6, "double": 3, "note": "6 single or 3 double driver subs per unit" },
       "description": "The Column Crusher - full-range with built-in 18\" sub"
     }
   ],
