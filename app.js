@@ -1017,6 +1017,12 @@ const App = () => {
           className="h-10 mx-auto mb-2"
         />
         <p className="text-gray-500 text-sm">System Builder</p>
+        <a 
+          href="v3.html" 
+          className="inline-block mt-2 text-xs text-bb-orange hover:underline"
+        >
+          🔧 Already know what you want? Try the Product Builder →
+        </a>
       </div>
 
       {step < 6 && renderProgress()}
