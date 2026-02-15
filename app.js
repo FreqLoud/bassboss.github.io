@@ -186,6 +186,15 @@ const App = () => {
     return all.find(a => a.id === id);
   };
 
+  const getRandomFact = (category = null) => {
+    if (!catalog?.facts) return null;
+    const facts = category 
+      ? catalog.facts.filter(f => f.category === category)
+      : catalog.facts;
+    if (facts.length === 0) return null;
+    return facts[Math.floor(Math.random() * facts.length)];
+  };
+
   const calculateVolume = (dimensions) => {
     if (!dimensions) return 0;
     const parts = dimensions.split('x').map(d => parseFloat(d.trim()));
@@ -607,11 +616,26 @@ const App = () => {
           {tops.length > 0 && (
             <div className="mb-4">
               <h4 className="text-sm font-semibold text-gray-500 uppercase mb-2">Tops</h4>
-              <ul className="space-y-1">
+              <ul className="space-y-2">
                 {tops.map((item, i) => (
-                  <li key={i} className="flex justify-between text-gray-700">
-                    <span>{item.quantity}× {item.name} <span className="text-xs text-gray-400 font-normal">{item.shortDesc}</span></span>
-                    <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
+                  <li key={i} className="bg-gray-50 rounded-lg p-3">
+                    <div className="flex justify-between text-gray-700">
+                      <span className="font-medium">{item.quantity}× {item.name}</span>
+                      <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
+                    </div>
+                    {item.specs && (
+                      <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                        <span>📊 {item.specs.splContinuous}</span>
+                        <span>🎵 {item.specs.frequency}</span>
+                        <span>⚖️ {item.specs.weight}</span>
+                      </div>
+                    )}
+                    {item.url && (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" 
+                         className="text-xs text-bb-orange hover:underline mt-1 inline-block">
+                        Learn more →
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -621,11 +645,26 @@ const App = () => {
           {subs.length > 0 && (
             <div className="mb-4">
               <h4 className="text-sm font-semibold text-gray-500 uppercase mb-2">Subwoofers</h4>
-              <ul className="space-y-1">
+              <ul className="space-y-2">
                 {subs.map((item, i) => (
-                  <li key={i} className="flex justify-between text-gray-700">
-                    <span>{item.quantity}× {item.name} <span className="text-xs text-gray-400 font-normal">{item.shortDesc}</span></span>
-                    <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
+                  <li key={i} className="bg-gray-50 rounded-lg p-3">
+                    <div className="flex justify-between text-gray-700">
+                      <span className="font-medium">{item.quantity}× {item.name}</span>
+                      <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
+                    </div>
+                    {item.specs && (
+                      <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                        <span>📊 {item.specs.splContinuous}</span>
+                        <span>🎵 {item.specs.frequency}</span>
+                        <span>⚖️ {item.specs.weight}</span>
+                      </div>
+                    )}
+                    {item.url && (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" 
+                         className="text-xs text-bb-orange hover:underline mt-1 inline-block">
+                        Learn more →
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -635,11 +674,26 @@ const App = () => {
           {columns.length > 0 && (
             <div className="mb-4">
               <h4 className="text-sm font-semibold text-gray-500 uppercase mb-2">Columns</h4>
-              <ul className="space-y-1">
+              <ul className="space-y-2">
                 {columns.map((item, i) => (
-                  <li key={i} className="flex justify-between text-gray-700">
-                    <span>{item.quantity}× {item.name} <span className="text-xs text-gray-400 font-normal">{item.shortDesc}</span></span>
-                    <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
+                  <li key={i} className="bg-gray-50 rounded-lg p-3">
+                    <div className="flex justify-between text-gray-700">
+                      <span className="font-medium">{item.quantity}× {item.name}</span>
+                      <span className="text-gray-500">${(item.price * item.quantity).toLocaleString()}</span>
+                    </div>
+                    {item.specs && (
+                      <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                        <span>📊 {item.specs.splContinuous}</span>
+                        <span>🎵 {item.specs.frequency}</span>
+                        <span>⚖️ {item.specs.weight}</span>
+                      </div>
+                    )}
+                    {item.url && (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" 
+                         className="text-xs text-bb-orange hover:underline mt-1 inline-block">
+                        Learn more →
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -811,6 +865,32 @@ const App = () => {
                 </p>
                 <p className="text-sm text-amber-700 font-semibold mt-3">
                   💡 Start with what you need today, and add more subs when you're ready to level up!
+                </p>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Did You Know? Section */}
+        {(() => {
+          const fact = getRandomFact();
+          if (!fact) return null;
+          
+          const categoryEmoji = {
+            tech: '🔧',
+            sub: '🔊',
+            top: '🔈',
+            system: '📦'
+          };
+          
+          return (
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl p-6 shadow-lg text-white">
+                <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  {categoryEmoji[fact.category] || '💡'} Did You Know?
+                </h3>
+                <p className="text-gray-200">
+                  {fact.text}
                 </p>
               </div>
             </div>

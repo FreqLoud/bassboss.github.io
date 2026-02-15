@@ -10,6 +10,12 @@
       "dispersion": "90x60",
       "amperage": 1.4,
       "dimensions": "18 x 10 x 15",
+      "url": "https://bassboss.com/sv9",
+      "specs": {
+        "frequency": "50 – 19,000Hz",
+        "splContinuous": "118 dB",
+        "weight": "27.5 lbs (12.8 kg)"
+      },
       "subCapacity": {
         "single": 1,
         "double": 1,
@@ -28,6 +34,12 @@
       "dispersion": "90x90",
       "amperage": 1.4,
       "dimensions": "14 x 14 x 11",
+      "url": "https://bassboss.com/diamon",
+      "specs": {
+        "frequency": "50Hz – 19kHz",
+        "splContinuous": "123 dB",
+        "weight": "30 lbs (13.5 kg)"
+      },
       "subCapacity": {
         "single": 4,
         "double": 3,
@@ -46,6 +58,12 @@
       "dispersion": "120x20",
       "amperage": 4.6,
       "dimensions": "24.6 x 14.5 x 19.1",
+      "url": "https://bassboss.com/dv12",
+      "specs": {
+        "frequency": "45 – 19,000Hz",
+        "splContinuous": "128 dB",
+        "weight": "63 lbs (28 kg)"
+      },
       "subCapacity": {
         "single": 4,
         "double": 3,
@@ -63,6 +81,12 @@
       "topClass": "singleDriver",
       "amperage": 1.4,
       "dimensions": "14 x 14 x 11",
+      "url": "https://bassboss.com/ccm12",
+      "specs": {
+        "frequency": "50Hz – 19kHz",
+        "splContinuous": "123 dB",
+        "weight": "30 lbs (13.5 kg)"
+      },
       "subCapacity": {
         "single": 4,
         "double": 3,
@@ -81,6 +105,12 @@
       "dispersion": "80x60",
       "amperage": 4.6,
       "dimensions": "47.8 x 14.3 x 17.8",
+      "url": "https://bassboss.com/at212",
+      "specs": {
+        "frequency": "50 – 18,000Hz",
+        "splContinuous": "136 dB",
+        "weight": "99 lbs (45 kg)"
+      },
       "subCapacity": {
         "single": 6,
         "double": 3,
@@ -99,6 +129,12 @@
       "dispersion": "80x80",
       "amperage": 5.4,
       "dimensions": "48 x 16 x 20",
+      "url": "https://bassboss.com/at312",
+      "specs": {
+        "frequency": "60 – 19,000Hz",
+        "splContinuous": "133 dB",
+        "weight": "126 lbs (57 kg)"
+      },
       "subCapacity": {
         "single": 8,
         "double": 4,
@@ -117,6 +153,12 @@
       "dispersion": "120x10",
       "amperage": 4.6,
       "dimensions": "16.1 x 40.5 x 20.4",
+      "url": "https://bassboss.com/mfla",
+      "specs": {
+        "frequency": "60 – 18,000Hz",
+        "splContinuous": "136 dB",
+        "weight": "104 lbs (47 kg)"
+      },
       "subCapacity": {
         "single": 10,
         "double": 6,
@@ -135,6 +177,12 @@
       "dispersion": "N/A",
       "amperage": 15,
       "dimensions": "48 x 48 x 24",
+      "url": "https://bassboss.com/krakatoa",
+      "specs": {
+        "frequency": "25 – 19,000Hz",
+        "splContinuous": "142 dB",
+        "weight": "470 lbs (213 kg)"
+      },
       "subCapacity": {
         "single": 24,
         "double": 12,
@@ -156,6 +204,12 @@
       "lowestFreq": 40,
       "amperage": 4.6,
       "dimensions": "20.5 x 17 x 24",
+      "url": "https://bassboss.com/bb15",
+      "specs": {
+        "frequency": "40–115Hz",
+        "splContinuous": "127 dB",
+        "weight": "72 lbs (32 kg)"
+      },
       "description": "Compact single 15\"",
       "shortDesc": "Single 15\" sub"
     },
@@ -170,6 +224,12 @@
       "lowestFreq": 35,
       "amperage": 4.6,
       "dimensions": "27.5 x 20.5 x 29.5",
+      "url": "https://bassboss.com/dj18s",
+      "specs": {
+        "frequency": "27 – 100Hz",
+        "splContinuous": "129 dB",
+        "weight": "110 lbs (50 kg)"
+      },
       "description": "Deep single 18\"",
       "shortDesc": "Single 18\" sub"
     },
@@ -184,6 +244,12 @@
       "lowestFreq": 38,
       "amperage": 4.6,
       "dimensions": "22.5 x 30 x 24",
+      "url": "https://bassboss.com/ssp118",
+      "specs": {
+        "frequency": "30 – 100Hz",
+        "splContinuous": "130 dB",
+        "weight": "125 lbs (57 kg)"
+      },
       "description": "Efficient single 18\"",
       "shortDesc": "Single 18\" sub"
     },
@@ -198,6 +264,12 @@
       "lowestFreq": 38,
       "amperage": 6,
       "dimensions": "22 x 36 x 24",
+      "url": "https://bassboss.com/ssp215",
+      "specs": {
+        "frequency": "35 – 100Hz",
+        "splContinuous": "133 dB",
+        "weight": "180 lbs (82 kg)"
+      },
       "description": "Dual 15\" — 2× output",
       "shortDesc": "Dual 15\" sub"
     },
@@ -212,6 +284,12 @@
       "lowestFreq": 32,
       "amperage": 4.6,
       "dimensions": "36 x 24 x 36",
+      "url": "https://bassboss.com/vs21",
+      "specs": {
+        "frequency": "28 – 100Hz",
+        "splContinuous": "135 dB",
+        "weight": "180 lbs (82 kg)"
+      },
       "description": "Deep single 21\"",
       "shortDesc": "Single 21\" sub"
     },
@@ -226,6 +304,12 @@
       "lowestFreq": 35,
       "amperage": 9,
       "dimensions": "22.5 x 48 x 29.5",
+      "url": "https://bassboss.com/ssp218",
+      "specs": {
+        "frequency": "30 – 100Hz",
+        "splContinuous": "136 dB",
+        "weight": "199 lbs (90 kg)"
+      },
       "description": "Dual 18\" — 2× output",
       "shortDesc": "Dual 18\" sub"
     },
@@ -240,6 +324,12 @@
       "lowestFreq": 28,
       "amperage": 9,
       "dimensions": "22.5 x 42 x 42",
+      "url": "https://bassboss.com/zv28",
+      "specs": {
+        "frequency": "23 – 90Hz",
+        "splContinuous": "134 dB",
+        "weight": "235 lbs (106.5 kg)"
+      },
       "description": "Dual 18\" infrasonic — 2× output",
       "shortDesc": "Dual 18\" infra sub"
     },
@@ -254,6 +344,12 @@
       "lowestFreq": 28,
       "amperage": 9,
       "dimensions": "28.5 x 45 x 45",
+      "url": "https://bassboss.com/makara",
+      "specs": {
+        "frequency": "23 – 100Hz",
+        "splContinuous": "140 dB",
+        "weight": "294 lbs (133 kg)"
+      },
       "description": "Dual 21\" — 2× output",
       "shortDesc": "Dual 21\" sub"
     },
@@ -268,6 +364,12 @@
       "lowestFreq": 25,
       "amperage": 18,
       "dimensions": "45 x 45 x 45",
+      "url": "https://bassboss.com/kraken",
+      "specs": {
+        "frequency": "27 – 100Hz",
+        "splContinuous": "145 dB",
+        "weight": "460 lbs (209 kg)"
+      },
       "description": "Quad 21\" — 4× output",
       "shortDesc": "Quad 21\" sub"
     }
@@ -283,6 +385,12 @@
       "amperage": 8,
       "dimensions": "18 x 18 x 108",
       "height": "9 ft",
+      "url": "https://bassboss.com/sublim8",
+      "specs": {
+        "frequency": "35Hz – 19,000Hz",
+        "splContinuous": "130 dB",
+        "weight": "200 lbs (90.7 kg)"
+      },
       "subCapacity": {
         "single": 6,
         "double": 3,
@@ -312,72 +420,56 @@
         "id": "BB-CART-SSP118-H",
         "name": "SSP118 Cart",
         "price": 295,
-        "forProducts": [
-          "SSP118-MK3"
-        ],
+        "forProducts": ["SSP118-MK3"],
         "description": "Horizontal transport cart"
       },
       {
         "id": "BB-CART-VS21-V",
         "name": "VS21 Cart (Vertical)",
         "price": 295,
-        "forProducts": [
-          "VS21-MK3"
-        ],
+        "forProducts": ["VS21-MK3"],
         "description": "Vertical transport cart"
       },
       {
         "id": "BB-CART-VS21-H",
         "name": "VS21 Cart (Horizontal)",
         "price": 395,
-        "forProducts": [
-          "VS21-MK3"
-        ],
+        "forProducts": ["VS21-MK3"],
         "description": "Horizontal transport cart"
       },
       {
         "id": "BB-CART-SSP218-H",
         "name": "SSP218 Cart",
         "price": 395,
-        "forProducts": [
-          "SSP218-MK3"
-        ],
+        "forProducts": ["SSP218-MK3"],
         "description": "Horizontal transport cart"
       },
       {
         "id": "BB-CART-ZV28-V",
         "name": "ZV28 Cart (Vertical)",
         "price": 295,
-        "forProducts": [
-          "ZV28-MK3"
-        ],
+        "forProducts": ["ZV28-MK3"],
         "description": "Vertical transport cart"
       },
       {
         "id": "BB-CART-ZV28-H",
         "name": "ZV28 Cart (Horizontal)",
         "price": 395,
-        "forProducts": [
-          "ZV28-MK3"
-        ],
+        "forProducts": ["ZV28-MK3"],
         "description": "Horizontal transport cart"
       },
       {
         "id": "BB-CART-MAKARA-V",
         "name": "Makara Cart",
         "price": 395,
-        "forProducts": [
-          "Makara-MK3"
-        ],
+        "forProducts": ["Makara-MK3"],
         "description": "Vertical transport cart"
       },
       {
         "id": "BB-CART-KRKN-H",
         "name": "Kraken Cart",
         "price": 395,
-        "forProducts": [
-          "Kraken-MK3"
-        ],
+        "forProducts": ["Kraken-MK3"],
         "description": "Horizontal transport cart"
       }
     ],
@@ -386,42 +478,48 @@
         "id": "BB-PSA-SB-DV12",
         "name": "DV12 Speaker Bracket",
         "price": 225,
-        "forProducts": [
-          "DV12-MK3"
-        ],
+        "forProducts": ["DV12-MK3"],
         "description": "Mounting bracket"
       },
       {
         "id": "BB-PSA-VSLA",
         "name": "Line Array Stand",
         "price": 745,
-        "forProducts": [
-          "MFLA-MK3"
-        ],
+        "forProducts": ["MFLA-MK3"],
         "description": "Vertical stand adapter"
       },
       {
         "id": "BB-CART-MFLA-GT",
         "name": "MFLA Ground Transport",
         "price": 1895,
-        "forProducts": [
-          "MFLA-MK3"
-        ],
+        "forProducts": ["MFLA-MK3"],
         "description": "Ground transport system"
       },
       {
         "id": "BB-PSA-RMFLA",
         "name": "MFLA Rigging Frame",
         "price": 1995,
-        "forProducts": [
-          "MFLA-MK3"
-        ],
+        "forProducts": ["MFLA-MK3"],
         "description": "Rigging frame for flying"
       }
     ]
   },
+  "facts": [
+    { "category": "tech", "text": "All BASSBOSS speakers use 96kHz DSP sampling — double the resolution of most competitors." },
+    { "category": "tech", "text": "Every BASSBOSS product is phase-coherent with every other BASSBOSS product. Mix and match freely!" },
+    { "category": "tech", "text": "BASSBOSS doesn't publish peak wattage because it's misleading. Our continuous SPL ratings tell the real story." },
+    { "category": "sub", "text": "The Kraken's four 21\" drivers move more air than most PA systems combined." },
+    { "category": "sub", "text": "ZV28 reaches down to 23Hz — that's chest-thumping infrasound territory." },
+    { "category": "sub", "text": "Makara means 'sea creature' in Sanskrit — fitting for a sub that makes waves at 23Hz." },
+    { "category": "top", "text": "MFLA can be ground-stacked, pole-mounted, or flown — true modular flexibility." },
+    { "category": "top", "text": "DiaMon's coaxial design means perfect time alignment at any listening position." },
+    { "category": "top", "text": "AT312's three 12\" drivers deliver point-source clarity with line-array power." },
+    { "category": "system", "text": "Double-driver subs (SSP215, SSP218, ZV28, Makara) give you 2× the output in one box." },
+    { "category": "system", "text": "A single person can move an SV9 + DJ18S system. Start small, grow big." },
+    { "category": "system", "text": "BASSBOSS presets are designed to work together — no phase issues when mixing models." }
+  ],
   "meta": {
-    "version": "2.1",
+    "version": "2.2",
     "lastUpdated": "2026-02-15",
     "currency": "USD",
     "phaseCoherent": true,
