@@ -502,7 +502,7 @@ const App = () => {
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold">${stats.totalPrice.toLocaleString()}</div>
-              <div className="text-sm opacity-90">MSRP</div>
+              <div className="text-sm opacity-90">Retail</div>
             </div>
           </div>
         </div>
@@ -595,11 +595,44 @@ const App = () => {
     const topModel = tiers.knocks?.system?.tops?.[0];
     const topProduct = topModel ? getProduct(topModel) : null;
 
+    // Get labels for recap
+    const genreLabel = GENRES.find(g => g.id === answers.genre)?.label || answers.genre;
+    const crowdLabel = CROWD_SIZES.find(c => c.id === answers.crowdSize)?.label || answers.crowdSize;
+    const transportLabel = transport?.label || answers.transport;
+
     return (
       <div className="space-y-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">Your BASSBOSS Systems</h2>
           <p className="text-gray-400">Three tiers to match your goals and budget</p>
+        </div>
+
+        {/* Recap of choices */}
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white/10 backdrop-blur rounded-xl p-4 flex flex-wrap justify-center gap-4 text-sm">
+            <div className="flex items-center gap-2 text-white">
+              <span className="text-gray-400">Genre:</span>
+              <span className="font-semibold">{genreLabel}</span>
+            </div>
+            <div className="text-gray-600">•</div>
+            <div className="flex items-center gap-2 text-white">
+              <span className="text-gray-400">Crowd:</span>
+              <span className="font-semibold">{crowdLabel}</span>
+            </div>
+            <div className="text-gray-600">•</div>
+            <div className="flex items-center gap-2 text-white">
+              <span className="text-gray-400">Transport:</span>
+              <span className="font-semibold">{transportLabel}</span>
+            </div>
+            {answers.boothMonitors && (
+              <>
+                <div className="text-gray-600">•</div>
+                <div className="flex items-center gap-2 text-white">
+                  <span className="font-semibold">🎧 Booth Monitors</span>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Transport warning */}
