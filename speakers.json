@@ -67,7 +67,7 @@
     {
       "id": "AT312-MK3",
       "name": "AT312-MK3",
-      "price": 5995,
+      "price": 5495,
       "type": "top",
       "sizeClass": "large",
       "topClass": "arrayLarge",
@@ -93,7 +93,7 @@
     {
       "id": "Krakatoa-MK3",
       "name": "Krakatoa-MK3",
-      "price": 19995,
+      "price": 17995,
       "type": "top",
       "sizeClass": "xl",
       "topClass": "festival",
@@ -108,7 +108,7 @@
     {
       "id": "BB15-MK3",
       "name": "BB15-MK3",
-      "price": 2495,
+      "price": 2995,
       "spl": 128,
       "type": "sub",
       "sizeClass": "small",
@@ -121,7 +121,7 @@
     {
       "id": "DJ18S-MK3",
       "name": "DJ18S-MK3",
-      "price": 3595,
+      "price": 3495,
       "spl": 131,
       "type": "sub",
       "sizeClass": "small",
@@ -147,7 +147,7 @@
     {
       "id": "SSP215-MK3",
       "name": "SSP215-MK3",
-      "price": 4995,
+      "price": 5495,
       "spl": 133,
       "type": "sub",
       "sizeClass": "medium",
@@ -173,7 +173,7 @@
     {
       "id": "SSP218-MK3",
       "name": "SSP218-MK3",
-      "price": 6495,
+      "price": 5995,
       "spl": 136,
       "type": "sub",
       "sizeClass": "large",
@@ -186,7 +186,7 @@
     {
       "id": "ZV28-MK3",
       "name": "ZV28-MK3",
-      "price": 7495,
+      "price": 5995,
       "spl": 136,
       "type": "sub",
       "sizeClass": "large",
@@ -212,7 +212,7 @@
     {
       "id": "Kraken-MK3",
       "name": "Kraken-MK3",
-      "price": 14995,
+      "price": 17995,
       "spl": 144,
       "type": "sub",
       "sizeClass": "xl",
@@ -248,11 +248,31 @@
       "description": "Ultimate festival stack"
     }
   ],
+  "accessories": {
+    "carts": [
+      { "id": "BB-CART-DJ18S", "name": "DJ18S Cart", "price": 0, "forProducts": ["DJ18S-MK3"], "description": "Included with purchase" },
+      { "id": "BB-CART-SSP118-H", "name": "SSP118 Cart", "price": 295, "forProducts": ["SSP118-MK3"], "description": "Horizontal transport cart" },
+      { "id": "BB-CART-VS21-V", "name": "VS21 Cart (Vertical)", "price": 295, "forProducts": ["VS21-MK3"], "description": "Vertical transport cart" },
+      { "id": "BB-CART-VS21-H", "name": "VS21 Cart (Horizontal)", "price": 395, "forProducts": ["VS21-MK3"], "description": "Horizontal transport cart" },
+      { "id": "BB-CART-SSP218-H", "name": "SSP218 Cart", "price": 395, "forProducts": ["SSP218-MK3"], "description": "Horizontal transport cart" },
+      { "id": "BB-CART-ZV28-V", "name": "ZV28 Cart (Vertical)", "price": 295, "forProducts": ["ZV28-MK3"], "description": "Vertical transport cart" },
+      { "id": "BB-CART-ZV28-H", "name": "ZV28 Cart (Horizontal)", "price": 395, "forProducts": ["ZV28-MK3"], "description": "Horizontal transport cart" },
+      { "id": "BB-CART-MAKARA-V", "name": "Makara Cart", "price": 395, "forProducts": ["Makara-MK3"], "description": "Vertical transport cart" },
+      { "id": "BB-CART-KRKN-H", "name": "Kraken Cart", "price": 395, "forProducts": ["Kraken-MK3"], "description": "Horizontal transport cart" }
+    ],
+    "stands": [
+      { "id": "BB-PSA-SB-DV12", "name": "DV12 Speaker Bracket", "price": 225, "forProducts": ["DV12-MK3"], "description": "Mounting bracket" },
+      { "id": "BB-PSA-VSLA", "name": "Line Array Stand", "price": 745, "forProducts": ["MFLA-MK3"], "description": "Vertical stand adapter" },
+      { "id": "BB-CART-MFLA-GT", "name": "MFLA Ground Transport", "price": 1895, "forProducts": ["MFLA-MK3"], "description": "Ground transport system" },
+      { "id": "BB-PSA-RMFLA", "name": "MFLA Rigging Frame", "price": 1995, "forProducts": ["MFLA-MK3"], "description": "Rigging frame for flying" }
+    ]
+  },
   "meta": {
-    "version": "2.0",
+    "version": "2.1",
     "lastUpdated": "2026-02-15",
     "currency": "USD",
     "phaseCoherent": true,
+    "priceType": "Retail (MAP)",
     "notes": "All BASSBOSS subwoofers are designed to work together and are phase-coherent"
   }
 }
