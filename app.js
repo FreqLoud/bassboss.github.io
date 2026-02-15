@@ -319,15 +319,15 @@ const App = () => {
         w-full p-6 rounded-2xl border-2 text-left transition-all duration-200
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] cursor-pointer'}
         ${selected 
-          ? 'border-bb-orange bg-bb-orange/10 shadow-lg' 
-          : 'border-gray-200 bg-white hover:border-bb-orange/50 hover:shadow-md'}
+          ? 'border-bb-orange bg-white shadow-lg ring-2 ring-bb-orange' 
+          : 'border-gray-600 bg-white hover:border-bb-orange/50 hover:shadow-md'}
       `}
     >
       <div className="flex items-start gap-4">
         <span className="text-3xl">{icon}</span>
         <div>
           <div className="font-semibold text-lg text-gray-900">{title}</div>
-          {subtitle && <div className="text-sm text-gray-500 mt-1">{subtitle}</div>}
+          {subtitle && <div className="text-sm text-gray-600 mt-1">{subtitle}</div>}
         </div>
         {selected && (
           <div className="ml-auto">
@@ -555,10 +555,16 @@ const App = () => {
               <span className="text-gray-500">Est. Volume</span>
               <div className="font-semibold">{stats.totalVolume.toFixed(1)} ft³</div>
               <div className="text-xs text-gray-400">
-                {stats.totalVolume <= 15 ? '🚗 Fits in a car' :
-                 stats.totalVolume <= 60 ? '🚙 Fits in an SUV' :
-                 stats.totalVolume <= 200 ? '🚐 Needs a cargo van' :
-                 '🚚 Needs a truck/trailer'}
+{(() => {
+                  const hasDoubleSubs = subs.some(s => s.driverClass === 'double' || s.driverClass === 'quad');
+                  const hasQuadSubs = subs.some(s => s.driverClass === 'quad');
+                  const vol = stats.totalVolume;
+                  
+                  if (hasQuadSubs || vol > 200) return '🚚 Needs a truck/trailer';
+                  if (hasDoubleSubs || vol > 50) return '🚐 Needs a cargo van';
+                  if (vol > 15) return '🚙 Fits in an SUV';
+                  return '🚗 Fits in a car';
+                })()}
               </div>
             </div>
             <div>
@@ -658,7 +664,7 @@ const App = () => {
                 All BASSBOSS subwoofers are designed to work together and are phase-coherent — 
                 so you can mix and match models as you expand your system.
               </p>
-              <p className="text-sm text-bb-orange font-medium mt-3">
+              <p className="text-sm text-amber-700 font-semibold mt-3">
                 💡 Start with what you need today, and just add more subs when you're ready to level up to larger audiences.
               </p>
             </div>
