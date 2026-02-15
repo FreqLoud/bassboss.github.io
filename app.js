@@ -78,7 +78,7 @@ const DECISION_MATRIX = {
   large: {
     deep:  { bangs: { tops: ['AT312-MK3', 'AT312-MK3'], subs: ['ZV28-MK3', 'ZV28-MK3'] },
              knocks: { tops: ['AT312-MK3', 'AT312-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
-             destroys: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } },
+             destroys: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } },
     some:  { bangs: { tops: ['AT212-MK3', 'AT212-MK3'], subs: ['VS21-MK3', 'VS21-MK3'] },
              knocks: { tops: ['AT312-MK3', 'AT312-MK3'], subs: ['SSP218-MK3', 'SSP218-MK3'] },
              destroys: { tops: ['AT312-MK3', 'AT312-MK3', 'AT312-MK3', 'AT312-MK3'], subs: ['SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3'] } },
@@ -778,27 +778,44 @@ const App = () => {
         )}
 
         {/* Upgrade path messaging */}
-        {topProduct?.subCapacity && topProduct.topClass !== 'compact' && (
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-white border border-bb-orange/30 rounded-xl p-6 shadow-lg">
-              <h3 className="font-bold text-lg mb-2 flex items-center gap-2 text-gray-900">
-                🚀 Ready to Grow?
-              </h3>
-              <p className="text-gray-700">
-                Each <strong>{topProduct.name}</strong> has serious headroom — it can handle up to{' '}
-                <strong>{topProduct.subCapacity.single} single-driver subs</strong> or{' '}
-                <strong>{topProduct.subCapacity.double} double-driver subs</strong> per unit!
-              </p>
-              <p className="text-gray-600 mt-2">
-                All BASSBOSS subwoofers are designed to work together and are phase-coherent — 
-                so you can mix and match models as you expand your system.
-              </p>
-              <p className="text-sm text-amber-700 font-semibold mt-3">
-                💡 Start with what you need today, and just add more subs when you're ready to level up to larger audiences.
-              </p>
+        {(() => {
+          const currentSystem = tiers[selectedTier]?.system;
+          if (!currentSystem?.tops) return null;
+          
+          // Get unique top models (excluding SV9/compact)
+          const uniqueTops = [...new Set(currentSystem.tops)]
+            .map(id => getProduct(id))
+            .filter(p => p && p.subCapacity && p.topClass !== 'compact');
+          
+          if (uniqueTops.length === 0) return null;
+          
+          return (
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-white border border-bb-orange/30 rounded-xl p-6 shadow-lg">
+                <h3 className="font-bold text-lg mb-2 flex items-center gap-2 text-gray-900">
+                  🚀 Ready to Grow?
+                </h3>
+                <p className="text-gray-700 mb-3">
+                  Your tops have serious sub headroom built in:
+                </p>
+                <ul className="text-gray-700 space-y-1 mb-3">
+                  {uniqueTops.map(top => (
+                    <li key={top.id}>
+                      <strong>{top.name}</strong>: up to {top.subCapacity.single} single-driver or {top.subCapacity.double} double-driver subs each
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-gray-600">
+                  All BASSBOSS subwoofers are designed to work together and are phase-coherent — 
+                  so you can mix and match models as you expand your system.
+                </p>
+                <p className="text-sm text-amber-700 font-semibold mt-3">
+                  💡 Start with what you need today, and add more subs when you're ready to level up!
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Accessories Section */}
         {(() => {
