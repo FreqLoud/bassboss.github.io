@@ -2,9 +2,9 @@
 // Clean, matrix-based recommendations with upgrade path messaging
 
 const TIERS = {
-  bangs: { name: 'Bangs', color: 'amber', emoji: '💥', description: 'Solid foundation' },
-  knocks: { name: 'Knocks', color: 'orange', emoji: '🔊', description: 'Serious power' },
-  destroys: { name: 'Destroys', color: 'red', emoji: '💀', description: 'Maximum impact' }
+  bangs: { name: 'Bangs', color: 'amber', emoji: '💥', description: 'Seriously Solid' },
+  knocks: { name: 'Knocks', color: 'orange', emoji: '🔊', description: 'Headroom Galore' },
+  destroys: { name: 'Destroys', color: 'red', emoji: '💀', description: 'Goodbye dB meter' }
 };
 
 const GENRES = [
