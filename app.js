@@ -262,6 +262,21 @@ const App = () => {
       }
     });
 
+    // Ensure tiers are ordered by price (Bangs < Knocks < Destroys)
+    const tierPrices = {
+      bangs: tiers.bangs?.stats?.totalPrice || 0,
+      knocks: tiers.knocks?.stats?.totalPrice || 0,
+      destroys: tiers.destroys?.stats?.totalPrice || 0
+    };
+    
+    // If prices aren't in ascending order, swap the systems
+    const sortedTiers = Object.entries(tierPrices).sort((a, b) => a[1] - b[1]);
+    const orderedTiers = {
+      bangs: tiers[sortedTiers[0][0]],
+      knocks: tiers[sortedTiers[1][0]],
+      destroys: tiers[sortedTiers[2][0]]
+    };
+
     // Add booth monitors if requested
     let boothRec = null;
     if (boothMonitors) {
@@ -273,7 +288,7 @@ const App = () => {
       };
     }
 
-    return { tiers, boothRec, bassLevel, crowdSize };
+    return { tiers: orderedTiers, boothRec, bassLevel, crowdSize };
   };
 
   const handleSelect = (key, value) => {

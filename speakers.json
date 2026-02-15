@@ -250,7 +250,6 @@
   ],
   "accessories": {
     "carts": [
-      { "id": "BB-CART-DJ18S", "name": "DJ18S Cart", "price": 0, "forProducts": ["DJ18S-MK3"], "description": "Included with purchase" },
       { "id": "BB-CART-SSP118-H", "name": "SSP118 Cart", "price": 295, "forProducts": ["SSP118-MK3"], "description": "Horizontal transport cart" },
       { "id": "BB-CART-VS21-V", "name": "VS21 Cart (Vertical)", "price": 295, "forProducts": ["VS21-MK3"], "description": "Vertical transport cart" },
       { "id": "BB-CART-VS21-H", "name": "VS21 Cart (Horizontal)", "price": 395, "forProducts": ["VS21-MK3"], "description": "Horizontal transport cart" },
