@@ -254,14 +254,30 @@ const App = () => {
   };
 
   const nextStep = () => {
-    if (step === 4) {
+    let nextStepNum = step + 1;
+    
+    // Skip booth subs question (step 3) if not needed
+    if (nextStepNum === 3 && !(answers.boothMonitors && answers.genre !== 'less')) {
+      nextStepNum = 4;
+    }
+    
+    if (nextStepNum === 5) {
       // Generate recommendation before showing results
       setRecommendation(generateRecommendation());
     }
-    setStep(s => s + 1);
+    setStep(nextStepNum);
   };
 
-  const prevStep = () => setStep(s => Math.max(0, s - 1));
+  const prevStep = () => {
+    let prevStepNum = step - 1;
+    
+    // Skip booth subs question (step 3) going back if not needed
+    if (prevStepNum === 3 && !(answers.boothMonitors && answers.genre !== 'less')) {
+      prevStepNum = 2;
+    }
+    
+    setStep(Math.max(0, prevStepNum));
+  };
   const restart = () => {
     setStep(0);
     setAnswers({ wantsColumn: null, genre: null, crowdSize: null, boothMonitors: null, boothSubs: null, transport: null });
@@ -398,11 +414,6 @@ const App = () => {
         );
 
       case 3: // Booth subs (conditional)
-        if (!shouldShowBoothSubs) {
-          // Skip this step
-          React.useEffect(() => { nextStep(); }, []);
-          return null;
-        }
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
