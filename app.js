@@ -145,6 +145,8 @@ const App = () => {
     transport: null
   });
   const [recommendation, setRecommendation] = React.useState(null);
+  const [selectedTier, setSelectedTier] = React.useState('knocks');
+  const [selectedAccessories, setSelectedAccessories] = React.useState([]);
 
   React.useEffect(() => {
     fetch('speakers.json')
@@ -157,6 +159,31 @@ const App = () => {
     if (!catalog) return null;
     return [...catalog.tops, ...catalog.subs, ...(catalog.columns || []), ...(catalog.systems || [])]
       .find(p => p.id === id);
+  };
+
+  const getAccessoriesForProducts = (productIds) => {
+    if (!catalog?.accessories) return [];
+    const allAccessories = [
+      ...(catalog.accessories.carts || []),
+      ...(catalog.accessories.stands || [])
+    ];
+    return allAccessories.filter(acc => 
+      acc.forProducts.some(p => productIds.includes(p))
+    );
+  };
+
+  const toggleAccessory = (accId) => {
+    setSelectedAccessories(prev => 
+      prev.includes(accId) 
+        ? prev.filter(id => id !== accId)
+        : [...prev, accId]
+    );
+  };
+
+  const getAccessoryById = (id) => {
+    if (!catalog?.accessories) return null;
+    const all = [...(catalog.accessories.carts || []), ...(catalog.accessories.stands || [])];
+    return all.find(a => a.id === id);
   };
 
   const calculateVolume = (dimensions) => {
@@ -703,6 +730,85 @@ const App = () => {
             </div>
           </div>
         )}
+
+        {/* Accessories Section */}
+        {(() => {
+          const currentSystem = tiers[selectedTier]?.system;
+          if (!currentSystem) return null;
+          
+          const productIds = [...(currentSystem.tops || []), ...(currentSystem.subs || [])];
+          const availableAccessories = getAccessoriesForProducts(productIds);
+          
+          if (availableAccessories.length === 0) return null;
+          
+          const accessoriesTotal = selectedAccessories.reduce((sum, accId) => {
+            const acc = getAccessoryById(accId);
+            return sum + (acc?.price || 0);
+          }, 0);
+          
+          return (
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-white rounded-xl p-6 shadow-lg">
+                <h3 className="font-bold text-lg mb-4 text-gray-900 flex items-center gap-2">
+                  🛒 Recommended Accessories
+                  <span className="text-sm font-normal text-gray-500">
+                    (for {TIERS[selectedTier].name} system)
+                  </span>
+                </h3>
+                
+                {/* Tier selector */}
+                <div className="flex gap-2 mb-4">
+                  {Object.keys(tiers).map(tier => (
+                    <button
+                      key={tier}
+                      onClick={() => {
+                        setSelectedTier(tier);
+                        setSelectedAccessories([]);
+                      }}
+                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                        selectedTier === tier 
+                          ? 'bg-bb-orange text-white' 
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {TIERS[tier].emoji} {TIERS[tier].name}
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="space-y-2">
+                  {availableAccessories.map(acc => (
+                    <label 
+                      key={acc.id}
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedAccessories.includes(acc.id)}
+                        onChange={() => toggleAccessory(acc.id)}
+                        className="w-5 h-5 rounded border-gray-300 text-bb-orange focus:ring-bb-orange"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">{acc.name}</div>
+                        <div className="text-sm text-gray-500">{acc.description}</div>
+                      </div>
+                      <div className="font-semibold text-gray-700">
+                        {acc.price === 0 ? 'FREE' : `$${acc.price.toLocaleString()}`}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+                
+                {selectedAccessories.length > 0 && (
+                  <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                    <span className="text-gray-600">Accessories Total:</span>
+                    <span className="font-bold text-lg text-gray-900">${accessoriesTotal.toLocaleString()}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Actions */}
         <div className="flex justify-center gap-4 pt-4">
