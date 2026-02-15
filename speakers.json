@@ -6,10 +6,11 @@
       "price": 1595,
       "type": "top",
       "sizeClass": "small",
+      "topClass": "compact",
       "dispersion": "90x60",
       "amperage": 1.4,
       "dimensions": "18 x 10 x 15",
-      "subCapacity": { "balanced": 1, "max": 2 },
+      "subCapacity": { "single": 1, "double": 1, "note": "Balanced 1:1 ratio" },
       "description": "Compact powerhouse for mobile DJs"
     },
     {
@@ -18,10 +19,11 @@
       "price": 2795,
       "type": "top",
       "sizeClass": "small",
+      "topClass": "singleDriver",
       "dispersion": "90x90",
       "amperage": 1.4,
       "dimensions": "14 x 14 x 11",
-      "subCapacity": { "balanced": 1, "max": 4 },
+      "subCapacity": { "single": 4, "double": 3, "note": "+3 single or +2 double driver subs beyond your system" },
       "description": "Compact coaxial with massive sub headroom"
     },
     {
@@ -30,10 +32,11 @@
       "price": 3495,
       "type": "top",
       "sizeClass": "medium",
+      "topClass": "singleDriver",
       "dispersion": "120x20",
       "amperage": 4.6,
       "dimensions": "24.6 x 14.5 x 19.1",
-      "subCapacity": { "balanced": 2, "max": 4 },
+      "subCapacity": { "single": 4, "double": 3, "note": "+3 single or +2 double driver subs beyond your system" },
       "description": "Wide coverage for medium venues"
     },
     {
@@ -42,8 +45,10 @@
       "price": 2295,
       "type": "monitor",
       "sizeClass": "small",
+      "topClass": "singleDriver",
       "amperage": 1.4,
       "dimensions": "14 x 14 x 11",
+      "subCapacity": { "single": 4, "double": 3, "note": "+3 single or +2 double driver subs beyond your system" },
       "description": "Coaxial stage/booth monitor"
     },
     {
@@ -52,10 +57,11 @@
       "price": 4995,
       "type": "top",
       "sizeClass": "medium",
+      "topClass": "arrayMedium",
       "dispersion": "80x60",
       "amperage": 4.6,
       "dimensions": "47.8 x 14.3 x 17.8",
-      "subCapacity": { "balanced": 2, "max": 6 },
+      "subCapacity": { "single": 6, "double": 3, "note": "6 single or 3 double driver subs per unit" },
       "description": "Mid-size workhorse"
     },
     {
@@ -64,10 +70,11 @@
       "price": 5995,
       "type": "top",
       "sizeClass": "large",
+      "topClass": "arrayLarge",
       "dispersion": "80x80",
       "amperage": 5.4,
       "dimensions": "48 x 16 x 20",
-      "subCapacity": { "balanced": 2, "max": 8 },
+      "subCapacity": { "single": 8, "double": 4, "note": "8 single or 4 double driver subs per unit" },
       "description": "Extended throw for large venues"
     },
     {
@@ -76,10 +83,11 @@
       "price": 6995,
       "type": "top",
       "sizeClass": "large",
+      "topClass": "lineArray",
       "dispersion": "120x10",
       "amperage": 4.6,
       "dimensions": "16.1 x 40.5 x 20.4",
-      "subCapacity": { "balanced": 2, "max": 8 },
+      "subCapacity": { "single": 10, "double": 6, "note": "10 single or 6 double driver subs per unit" },
       "description": "Modular line array element"
     },
     {
@@ -88,10 +96,11 @@
       "price": 19995,
       "type": "top",
       "sizeClass": "xl",
+      "topClass": "festival",
       "dispersion": "N/A",
       "amperage": 15,
       "dimensions": "48 x 48 x 24",
-      "subCapacity": { "balanced": 4, "max": 12 },
+      "subCapacity": { "single": 16, "double": 8, "note": "Festival-scale capacity" },
       "description": "Festival flagship top"
     }
   ],
@@ -103,10 +112,11 @@
       "spl": 128,
       "type": "sub",
       "sizeClass": "small",
+      "driverClass": "single",
       "lowestFreq": 40,
       "amperage": 4.6,
       "dimensions": "20.5 x 17 x 24",
-      "description": "Compact and balanced"
+      "description": "Compact single 15\""
     },
     {
       "id": "DJ18S-MK3",
@@ -115,10 +125,11 @@
       "spl": 131,
       "type": "sub",
       "sizeClass": "small",
+      "driverClass": "single",
       "lowestFreq": 35,
       "amperage": 4.6,
       "dimensions": "27.5 x 20.5 x 29.5",
-      "description": "Deep and punchy for DJs"
+      "description": "Deep single 18\""
     },
     {
       "id": "SSP118-MK3",
@@ -127,6 +138,7 @@
       "spl": 130,
       "type": "sub",
       "sizeClass": "medium",
+      "driverClass": "single",
       "lowestFreq": 38,
       "amperage": 4.6,
       "dimensions": "22.5 x 30 x 24",
@@ -139,10 +151,11 @@
       "spl": 133,
       "type": "sub",
       "sizeClass": "medium",
+      "driverClass": "double",
       "lowestFreq": 38,
       "amperage": 6.0,
       "dimensions": "22 x 36 x 24",
-      "description": "Dual 15\" punch"
+      "description": "Dual 15\" — 2× output"
     },
     {
       "id": "VS21-MK3",
@@ -151,10 +164,11 @@
       "spl": 132,
       "type": "sub",
       "sizeClass": "medium",
+      "driverClass": "single",
       "lowestFreq": 32,
       "amperage": 4.6,
       "dimensions": "36 x 24 x 36",
-      "description": "Deep 21\" extension"
+      "description": "Deep single 21\""
     },
     {
       "id": "SSP218-MK3",
@@ -163,10 +177,11 @@
       "spl": 136,
       "type": "sub",
       "sizeClass": "large",
+      "driverClass": "double",
       "lowestFreq": 35,
       "amperage": 9,
       "dimensions": "22.5 x 48 x 29.5",
-      "description": "Dual 18\" powerhouse"
+      "description": "Dual 18\" — 2× output"
     },
     {
       "id": "ZV28-MK3",
@@ -175,10 +190,11 @@
       "spl": 136,
       "type": "sub",
       "sizeClass": "large",
+      "driverClass": "double",
       "lowestFreq": 28,
       "amperage": 9,
       "dimensions": "22.5 x 42 x 42",
-      "description": "Infrasonic extension"
+      "description": "Dual 18\" infrasonic — 2× output"
     },
     {
       "id": "Makara-MK3",
@@ -187,10 +203,11 @@
       "spl": 138,
       "type": "sub",
       "sizeClass": "large",
+      "driverClass": "double",
       "lowestFreq": 28,
       "amperage": 9,
       "dimensions": "28.5 x 45 x 45",
-      "description": "High-output deep bass"
+      "description": "Dual 21\" — 2× output"
     },
     {
       "id": "Kraken-MK3",
@@ -199,10 +216,11 @@
       "spl": 144,
       "type": "sub",
       "sizeClass": "xl",
+      "driverClass": "quad",
       "lowestFreq": 25,
       "amperage": 18,
       "dimensions": "45 x 45 x 45",
-      "description": "Festival-grade monster"
+      "description": "Quad 21\" — 4× output"
     }
   ],
   "columns": [

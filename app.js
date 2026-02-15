@@ -2,9 +2,9 @@
 // Clean, matrix-based recommendations with upgrade path messaging
 
 const TIERS = {
-  bangs: { name: 'Bangs', color: 'emerald', emoji: '💥', description: 'Solid foundation' },
-  knocks: { name: 'Knocks', color: 'blue', emoji: '🔊', description: 'Serious power' },
-  destroys: { name: 'Destroys', color: 'purple', emoji: '💀', description: 'Maximum impact' }
+  bangs: { name: 'Bangs', color: 'amber', emoji: '💥', description: 'Solid foundation' },
+  knocks: { name: 'Knocks', color: 'orange', emoji: '🔊', description: 'Serious power' },
+  destroys: { name: 'Destroys', color: 'red', emoji: '💀', description: 'Maximum impact' }
 };
 
 const GENRES = [
@@ -298,7 +298,7 @@ const App = () => {
 
   const renderProgress = () => (
     <div className="w-full max-w-2xl mx-auto mb-8">
-      <div className="flex justify-between text-sm text-gray-500 mb-2">
+      <div className="flex justify-between text-sm text-gray-400 mb-2">
         <span>Build Your System</span>
         <span>{Math.min(step + 1, 5)} of 5</span>
       </div>
@@ -348,8 +348,8 @@ const App = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">What's your sound?</h2>
-              <p className="text-gray-600">This helps us recommend the right bass levels</p>
+              <h2 className="text-3xl font-bold text-white mb-2">What's your sound?</h2>
+              <p className="text-gray-400">This helps us recommend the right bass levels</p>
             </div>
             <div className="grid gap-4 max-w-xl mx-auto">
               {GENRES.map(g => (
@@ -370,8 +370,8 @@ const App = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">How big is your crowd?</h2>
-              <p className="text-gray-600">The main driver of system size</p>
+              <h2 className="text-3xl font-bold text-white mb-2">How big is your crowd?</h2>
+              <p className="text-gray-400">The main driver of system size</p>
             </div>
             <div className="grid gap-4 max-w-xl mx-auto">
               {CROWD_SIZES.map(c => (
@@ -391,8 +391,8 @@ const App = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">DJ booth or stage sound?</h2>
-              <p className="text-gray-600">Separate monitors for performers</p>
+              <h2 className="text-3xl font-bold text-white mb-2">DJ booth or stage sound?</h2>
+              <p className="text-gray-400">Separate monitors for performers</p>
             </div>
             <div className="grid gap-4 max-w-xl mx-auto">
               <OptionCard
@@ -417,8 +417,8 @@ const App = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Subs in the booth?</h2>
-              <p className="text-gray-600">Extra low-end for the DJ</p>
+              <h2 className="text-3xl font-bold text-white mb-2">Subs in the booth?</h2>
+              <p className="text-gray-400">Extra low-end for the DJ</p>
             </div>
             <div className="grid gap-4 max-w-xl mx-auto">
               <OptionCard
@@ -443,8 +443,8 @@ const App = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">How are you moving gear?</h2>
-              <p className="text-gray-600">We'll flag if anything won't fit</p>
+              <h2 className="text-3xl font-bold text-white mb-2">How are you moving gear?</h2>
+              <p className="text-gray-400">We'll flag if anything won't fit</p>
             </div>
             <div className="grid gap-4 max-w-xl mx-auto">
               {TRANSPORT.map(t => (
@@ -478,15 +478,15 @@ const App = () => {
     const columns = stats.items.filter(i => i.category === 'columns');
     
     const colorClasses = {
-      emerald: 'border-emerald-400 bg-emerald-50',
-      blue: 'border-blue-400 bg-blue-50',
-      purple: 'border-purple-400 bg-purple-50'
+      amber: 'border-amber-400 bg-amber-50',
+      orange: 'border-orange-400 bg-orange-50',
+      red: 'border-red-400 bg-red-50'
     };
 
     const headerClasses = {
-      emerald: 'bg-emerald-500',
-      blue: 'bg-blue-500', 
-      purple: 'bg-purple-500'
+      amber: 'bg-amber-500',
+      orange: 'bg-orange-500', 
+      red: 'bg-red-500'
     };
 
     return (
@@ -554,6 +554,12 @@ const App = () => {
             <div>
               <span className="text-gray-500">Est. Volume</span>
               <div className="font-semibold">{stats.totalVolume.toFixed(1)} ft³</div>
+              <div className="text-xs text-gray-400">
+                {stats.totalVolume <= 15 ? '🚗 Fits in a car' :
+                 stats.totalVolume <= 60 ? '🚙 Fits in an SUV' :
+                 stats.totalVolume <= 200 ? '🚐 Needs a cargo van' :
+                 '🚚 Needs a truck/trailer'}
+              </div>
             </div>
             <div>
               <span className="text-gray-500">Power Draw</span>
@@ -586,8 +592,8 @@ const App = () => {
     return (
       <div className="space-y-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Your BASSBOSS Systems</h2>
-          <p className="text-gray-600">Three tiers to match your goals and budget</p>
+          <h2 className="text-3xl font-bold text-white mb-2">Your BASSBOSS Systems</h2>
+          <p className="text-gray-400">Three tiers to match your goals and budget</p>
         </div>
 
         {/* Transport warning */}
@@ -637,19 +643,23 @@ const App = () => {
         )}
 
         {/* Upgrade path messaging */}
-        {topProduct?.subCapacity && (
+        {topProduct?.subCapacity && topProduct.topClass !== 'compact' && (
           <div className="max-w-3xl mx-auto">
-            <div className="bg-gradient-to-r from-bb-orange/10 to-amber-50 border border-bb-orange/30 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+            <div className="bg-white border border-bb-orange/30 rounded-xl p-6 shadow-lg">
+              <h3 className="font-bold text-lg mb-2 flex items-center gap-2 text-gray-900">
                 🚀 Ready to Grow?
               </h3>
               <p className="text-gray-700">
-                Your <strong>{topProduct.name}</strong> has serious headroom — it can handle up to{' '}
-                <strong>{topProduct.subCapacity.max} subwoofers</strong> per side!
-                All BASSBOSS subs are phase-coherent, so you can mix and match models as you expand.
+                Each <strong>{topProduct.name}</strong> has serious headroom — it can handle up to{' '}
+                <strong>{topProduct.subCapacity.single} single-driver subs</strong> or{' '}
+                <strong>{topProduct.subCapacity.double} double-driver subs</strong> per unit!
               </p>
-              <p className="text-sm text-gray-500 mt-2">
-                Start with what you need today, and add more subs whenever you're ready to level up.
+              <p className="text-gray-600 mt-2">
+                All BASSBOSS subwoofers are designed to work together and are phase-coherent — 
+                so you can mix and match models as you expand your system.
+              </p>
+              <p className="text-sm text-bb-orange font-medium mt-3">
+                💡 Start with what you need today, and just add more subs when you're ready to level up to larger audiences.
               </p>
             </div>
           </div>
@@ -659,7 +669,7 @@ const App = () => {
         <div className="flex justify-center gap-4 pt-4">
           <button
             onClick={restart}
-            className="px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+            className="px-6 py-3 rounded-xl border-2 border-gray-600 text-gray-300 font-semibold hover:bg-gray-800 transition-colors"
           >
             Start Over
           </button>
@@ -711,7 +721,7 @@ const App = () => {
               className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
                 step === 0 
                   ? 'text-gray-300 cursor-not-allowed' 
-                  : 'text-gray-600 hover:bg-gray-100'
+                  : 'text-gray-300 hover:bg-gray-800'
               }`}
             >
               ← Back
