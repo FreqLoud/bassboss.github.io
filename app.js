@@ -692,7 +692,7 @@ const App = () => {
         {renderStep()}
 
         {/* Navigation */}
-        {step < 5 && step !== 3 && (
+        {step < 5 && (
           <div className="flex justify-between max-w-xl mx-auto mt-8">
             <button
               onClick={prevStep}
