@@ -104,10 +104,19 @@ function App() {
     return [];
   }, [searchResults, selectedCategory, articlesByCategory]);
 
-  // Render article content with basic formatting
-  const renderContent = (content) => {
-    // Convert line breaks and basic formatting
-    const paragraphs = content.split(/\n\n+/);
+  // Render article content - use HTML if available
+  const renderContent = (article) => {
+    if (article.htmlContent) {
+      return (
+        <div 
+          className="article-content prose prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: article.htmlContent }}
+        />
+      );
+    }
+    
+    // Fallback to basic formatting
+    const paragraphs = article.content.split(/\n\n+/);
     return paragraphs.map((p, i) => (
       <p key={i} className="mb-4 text-gray-300 leading-relaxed">
         {p.split('\n').map((line, j) => (
@@ -407,7 +416,7 @@ function App() {
                   <h1 className="text-2xl font-bold text-white mb-6">{selectedArticle.title}</h1>
                   
                   <div className="article-content">
-                    {renderContent(selectedArticle.content)}
+                    {renderContent(selectedArticle)}
                   </div>
 
                   {/* Footer */}
