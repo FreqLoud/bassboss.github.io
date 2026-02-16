@@ -23,292 +23,266 @@
   </style>
 </head>
 <body class="bg-bb-black min-h-screen text-white p-6">
-  <div id="app"></div>
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold">
+          <span class="text-bb-orange">BASSBOSS</span> CEO Dashboard
+        </h1>
+        <p class="text-gray-400 mt-1">Inventory & Sales Overview</p>
+      </div>
+      <div class="text-right text-sm text-gray-500">
+        <div>Last Updated: Feb 16, 2026</div>
+        <div class="text-bb-orange">⚡ Data from AM&S</div>
+      </div>
+    </div>
 
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <script type="text/babel">
-    // Dashboard Data (embedded)
-    const DATA = {
-      summary: {
-        qoh: { units: 935, revenueValue: 1537936, cogsValue: 841173 },
-        opo: { units: 940, revenueValue: 1749706, cogsValue: 934373 },
-        onWater: { units: 316, revenueValue: 687560, cogsValue: 354976 }
-      },
-      moiHealth: {
-        critical: { count: 3, label: '< 3 MOI', color: 'red' },
-        low: { count: 3, label: '3-4 MOI', color: 'orange' },
-        healthy: { count: 13, label: '4-10 MOI', color: 'green' },
-        overstock: { count: 13, label: '> 10 MOI', color: 'yellow' },
-        noSales: { count: 12, label: 'No Sales', color: 'gray' }
-      },
-      products: [
-        { sku: "SV9-MK3", type: "top", cogs: 565, map: 1595, avgSales: 26, margin: 65 },
-        { sku: "DiaMon-MK3", type: "top", cogs: 598, map: 2795, avgSales: 3, margin: 79 },
-        { sku: "DV12-MK3", type: "top", cogs: 946, map: 3495, avgSales: 12, margin: 73 },
-        { sku: "CCM12-MK3", type: "top", cogs: 629, map: 2295, avgSales: 9, margin: 73 },
-        { sku: "AT212-MK3", type: "top", cogs: 1109, map: 4995, avgSales: 4, margin: 78 },
-        { sku: "AT312-MK3", type: "top", cogs: 1411, map: 5495, avgSales: 4, margin: 74 },
-        { sku: "MFLA-MK3", type: "top", cogs: 1945, map: 6995, avgSales: 6, margin: 72 },
-        { sku: "Krakatoa-MK3", type: "top", cogs: 3499, map: 17995, avgSales: 1, margin: 81 },
-        { sku: "BB15-MK3", type: "sub", cogs: 735, map: 2995, avgSales: 14, margin: 75 },
-        { sku: "DJ18S-MK3", type: "sub", cogs: 838, map: 3495, avgSales: 8, margin: 76 },
-        { sku: "SSP118-MK3", type: "sub", cogs: 861, map: 3995, avgSales: 9, margin: 78 },
-        { sku: "SSP215-MK3", type: "sub", cogs: 1506, map: 5495, avgSales: 2, margin: 73 },
-        { sku: "VS21-MK3", type: "sub", cogs: 1134, map: 4995, avgSales: 8, margin: 77 },
-        { sku: "SSP218-MK3", type: "sub", cogs: 1562, map: 5995, avgSales: 3, margin: 74 },
-        { sku: "ZV28-MK3", type: "sub", cogs: 1726, map: 5995, avgSales: 5, margin: 71 },
-        { sku: "Makara-MK3", type: "sub", cogs: 2041, map: 7995, avgSales: 5, margin: 74 },
-        { sku: "Kraken-MK3", type: "sub", cogs: 3433, map: 17995, avgSales: 1, margin: 81 },
-        { sku: "Sublim8-MK3", type: "column", cogs: 1942, map: 7995, avgSales: 13, margin: 76 },
-      ]
-    };
-
-    const formatCurrency = (n) => '$' + n.toLocaleString();
-    const formatK = (n) => n >= 1000000 ? (n/1000000).toFixed(1) + 'M' : (n/1000).toFixed(0) + 'K';
-
-    function MetricCard({ title, value, subtitle, icon, color = 'bb-orange' }) {
-      return (
-        <div className="card rounded-xl p-5 border border-gray-800">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-gray-400 text-sm">{title}</span>
-            <span className="text-2xl">{icon}</span>
-          </div>
-          <div className={`text-3xl font-bold text-${color}`}>{value}</div>
-          {subtitle && <div className="text-gray-500 text-sm mt-1">{subtitle}</div>}
+    <!-- Top Metrics -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="card rounded-xl p-5 border border-gray-800">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-gray-400 text-sm">Total Inventory</span>
+          <span class="text-2xl">📦</span>
         </div>
-      );
-    }
+        <div class="text-3xl font-bold text-bb-orange">2,191</div>
+        <div class="text-gray-500 text-sm mt-1">units across all stages</div>
+      </div>
+      <div class="card rounded-xl p-5 border border-gray-800">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-gray-400 text-sm">Revenue Value</span>
+          <span class="text-2xl">💰</span>
+        </div>
+        <div class="text-3xl font-bold text-bb-orange">$4.0M</div>
+        <div class="text-gray-500 text-sm mt-1">at MAP pricing</div>
+      </div>
+      <div class="card rounded-xl p-5 border border-gray-800">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-gray-400 text-sm">COGS Value</span>
+          <span class="text-2xl">📊</span>
+        </div>
+        <div class="text-3xl font-bold text-bb-orange">$2.1M</div>
+        <div class="text-gray-500 text-sm mt-1">total cost basis</div>
+      </div>
+      <div class="card rounded-xl p-5 border border-gray-800">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-gray-400 text-sm">Gross Margin</span>
+          <span class="text-2xl">📈</span>
+        </div>
+        <div class="text-3xl font-bold text-bb-orange">46%</div>
+        <div class="text-gray-500 text-sm mt-1">blended average</div>
+      </div>
+    </div>
 
-    function MOIBar({ label, count, total, color }) {
-      const pct = (count / total) * 100;
-      const colors = {
-        red: 'bg-red-500',
-        orange: 'bg-orange-500',
-        green: 'bg-green-500',
-        yellow: 'bg-yellow-500',
-        gray: 'bg-gray-500'
-      };
-      return (
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-24 text-sm text-gray-400">{label}</div>
-          <div className="flex-1 bg-gray-800 rounded-full h-6 overflow-hidden">
-            <div 
-              className={`${colors[color]} h-full rounded-full flex items-center justify-end pr-2`}
-              style={{ width: `${Math.max(pct, 10)}%` }}
-            >
-              <span className="text-xs font-bold text-black">{count}</span>
+    <!-- Inventory Breakdown -->
+    <div class="grid md:grid-cols-3 gap-4 mb-8">
+      <div class="card rounded-xl p-5 border border-gray-800">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-gray-400">QOH (On Hand)</span>
+          <span class="text-green-400 text-2xl">📍</span>
+        </div>
+        <div class="text-2xl font-bold text-white">935 units</div>
+        <div class="text-sm text-gray-500">$1,537,936 revenue value</div>
+      </div>
+      <div class="card rounded-xl p-5 border border-gray-800">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-gray-400">OPO (On Order)</span>
+          <span class="text-blue-400 text-2xl">📋</span>
+        </div>
+        <div class="text-2xl font-bold text-white">940 units</div>
+        <div class="text-sm text-gray-500">$1,749,706 revenue value</div>
+      </div>
+      <div class="card rounded-xl p-5 border border-gray-800">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-gray-400">On Water</span>
+          <span class="text-cyan-400 text-2xl">🚢</span>
+        </div>
+        <div class="text-2xl font-bold text-white">316 units</div>
+        <div class="text-sm text-gray-500">$687,560 revenue value</div>
+      </div>
+    </div>
+
+    <!-- MOI Health & Attention -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div class="card rounded-xl p-6 border border-gray-800">
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <span>📊</span> Inventory Health (MOI)
+        </h3>
+        
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-24 text-sm text-gray-400">&lt; 3 MOI</div>
+          <div class="flex-1 bg-gray-800 rounded-full h-6 overflow-hidden">
+            <div class="bg-red-500 h-full rounded-full flex items-center justify-end pr-2" style="width: 15%">
+              <span class="text-xs font-bold text-black">3</span>
             </div>
           </div>
         </div>
-      );
-    }
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-24 text-sm text-gray-400">3-4 MOI</div>
+          <div class="flex-1 bg-gray-800 rounded-full h-6 overflow-hidden">
+            <div class="bg-orange-500 h-full rounded-full flex items-center justify-end pr-2" style="width: 15%">
+              <span class="text-xs font-bold text-black">3</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-24 text-sm text-gray-400">4-10 MOI</div>
+          <div class="flex-1 bg-gray-800 rounded-full h-6 overflow-hidden">
+            <div class="bg-green-500 h-full rounded-full flex items-center justify-end pr-2" style="width: 35%">
+              <span class="text-xs font-bold text-black">13</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-24 text-sm text-gray-400">&gt; 10 MOI</div>
+          <div class="flex-1 bg-gray-800 rounded-full h-6 overflow-hidden">
+            <div class="bg-yellow-500 h-full rounded-full flex items-center justify-end pr-2" style="width: 35%">
+              <span class="text-xs font-bold text-black">13</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-24 text-sm text-gray-400">No Sales</div>
+          <div class="flex-1 bg-gray-800 rounded-full h-6 overflow-hidden">
+            <div class="bg-gray-500 h-full rounded-full flex items-center justify-end pr-2" style="width: 30%">
+              <span class="text-xs font-bold text-black">12</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card rounded-xl p-6 border border-gray-800">
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <span>⚠️</span> Attention Needed
+        </h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+            <span class="text-red-400">Critical Stock (&lt; 3 MOI)</span>
+            <span class="text-red-400 font-bold">3 SKUs</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+            <span class="text-yellow-400">Overstock (&gt; 10 MOI)</span>
+            <span class="text-yellow-400 font-bold">13 SKUs</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-gray-500/10 border border-gray-500/30 rounded-lg">
+            <span class="text-gray-400">No Sales (4 months)</span>
+            <span class="text-gray-400 font-bold">12 SKUs</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    function ProductTable({ products, filter }) {
+    <!-- Products Table -->
+    <div class="card rounded-xl p-6 border border-gray-800">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold flex items-center gap-2">
+          <span>🔊</span> Product Performance
+        </h3>
+        <div class="flex gap-2">
+          <button onclick="filterProducts('all')" id="btn-all" class="px-3 py-1 rounded-lg text-sm bg-bb-orange text-black font-semibold">All</button>
+          <button onclick="filterProducts('top')" id="btn-top" class="px-3 py-1 rounded-lg text-sm bg-gray-800 text-gray-400 hover:bg-gray-700">Tops</button>
+          <button onclick="filterProducts('sub')" id="btn-sub" class="px-3 py-1 rounded-lg text-sm bg-gray-800 text-gray-400 hover:bg-gray-700">Subs</button>
+          <button onclick="filterProducts('column')" id="btn-column" class="px-3 py-1 rounded-lg text-sm bg-gray-800 text-gray-400 hover:bg-gray-700">Columns</button>
+        </div>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" id="product-table">
+          <thead>
+            <tr class="text-left text-gray-400 border-b border-gray-800">
+              <th class="pb-3 font-medium">Product</th>
+              <th class="pb-3 font-medium text-right">COGS</th>
+              <th class="pb-3 font-medium text-right">MAP</th>
+              <th class="pb-3 font-medium text-right">Margin</th>
+              <th class="pb-3 font-medium text-right">Avg Sales/Mo</th>
+            </tr>
+          </thead>
+          <tbody id="product-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center text-gray-600 text-sm mt-8 pb-8">
+      <p>BASSBOSS Internal Dashboard • Data from AM&S</p>
+      <p class="mt-1">🔒 Confidential — Do not share</p>
+    </div>
+  </div>
+
+  <script>
+    const products = [
+      { sku: "SV9-MK3", type: "top", cogs: 565, map: 1595, avgSales: 26, margin: 65 },
+      { sku: "DiaMon-MK3", type: "top", cogs: 598, map: 2795, avgSales: 3, margin: 79 },
+      { sku: "DV12-MK3", type: "top", cogs: 946, map: 3495, avgSales: 12, margin: 73 },
+      { sku: "CCM12-MK3", type: "top", cogs: 629, map: 2295, avgSales: 9, margin: 73 },
+      { sku: "AT212-MK3", type: "top", cogs: 1109, map: 4995, avgSales: 4, margin: 78 },
+      { sku: "AT312-MK3", type: "top", cogs: 1411, map: 5495, avgSales: 4, margin: 74 },
+      { sku: "MFLA-MK3", type: "top", cogs: 1945, map: 6995, avgSales: 6, margin: 72 },
+      { sku: "Krakatoa-MK3", type: "top", cogs: 3499, map: 17995, avgSales: 1, margin: 81 },
+      { sku: "BB15-MK3", type: "sub", cogs: 735, map: 2995, avgSales: 14, margin: 75 },
+      { sku: "DJ18S-MK3", type: "sub", cogs: 838, map: 3495, avgSales: 8, margin: 76 },
+      { sku: "SSP118-MK3", type: "sub", cogs: 861, map: 3995, avgSales: 9, margin: 78 },
+      { sku: "SSP215-MK3", type: "sub", cogs: 1506, map: 5495, avgSales: 2, margin: 73 },
+      { sku: "VS21-MK3", type: "sub", cogs: 1134, map: 4995, avgSales: 8, margin: 77 },
+      { sku: "SSP218-MK3", type: "sub", cogs: 1562, map: 5995, avgSales: 3, margin: 74 },
+      { sku: "ZV28-MK3", type: "sub", cogs: 1726, map: 5995, avgSales: 5, margin: 71 },
+      { sku: "Makara-MK3", type: "sub", cogs: 2041, map: 7995, avgSales: 5, margin: 74 },
+      { sku: "Kraken-MK3", type: "sub", cogs: 3433, map: 17995, avgSales: 1, margin: 81 },
+      { sku: "Sublim8-MK3", type: "column", cogs: 1942, map: 7995, avgSales: 13, margin: 76 },
+    ];
+
+    function renderTable(filter) {
       const filtered = filter === 'all' ? products : products.filter(p => p.type === filter);
       const sorted = [...filtered].sort((a, b) => b.avgSales - a.avgSales);
+      const tbody = document.getElementById('product-tbody');
       
-      return (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-gray-400 border-b border-gray-800">
-                <th className="pb-3 font-medium">Product</th>
-                <th className="pb-3 font-medium text-right">COGS</th>
-                <th className="pb-3 font-medium text-right">MAP</th>
-                <th className="pb-3 font-medium text-right">Margin</th>
-                <th className="pb-3 font-medium text-right">Avg Sales/Mo</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map(p => (
-                <tr key={p.sku} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                  <td className="py-3">
-                    <span className="font-medium text-white">{p.sku}</span>
-                    <span className={`ml-2 text-xs px-2 py-0.5 rounded ${
-                      p.type === 'top' ? 'bg-blue-500/20 text-blue-400' :
-                      p.type === 'sub' ? 'bg-purple-500/20 text-purple-400' :
-                      'bg-green-500/20 text-green-400'
-                    }`}>{p.type}</span>
-                  </td>
-                  <td className="py-3 text-right text-gray-400">${p.cogs.toLocaleString()}</td>
-                  <td className="py-3 text-right text-white font-medium">${p.map.toLocaleString()}</td>
-                  <td className="py-3 text-right">
-                    <span className={`${p.margin >= 75 ? 'text-green-400' : p.margin >= 70 ? 'text-yellow-400' : 'text-red-400'}`}>
-                      {p.margin}%
-                    </span>
-                  </td>
-                  <td className="py-3 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <div className="w-16 bg-gray-800 rounded-full h-2">
-                        <div 
-                          className="bg-bb-orange h-full rounded-full" 
-                          style={{ width: `${Math.min((p.avgSales / 26) * 100, 100)}%` }}
-                        />
-                      </div>
-                      <span className="w-6 text-bb-orange font-bold">{p.avgSales}</span>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      );
+      tbody.innerHTML = sorted.map(p => {
+        const typeColors = {
+          top: 'bg-blue-500/20 text-blue-400',
+          sub: 'bg-purple-500/20 text-purple-400',
+          column: 'bg-green-500/20 text-green-400'
+        };
+        const marginColor = p.margin >= 75 ? 'text-green-400' : p.margin >= 70 ? 'text-yellow-400' : 'text-red-400';
+        const barWidth = Math.min((p.avgSales / 26) * 100, 100);
+        
+        return `
+          <tr class="border-b border-gray-800/50 hover:bg-gray-800/30">
+            <td class="py-3">
+              <span class="font-medium text-white">${p.sku}</span>
+              <span class="ml-2 text-xs px-2 py-0.5 rounded ${typeColors[p.type]}">${p.type}</span>
+            </td>
+            <td class="py-3 text-right text-gray-400">$${p.cogs.toLocaleString()}</td>
+            <td class="py-3 text-right text-white font-medium">$${p.map.toLocaleString()}</td>
+            <td class="py-3 text-right ${marginColor}">${p.margin}%</td>
+            <td class="py-3 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <div class="w-16 bg-gray-800 rounded-full h-2">
+                  <div class="bg-bb-orange h-full rounded-full" style="width: ${barWidth}%"></div>
+                </div>
+                <span class="w-6 text-bb-orange font-bold">${p.avgSales}</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    function App() {
-      const [productFilter, setProductFilter] = React.useState('all');
-      const { summary, moiHealth, products } = DATA;
-      
-      const totalUnits = summary.qoh.units + summary.opo.units + summary.onWater.units;
-      const totalRevenue = summary.qoh.revenueValue + summary.opo.revenueValue + summary.onWater.revenueValue;
-      const totalCOGS = summary.qoh.cogsValue + summary.opo.cogsValue + summary.onWater.cogsValue;
-      const totalMOI = Object.values(moiHealth).reduce((a, b) => a + b.count, 0);
-
-      return (
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold">
-                <span className="text-bb-orange">BASSBOSS</span> CEO Dashboard
-              </h1>
-              <p className="text-gray-400 mt-1">Inventory & Sales Overview</p>
-            </div>
-            <div className="text-right text-sm text-gray-500">
-              <div>Last Updated: Feb 16, 2026</div>
-              <div className="text-bb-orange">⚡ Live from AM&S</div>
-            </div>
-          </div>
-
-          {/* Top Metrics */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <MetricCard 
-              title="Total Inventory" 
-              value={totalUnits.toLocaleString()} 
-              subtitle="units across all stages"
-              icon="📦"
-            />
-            <MetricCard 
-              title="Revenue Value" 
-              value={formatK(totalRevenue)}
-              subtitle="at MAP pricing"
-              icon="💰"
-            />
-            <MetricCard 
-              title="COGS Value" 
-              value={formatK(totalCOGS)}
-              subtitle="total cost basis"
-              icon="📊"
-            />
-            <MetricCard 
-              title="Gross Margin" 
-              value={Math.round((1 - totalCOGS/totalRevenue) * 100) + '%'}
-              subtitle="blended average"
-              icon="📈"
-            />
-          </div>
-
-          {/* Inventory Breakdown */}
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
-            <div className="card rounded-xl p-5 border border-gray-800">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-gray-400">QOH (On Hand)</span>
-                <span className="text-green-400 text-2xl">📍</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{summary.qoh.units} units</div>
-              <div className="text-sm text-gray-500">{formatCurrency(summary.qoh.revenueValue)} revenue value</div>
-            </div>
-            <div className="card rounded-xl p-5 border border-gray-800">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-gray-400">OPO (On Order)</span>
-                <span className="text-blue-400 text-2xl">📋</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{summary.opo.units} units</div>
-              <div className="text-sm text-gray-500">{formatCurrency(summary.opo.revenueValue)} revenue value</div>
-            </div>
-            <div className="card rounded-xl p-5 border border-gray-800">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-gray-400">On Water</span>
-                <span className="text-cyan-400 text-2xl">🚢</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{summary.onWater.units} units</div>
-              <div className="text-sm text-gray-500">{formatCurrency(summary.onWater.revenueValue)} revenue value</div>
-            </div>
-          </div>
-
-          {/* MOI Health */}
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <div className="card rounded-xl p-6 border border-gray-800">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <span>📊</span> Inventory Health (MOI)
-              </h3>
-              <MOIBar label="Critical" count={moiHealth.critical.count} total={totalMOI} color="red" />
-              <MOIBar label="Low" count={moiHealth.low.count} total={totalMOI} color="orange" />
-              <MOIBar label="Healthy" count={moiHealth.healthy.count} total={totalMOI} color="green" />
-              <MOIBar label="Overstock" count={moiHealth.overstock.count} total={totalMOI} color="yellow" />
-              <MOIBar label="No Sales" count={moiHealth.noSales.count} total={totalMOI} color="gray" />
-            </div>
-            
-            <div className="card rounded-xl p-6 border border-gray-800">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <span>⚠️</span> Attention Needed
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-                  <span className="text-red-400">Critical Stock (< 3 MOI)</span>
-                  <span className="text-red-400 font-bold">{moiHealth.critical.count} SKUs</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                  <span className="text-yellow-400">Overstock (> 10 MOI)</span>
-                  <span className="text-yellow-400 font-bold">{moiHealth.overstock.count} SKUs</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-gray-500/10 border border-gray-500/30 rounded-lg">
-                  <span className="text-gray-400">No Sales (4 months)</span>
-                  <span className="text-gray-400 font-bold">{moiHealth.noSales.count} SKUs</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Products Table */}
-          <div className="card rounded-xl p-6 border border-gray-800">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <span>🔊</span> Product Performance
-              </h3>
-              <div className="flex gap-2">
-                {['all', 'top', 'sub', 'column'].map(f => (
-                  <button
-                    key={f}
-                    onClick={() => setProductFilter(f)}
-                    className={`px-3 py-1 rounded-lg text-sm ${
-                      productFilter === f 
-                        ? 'bg-bb-orange text-black font-semibold' 
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
-                  >
-                    {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1) + 's'}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <ProductTable products={products} filter={productFilter} />
-          </div>
-
-          {/* Footer */}
-          <div className="text-center text-gray-600 text-sm mt-8 pb-8">
-            <p>BASSBOSS Internal Dashboard • Data from AM&S</p>
-            <p className="mt-1">🔒 Confidential — Do not share</p>
-          </div>
-        </div>
-      );
+    function filterProducts(filter) {
+      // Update button states
+      ['all', 'top', 'sub', 'column'].forEach(f => {
+        const btn = document.getElementById('btn-' + f);
+        if (f === filter) {
+          btn.className = 'px-3 py-1 rounded-lg text-sm bg-bb-orange text-black font-semibold';
+        } else {
+          btn.className = 'px-3 py-1 rounded-lg text-sm bg-gray-800 text-gray-400 hover:bg-gray-700';
+        }
+      });
+      renderTable(filter);
     }
 
-    ReactDOM.createRoot(document.getElementById('app')).render(<App />);
+    // Initial render
+    renderTable('all');
   </script>
 </body>
 </html>
