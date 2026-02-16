@@ -21,26 +21,30 @@
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     .card { background: linear-gradient(145deg, #1a1a1a, #0f0f0f); }
-    .score-green { color: #22c55e; }
-    .score-yellow { color: #eab308; }
-    .score-red { color: #ef4444; }
   </style>
 </head>
 <body class="bg-bb-black min-h-screen text-white">
   <div id="app" class="max-w-2xl mx-auto p-4 pb-24"></div>
 
   <script>
+    // Pre-loaded dealer data
+    const DEALERS = [{"id":1,"name":"Adubs Audio Services LLC","phone":"","address":"300 Main St, Bay City, MI 48706","website":"https://adubsaudio.com/","demoDealer":false,"demoGear":""},{"id":2,"name":"AGI Pro DJ (The Vission Group Inc)","phone":"","address":"5250 High Banks Rd #700, Springfield, OR 97478","website":"https://www.agiprodj.com/","demoDealer":false,"demoGear":""},{"id":3,"name":"Ambient Sound Inc","phone":"","address":"75 New England Way, Warwick, RI 02886","website":"http://ambientsound.com/","demoDealer":true,"demoGear":""},{"id":4,"name":"American Musical Supply (AMS)","phone":"800-478-4076","address":"Oakland, NJ 07436","website":"https://www.americanmusical.com","demoDealer":false,"demoGear":""},{"id":5,"name":"AVMaxx","phone":"(312) 723-0450","address":"2857 N Cicero Ave, Chicago, IL 60641","website":"https://www.avmaxx.com","demoDealer":true,"demoGear":"BB15, DJ18S, DV12, DiaMon"},{"id":6,"name":"Audiopyle Sound","phone":"(707) 315-6204","address":"7848 Bell Rd, Windsor, CA 95492","website":"http://www.audiopyle.com/","demoDealer":false,"demoGear":""},{"id":7,"name":"B&H Photo Video","phone":"800-482-8143","address":"420 9th Ave, New York, NY 10001","website":"https://www.bhphotovideo.com","demoDealer":false,"demoGear":""},{"id":8,"name":"Balloonheads Pro Audio","phone":"209 478-3370","address":"3023 Dorchester Ct. Stockton, CA 95207","website":"","demoDealer":false,"demoGear":""},{"id":9,"name":"BES Entertainment LLC","phone":"","address":"12143 PARKVIEW LN, HOLLAND, MI","website":"https://bes-entertainment.com","demoDealer":false,"demoGear":""},{"id":10,"name":"Canal Sound and Light","phone":"(212) 925-6575","address":"319 Canal St, New York, NY 10013","website":"https://www.canalsoundlight.com","demoDealer":true,"demoGear":"SV9, BB15, DV12, SSP118, CCM12"},{"id":11,"name":"Chuck Levin's Washington Music","phone":"301-946-8808","address":"11151 Veirs Mill Rd, Wheaton, MD","website":"https://chucklevins.com/","demoDealer":false,"demoGear":""},{"id":12,"name":"Diamond Visions Inc","phone":"","address":"201 Circle Drive North, Suite 107","website":"https://www.diamondvisionsinc.com/","demoDealer":false,"demoGear":""},{"id":13,"name":"Faithful AVL","phone":"616-821-6352","address":"Cedar Springs, MI","website":"FaithfulAVL.com","demoDealer":false,"demoGear":""},{"id":14,"name":"FM Electronics LLC","phone":"","address":"2238 N Town East Blvd, Mesquite, TX","website":"http://www.fmelectronic.net/","demoDealer":false,"demoGear":""},{"id":15,"name":"Front Row AV","phone":"785-727-2470","address":"Lawrence, Kansas 66046","website":"https://frontrowav.com","demoDealer":false,"demoGear":""},{"id":16,"name":"Full Blast Sound and Lights","phone":"","address":"San Antonio, TX","website":"https://fullblastsound.com/","demoDealer":false,"demoGear":""},{"id":17,"name":"Full Compass","phone":"800-356-5844","address":"Madison, WI 53593","website":"https://www.fullcompass.com","demoDealer":false,"demoGear":""},{"id":18,"name":"Galtech Trading","phone":"","address":"Dubai, UAE","website":"https://www.galtechtrading.com","demoDealer":false,"demoGear":""},{"id":19,"name":"Gleeson AVL, LLC","phone":"(877) 343-3713","address":"Attapulgus, GA 39815","website":"https://gleesonavl.com/","demoDealer":false,"demoGear":""},{"id":20,"name":"H&Y Super Electronics","phone":"818 365-3504","address":"San Fernando, CA 91340","website":"http://www.esuperelectronics.com/","demoDealer":false,"demoGear":""},{"id":21,"name":"Hollywood Lights","phone":"503-232-9001","address":"Portland, OR 97202","website":"Hollywoodlights.com","demoDealer":false,"demoGear":""},{"id":22,"name":"Hollywood DJ","phone":"","address":"934 E 11th St, Los Angeles, CA","website":"https://hollywooddj.com/","demoDealer":false,"demoGear":""},{"id":23,"name":"I DJ NOW - West Babylon","phone":"631-321-1700","address":"1015 Sunrise Hwy, West Babylon, NY","website":"http://www.idjnow.com/","demoDealer":true,"demoGear":"SV9, BB15, DV12, DJ18S"},{"id":24,"name":"I DJ NOW - Fresh Meadows","phone":"718-762-0100","address":"Fresh Meadows, NY 11365","website":"http://www.idjnow.com/","demoDealer":true,"demoGear":"SV9, BB15, DV12, DJ18S, Kraken"},{"id":25,"name":"IKWIA Inc","phone":"","address":"541 10th St NW, Atlanta, GA","website":"https://ikwia.com/","demoDealer":false,"demoGear":""},{"id":26,"name":"International House of Music","phone":"(213) 628-9161","address":"Los Angeles, CA 90014","website":"","demoDealer":false,"demoGear":""},{"id":27,"name":"J&E Pro Audio Supply","phone":"","address":"San Diego, CA 92154","website":"www.jeproaudio.com","demoDealer":false,"demoGear":""},{"id":28,"name":"John Soto Music","phone":"","address":"Aiken, SC 29803","website":"https://www.johnsotomusic.com/","demoDealer":false,"demoGear":""},{"id":29,"name":"Micheo Music - Guaynabo","phone":"","address":"Guaynabo, Puerto Rico","website":"https://www.micheomusic.com/","demoDealer":false,"demoGear":""},{"id":30,"name":"Micheo Music - Caguas","phone":"","address":"Caguas, Puerto Rico","website":"https://www.micheomusic.com/","demoDealer":false,"demoGear":""},{"id":31,"name":"Micheo Music - San Juan","phone":"","address":"San Juan, Puerto Rico","website":"https://www.micheomusic.com/","demoDealer":false,"demoGear":""},{"id":32,"name":"Micheo Music - Mayagüez","phone":"","address":"Mayagüez, Puerto Rico","website":"https://www.micheomusic.com/","demoDealer":false,"demoGear":""},{"id":33,"name":"Mood Texas","phone":"","address":"San Antonio, TX 78218","website":"https://moodtexas.com","demoDealer":false,"demoGear":""},{"id":34,"name":"Norm's Music","phone":"718-351-3234","address":"Staten Island, NY 10309","website":"https://normsmusic.com/","demoDealer":true,"demoGear":"DV12s, SSP118s"},{"id":35,"name":"One Way Media Solutions","phone":"707-745-5052","address":"Benicia, CA 94510","website":"https://onewaymediasolutions.com","demoDealer":false,"demoGear":""},{"id":36,"name":"Pro Audio Star","phone":"(888) 890-6222","address":"Brooklyn, NY 11238","website":"https://www.proaudiostar.com","demoDealer":false,"demoGear":""},{"id":37,"name":"Pro Audio World Inc","phone":"","address":"San Jose, CA 95128","website":"","demoDealer":true,"demoGear":""},{"id":38,"name":"Rock & Soul Electronics","phone":"212-695-3953","address":"10 W 37th St, New York, NY","website":"http://www.rockandsoul.com/","demoDealer":true,"demoGear":"DV12, DJ18, BB15"},{"id":39,"name":"SE Systems","phone":"336-275-4444","address":"Greensboro, NC 27406","website":"https://www.sesystems.com","demoDealer":false,"demoGear":""},{"id":40,"name":"SKS Music","phone":"","address":"Beijing, China","website":"http://www.sks-music.com","demoDealer":false,"demoGear":""},{"id":41,"name":"Sound Productions","phone":"800.203.5611","address":"Irving, TX 75063","website":"www.soundpro.com","demoDealer":false,"demoGear":""},{"id":42,"name":"Stagewerx Pro Sound","phone":"","address":"Tucson, AZ 85712","website":"https://www.stagewerxpsl.com/","demoDealer":false,"demoGear":""},{"id":43,"name":"Stevens AV","phone":"","address":"Winston-Salem, NC 27106","website":"https://www.stevensav.com","demoDealer":false,"demoGear":""},{"id":44,"name":"Streak Systems LLC","phone":"","address":"Austin, TX 78702","website":"https://www.streaksystems.com/","demoDealer":false,"demoGear":""},{"id":45,"name":"Sweetwater","phone":"","address":"Fort Wayne, IN 46818","website":"https://www.sweetwater.com/","demoDealer":false,"demoGear":""},{"id":46,"name":"Technology Providers - Phoenix","phone":"","address":"Phoenix, AZ 85040","website":"https://www.technoprov.com/","demoDealer":false,"demoGear":""},{"id":47,"name":"Technology Providers - SLC","phone":"","address":"Salt Lake City, UT 84104","website":"https://www.technoprov.com/","demoDealer":false,"demoGear":""},{"id":48,"name":"Technology Providers - ABQ","phone":"","address":"Albuquerque, NM 87110","website":"https://www.technoprov.com/","demoDealer":false,"demoGear":""},{"id":49,"name":"Technology Providers - Austin","phone":"","address":"Austin, TX 78744","website":"https://www.technoprov.com/","demoDealer":false,"demoGear":""},{"id":50,"name":"VIP Pro Audio - Conklin","phone":"718-272-7228","address":"Brooklyn, NY 11236","website":"https://vipproaudio.com","demoDealer":false,"demoGear":""},{"id":51,"name":"VIP Pro Audio - Rockaway","phone":"718-272-7228","address":"Brooklyn, NY 11236","website":"https://vipproaudio.com","demoDealer":false,"demoGear":""},{"id":52,"name":"Zzounds","phone":"800-996-8637","address":"Oakland, NJ 07436","website":"https://www.zzounds.com","demoDealer":false,"demoGear":""},{"id":53,"name":"MBH Solutions","phone":"(573) 859-3605","address":"Belle, MO 65013","website":"https://www.mbhdirect.com","demoDealer":true,"demoGear":""},{"id":54,"name":"Guitar Center - LA MESA","phone":"619-668-8400","address":"La Mesa, CA","website":"","demoDealer":true,"demoGear":""},{"id":55,"name":"Guitar Center - FOUNTAIN VALLEY","phone":"714-241-9140","address":"Fountain Valley, CA","website":"","demoDealer":true,"demoGear":""},{"id":56,"name":"Guitar Center - SHERMAN OAKS","phone":"818-990-8332","address":"Sherman Oaks, CA","website":"","demoDealer":true,"demoGear":""},{"id":57,"name":"Guitar Center - NORTHRIDGE","phone":"818-993-0286","address":"Northridge, CA","website":"","demoDealer":true,"demoGear":""},{"id":58,"name":"Guitar Center - RANCHO CUCAMONGA","phone":"909-899-9843","address":"Rancho Cucamonga, CA","website":"","demoDealer":true,"demoGear":""},{"id":59,"name":"Guitar Center - PASADENA","phone":"626-535-0108","address":"Pasadena, CA","website":"","demoDealer":true,"demoGear":""},{"id":60,"name":"Guitar Center - ROSEVILLE","phone":"916-746-8787","address":"Roseville, CA","website":"","demoDealer":true,"demoGear":""},{"id":61,"name":"Guitar Center - CLACKAMAS","phone":"503-654-0100","address":"Clackamas, OR","website":"","demoDealer":true,"demoGear":""},{"id":62,"name":"Guitar Center - DENVER","phone":"303-759-9100","address":"Denver, CO","website":"","demoDealer":true,"demoGear":""},{"id":63,"name":"Guitar Center - HOUSTON","phone":"713-952-9070","address":"Houston, TX","website":"","demoDealer":true,"demoGear":""},{"id":64,"name":"Guitar Center - WICHITA","phone":"316-946-5858","address":"Wichita, KS","website":"","demoDealer":true,"demoGear":""},{"id":65,"name":"Guitar Center - BOSTON","phone":"617-247-1389","address":"Boston, MA","website":"","demoDealer":true,"demoGear":""},{"id":66,"name":"Guitar Center - NEW ORLEANS","phone":"504-818-0338","address":"Harahan, LA","website":"","demoDealer":true,"demoGear":""},{"id":67,"name":"Guitar Center - RALEIGH","phone":"919-872-0331","address":"Raleigh, NC","website":"","demoDealer":true,"demoGear":""},{"id":68,"name":"Guitar Center - GREENSBORO","phone":"336-852-8620","address":"Greensboro, NC","website":"","demoDealer":true,"demoGear":""},{"id":69,"name":"Guitar Center - ATLANTA","phone":"404-320-7253","address":"Atlanta, GA","website":"","demoDealer":true,"demoGear":""},{"id":70,"name":"Guitar Center - SPRINGFIELD","phone":"973-921-0677","address":"Springfield, NJ","website":"","demoDealer":true,"demoGear":""},{"id":71,"name":"Guitar Center - ROCKVILLE","phone":"301-231-6100","address":"Rockville, MD","website":"","demoDealer":true,"demoGear":""},{"id":72,"name":"Guitar Center - FAIRFAX","phone":"703-934-8838","address":"Fairfax, VA","website":"","demoDealer":true,"demoGear":""},{"id":73,"name":"Guitar Center - ALLENTOWN","phone":"610-231-0616","address":"Whitehall Township, PA","website":"","demoDealer":true,"demoGear":""},{"id":74,"name":"Bajaao","phone":"91-22-42035353","address":"Mumbai, India","website":"","demoDealer":false,"demoGear":""},{"id":75,"name":"Hi Tech Audio","phone":"52 55 5709 0233","address":"Ciudad de México, Mexico","website":"","demoDealer":false,"demoGear":""},{"id":76,"name":"Prologic AV","phone":"888-895-9969","address":"Florida","website":"https://prologicav.com","demoDealer":false,"demoGear":""},{"id":77,"name":"ASC Consulting","phone":"305-519-3393","address":"Doral, FL 33122","website":"www.asconsultinginc.com","demoDealer":false,"demoGear":""}];
+
     // State
     let state = {
-      screen: 'home', // home, setup, call, results, history
-      dealerName: '',
-      dealerPhone: '',
+      screen: 'home',
+      callers: JSON.parse(localStorage.getItem('bb-callers') || '["Robert"]'),
+      currentCaller: localStorage.getItem('bb-current-caller') || 'Robert',
+      assignments: JSON.parse(localStorage.getItem('bb-assignments') || '{}'),
+      results: JSON.parse(localStorage.getItem('bb-audit-results') || '[]'),
+      selectedDealer: null,
       scenario: '',
       responses: {},
-      allResults: JSON.parse(localStorage.getItem('bb-audit-results') || '[]')
+      filter: 'all', // all, mine, uncalled, called
+      searchQuery: ''
     };
 
-    // Scoring weights
+    // Scoring
     const SCORING = {
       mentionedBassboss: { yes: 20, prompted: 10, no: 0 },
       recommendedBassboss: { yes: 25, partial: 15, no: 0 },
@@ -51,211 +55,251 @@
       followUp: { offered: 10, asked: 5, none: 0 }
     };
 
-    // Script prompts based on scenario
     const SCRIPTS = {
       dj: {
-        intro: "Hi, I'm a mobile DJ looking to upgrade my sound system. I do a lot of weddings and corporate events, usually 100-300 people. What would you recommend?",
+        intro: "Hi, I'm a mobile DJ looking to upgrade my sound system. I do weddings and corporate events, usually 100-300 people. What would you recommend?",
         probes: [
           "I've heard good things about BASSBOSS — do you carry their stuff?",
-          "What's the difference between their subs? I need something punchy for dance music.",
-          "How does the SV9 compare to other 9-inch tops on the market?",
+          "What's the difference between their subs?",
+          "How does the SV9 compare to other tops?",
           "What kind of power do I need for 300 people outdoors?"
-        ],
-        techQuestions: [
-          "What's the frequency response on those subs?",
-          "Are they bi-amped or do I need an external crossover?",
-          "How do they handle in humid conditions?"
         ]
       },
       producer: {
-        intro: "Hi, I'm an event producer and we're outfitting a new warehouse venue. We need a system that can handle 500-1000 people for EDM and live shows. What do you recommend?",
+        intro: "Hi, I'm an event producer outfitting a warehouse venue for 500-1000 people for EDM shows. What do you recommend?",
         probes: [
-          "Someone mentioned BASSBOSS to me — are they any good for this scale?",
-          "I need serious sub-bass. What's your most powerful subwoofer?",
-          "We're looking at line arrays vs point source. What's your take?",
+          "Someone mentioned BASSBOSS — are they good for this scale?",
+          "I need serious sub-bass. What's your most powerful sub?",
           "What about the MFLA or AT312 for mains?"
-        ],
-        techQuestions: [
-          "What kind of SPL can we expect at 50 meters?",
-          "How's the rigging on the line array options?",
-          "What's the power draw? We need to plan our electrical."
         ]
       }
     };
 
+    function save() {
+      localStorage.setItem('bb-callers', JSON.stringify(state.callers));
+      localStorage.setItem('bb-current-caller', state.currentCaller);
+      localStorage.setItem('bb-assignments', JSON.stringify(state.assignments));
+      localStorage.setItem('bb-audit-results', JSON.stringify(state.results));
+    }
+
     function calculateScore(responses) {
       let score = 0;
-      let max = 0;
-      
       for (const [key, value] of Object.entries(responses)) {
         if (SCORING[key] && SCORING[key][value] !== undefined) {
           score += SCORING[key][value];
         }
       }
-      
-      // Max possible: 20+25+15+20+15+10+10 = 115 → normalize to 100
       return Math.round((score / 115) * 100);
     }
 
     function getScoreClass(score) {
-      if (score >= 80) return 'score-green';
-      if (score >= 50) return 'score-yellow';
-      return 'score-red';
+      if (score >= 80) return 'text-green-400';
+      if (score >= 50) return 'text-yellow-400';
+      return 'text-red-400';
     }
 
-    function getScoreLabel(score) {
-      if (score >= 80) return '✅ Great Dealer';
-      if (score >= 50) return '⚠️ Needs Training';
-      return '🚨 Problem Dealer';
+    function getScoreEmoji(score) {
+      if (score >= 80) return '🌟';
+      if (score >= 50) return '⚠️';
+      return '🚨';
     }
 
-    function saveResult() {
-      const result = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        dealerName: state.dealerName,
-        dealerPhone: state.dealerPhone,
-        scenario: state.scenario,
-        responses: { ...state.responses },
-        score: calculateScore(state.responses),
-        notes: state.responses.notes || ''
-      };
-      
-      state.allResults.push(result);
-      localStorage.setItem('bb-audit-results', JSON.stringify(state.allResults));
-      return result;
+    function getDealerStatus(dealerId) {
+      const result = state.results.find(r => r.dealerId === dealerId);
+      if (result) return { status: 'called', result };
+      return { status: 'uncalled' };
     }
 
-    function exportCSV() {
-      const headers = ['Date', 'Dealer', 'Phone', 'Scenario', 'Score', 'Rating', 'Mentioned BB', 'Recommended BB', 'Tried to Switch', 'Product Knowledge', 'Spec Knowledge', 'Enthusiasm', 'Follow-up', 'Competitor', 'Notes'];
+    function getFilteredDealers() {
+      let dealers = DEALERS.filter(d => d.phone); // Only those with phone numbers
       
-      const rows = state.allResults.map(r => [
-        new Date(r.date).toLocaleDateString(),
-        r.dealerName,
-        r.dealerPhone,
-        r.scenario,
-        r.score,
-        r.score >= 80 ? 'Great' : r.score >= 50 ? 'Needs Training' : 'Problem',
-        r.responses.mentionedBassboss || '',
-        r.responses.recommendedBassboss || '',
-        r.responses.triedToSwitch || '',
-        r.responses.knewProducts || '',
-        r.responses.knewSpecs || '',
-        r.responses.enthusiasm || '',
-        r.responses.followUp || '',
-        r.responses.competitor || '',
-        (r.responses.notes || '').replace(/"/g, '""')
-      ]);
+      // Search filter
+      if (state.searchQuery) {
+        const q = state.searchQuery.toLowerCase();
+        dealers = dealers.filter(d => 
+          d.name.toLowerCase().includes(q) || 
+          d.address.toLowerCase().includes(q)
+        );
+      }
       
-      const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `bassboss-dealer-audit-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
+      // Status filter
+      if (state.filter === 'mine') {
+        dealers = dealers.filter(d => state.assignments[d.id] === state.currentCaller);
+      } else if (state.filter === 'uncalled') {
+        dealers = dealers.filter(d => getDealerStatus(d.id).status === 'uncalled');
+      } else if (state.filter === 'called') {
+        dealers = dealers.filter(d => getDealerStatus(d.id).status === 'called');
+      }
+      
+      return dealers;
+    }
+
+    function getStats() {
+      const withPhone = DEALERS.filter(d => d.phone).length;
+      const called = state.results.length;
+      const myAssigned = Object.values(state.assignments).filter(c => c === state.currentCaller).length;
+      const myCalled = state.results.filter(r => r.caller === state.currentCaller).length;
+      const avgScore = state.results.length > 0 
+        ? Math.round(state.results.reduce((a, r) => a + r.score, 0) / state.results.length) 
+        : 0;
+      return { withPhone, called, myAssigned, myCalled, avgScore };
     }
 
     function render() {
       const app = document.getElementById('app');
       
       if (state.screen === 'home') {
+        const stats = getStats();
+        const dealers = getFilteredDealers();
+        
         app.innerHTML = `
-          <div class="text-center py-8">
-            <h1 class="text-3xl font-bold mb-2">
-              <span class="text-bb-orange">BASSBOSS</span> Dealer Audit
-            </h1>
-            <p class="text-gray-400 mb-8">Mystery Shopper Tool</p>
-            
-            <div class="space-y-4">
-              <button onclick="startNewCall()" class="w-full py-4 bg-bb-orange text-black font-bold rounded-xl text-lg hover:bg-yellow-400 transition">
-                📞 Start New Call
-              </button>
-              
-              <button onclick="showHistory()" class="w-full py-4 bg-gray-800 text-white font-semibold rounded-xl hover:bg-gray-700 transition">
-                📊 View Results (${state.allResults.length} calls)
-              </button>
-              
-              ${state.allResults.length > 0 ? `
-                <button onclick="exportCSV()" class="w-full py-3 bg-gray-900 text-gray-400 rounded-xl hover:bg-gray-800 transition">
-                  ⬇️ Export CSV
-                </button>
-              ` : ''}
+          <div class="py-4">
+            <!-- Header -->
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h1 class="text-2xl font-bold"><span class="text-bb-orange">BASSBOSS</span> Dealer Audit</h1>
+                <p class="text-gray-400 text-sm">Mystery Shopper Campaign</p>
+              </div>
+              <button onclick="showSettings()" class="p-2 text-gray-400 hover:text-white">⚙️</button>
             </div>
             
-            ${state.allResults.length > 0 ? `
-              <div class="mt-8 card rounded-xl p-4 border border-gray-800">
-                <h3 class="text-sm text-gray-400 mb-3">Quick Stats</h3>
-                <div class="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div class="text-2xl font-bold text-bb-orange">${state.allResults.length}</div>
-                    <div class="text-xs text-gray-500">Total Calls</div>
-                  </div>
-                  <div>
-                    <div class="text-2xl font-bold text-green-400">${state.allResults.filter(r => r.score >= 80).length}</div>
-                    <div class="text-xs text-gray-500">Great</div>
-                  </div>
-                  <div>
-                    <div class="text-2xl font-bold text-red-400">${state.allResults.filter(r => r.score < 50).length}</div>
-                    <div class="text-xs text-gray-500">Problem</div>
-                  </div>
+            <!-- Current Caller -->
+            <div class="card rounded-xl p-4 border border-gray-800 mb-4">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="text-xs text-gray-500">Calling as</div>
+                  <div class="text-lg font-semibold text-bb-orange">${state.currentCaller}</div>
                 </div>
+                <select onchange="switchCaller(this.value)" class="bg-gray-800 rounded-lg px-3 py-2 text-sm">
+                  ${state.callers.map(c => `<option value="${c}" ${c === state.currentCaller ? 'selected' : ''}>${c}</option>`).join('')}
+                </select>
               </div>
+            </div>
+            
+            <!-- Progress -->
+            <div class="grid grid-cols-3 gap-3 mb-4">
+              <div class="card rounded-xl p-3 border border-gray-800 text-center">
+                <div class="text-2xl font-bold text-bb-orange">${stats.called}/${stats.withPhone}</div>
+                <div class="text-xs text-gray-500">Total Called</div>
+              </div>
+              <div class="card rounded-xl p-3 border border-gray-800 text-center">
+                <div class="text-2xl font-bold text-green-400">${stats.myCalled}</div>
+                <div class="text-xs text-gray-500">My Calls</div>
+              </div>
+              <div class="card rounded-xl p-3 border border-gray-800 text-center">
+                <div class="text-2xl font-bold ${getScoreClass(stats.avgScore)}">${stats.avgScore || '-'}</div>
+                <div class="text-xs text-gray-500">Avg Score</div>
+              </div>
+            </div>
+            
+            <!-- Search & Filter -->
+            <div class="flex gap-2 mb-4">
+              <input type="text" placeholder="Search dealers..." 
+                value="${state.searchQuery}"
+                onkeyup="updateSearch(this.value)"
+                class="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm">
+              <select onchange="setFilter(this.value)" class="bg-gray-800 rounded-lg px-3 py-2 text-sm">
+                <option value="all" ${state.filter === 'all' ? 'selected' : ''}>All (${stats.withPhone})</option>
+                <option value="uncalled" ${state.filter === 'uncalled' ? 'selected' : ''}>Uncalled</option>
+                <option value="called" ${state.filter === 'called' ? 'selected' : ''}>Called</option>
+              </select>
+            </div>
+            
+            <!-- Dealer List -->
+            <div class="space-y-2">
+              ${dealers.length === 0 ? `
+                <div class="text-center text-gray-500 py-8">No dealers found</div>
+              ` : dealers.map(d => {
+                const status = getDealerStatus(d.id);
+                const assigned = state.assignments[d.id];
+                return `
+                  <div onclick="selectDealer(${d.id})" 
+                    class="card rounded-xl p-4 border ${status.status === 'called' ? 'border-green-800' : 'border-gray-800'} cursor-pointer hover:border-gray-600">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <div class="font-semibold flex items-center gap-2">
+                          ${d.name}
+                          ${d.demoDealer ? '<span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded">Demo</span>' : ''}
+                        </div>
+                        <div class="text-sm text-gray-400">${d.address}</div>
+                        <div class="text-sm text-bb-orange mt-1">${d.phone}</div>
+                        ${d.demoGear ? `<div class="text-xs text-gray-500 mt-1">Has: ${d.demoGear}</div>` : ''}
+                      </div>
+                      <div class="text-right">
+                        ${status.status === 'called' ? `
+                          <div class="text-2xl">${getScoreEmoji(status.result.score)}</div>
+                          <div class="text-lg font-bold ${getScoreClass(status.result.score)}">${status.result.score}</div>
+                        ` : `
+                          <div class="text-gray-600 text-2xl">📞</div>
+                        `}
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+            
+            <!-- Export -->
+            ${state.results.length > 0 ? `
+              <button onclick="exportCSV()" class="w-full mt-4 py-3 bg-gray-800 rounded-xl text-sm">
+                ⬇️ Export Results (${state.results.length} calls)
+              </button>
             ` : ''}
           </div>
         `;
       }
       
-      else if (state.screen === 'setup') {
+      else if (state.screen === 'dealer') {
+        const dealer = DEALERS.find(d => d.id === state.selectedDealer);
+        const status = getDealerStatus(dealer.id);
+        
         app.innerHTML = `
           <div class="py-4">
-            <button onclick="goHome()" class="text-gray-400 mb-4">← Back</button>
-            <h2 class="text-2xl font-bold mb-6">Call Setup</h2>
+            <button onclick="goHome()" class="text-gray-400 mb-4">← Back to List</button>
             
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm text-gray-400 mb-2">Dealer Name</label>
-                <input type="text" id="dealerName" value="${state.dealerName}" 
-                  class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white"
-                  placeholder="e.g., Guitar Center Austin">
+            <div class="card rounded-xl p-4 border border-gray-800 mb-4">
+              <h2 class="text-xl font-bold">${dealer.name}</h2>
+              <div class="text-gray-400">${dealer.address}</div>
+              <a href="tel:${dealer.phone}" class="text-bb-orange text-lg block mt-2">${dealer.phone}</a>
+              ${dealer.website ? `<a href="${dealer.website.startsWith('http') ? dealer.website : 'https://' + dealer.website}" target="_blank" class="text-blue-400 text-sm">🌐 Website</a>` : ''}
+              ${dealer.demoGear ? `<div class="text-sm text-gray-500 mt-2">Demo gear: ${dealer.demoGear}</div>` : ''}
+            </div>
+            
+            ${status.status === 'called' ? `
+              <div class="card rounded-xl p-4 border border-green-800 mb-4">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <div class="text-sm text-gray-400">Already called by ${status.result.caller}</div>
+                    <div class="text-sm text-gray-500">${new Date(status.result.date).toLocaleDateString()}</div>
+                  </div>
+                  <div class="text-3xl font-bold ${getScoreClass(status.result.score)}">${status.result.score}</div>
+                </div>
+                ${status.result.notes ? `<div class="text-sm text-gray-400 mt-2 border-t border-gray-800 pt-2">${status.result.notes}</div>` : ''}
               </div>
-              
-              <div>
-                <label class="block text-sm text-gray-400 mb-2">Phone Number</label>
-                <input type="tel" id="dealerPhone" value="${state.dealerPhone}"
-                  class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white"
-                  placeholder="(512) 555-1234">
-              </div>
-              
-              <div>
-                <label class="block text-sm text-gray-400 mb-3">Your Scenario</label>
+              <button onclick="recallDealer()" class="w-full py-3 bg-gray-800 rounded-xl">
+                🔄 Call Again
+              </button>
+            ` : `
+              <div class="mb-4">
+                <label class="block text-sm text-gray-400 mb-2">Select Scenario</label>
                 <div class="grid grid-cols-2 gap-3">
-                  <button onclick="selectScenario('dj')" 
-                    class="p-4 rounded-xl border-2 ${state.scenario === 'dj' ? 'border-bb-orange bg-bb-orange/10' : 'border-gray-700'} text-left">
-                    <div class="text-2xl mb-2">🎧</div>
+                  <button onclick="startCall('dj')" class="p-4 rounded-xl border-2 border-gray-700 hover:border-bb-orange">
+                    <div class="text-2xl mb-1">🎧</div>
                     <div class="font-semibold">Mobile DJ</div>
-                    <div class="text-xs text-gray-400">Weddings, corporate</div>
                   </button>
-                  <button onclick="selectScenario('producer')"
-                    class="p-4 rounded-xl border-2 ${state.scenario === 'producer' ? 'border-bb-orange bg-bb-orange/10' : 'border-gray-700'} text-left">
-                    <div class="text-2xl mb-2">🎪</div>
+                  <button onclick="startCall('producer')" class="p-4 rounded-xl border-2 border-gray-700 hover:border-bb-orange">
+                    <div class="text-2xl mb-1">🎪</div>
                     <div class="font-semibold">Event Producer</div>
-                    <div class="text-xs text-gray-400">Venues, festivals</div>
                   </button>
                 </div>
               </div>
-              
-              <button onclick="startCall()" 
-                class="w-full py-4 bg-bb-orange text-black font-bold rounded-xl text-lg mt-6 disabled:opacity-50"
-                ${!state.dealerName || !state.scenario ? 'disabled' : ''}>
-                Start Call →
-              </button>
-            </div>
+            `}
           </div>
         `;
       }
       
       else if (state.screen === 'call') {
+        const dealer = DEALERS.find(d => d.id === state.selectedDealer);
         const script = SCRIPTS[state.scenario];
         const score = calculateScore(state.responses);
         
@@ -264,257 +308,182 @@
             <div class="flex justify-between items-center mb-4">
               <div>
                 <div class="text-sm text-gray-400">Calling</div>
-                <div class="font-bold">${state.dealerName}</div>
+                <div class="font-bold">${dealer.name}</div>
               </div>
               <div class="text-right">
-                <div class="text-sm text-gray-400">Live Score</div>
+                <div class="text-sm text-gray-400">Score</div>
                 <div class="text-2xl font-bold ${getScoreClass(score)}">${score}</div>
               </div>
             </div>
             
-            <!-- Script Card -->
-            <div class="card rounded-xl p-4 border border-gray-800 mb-4">
-              <div class="flex items-center gap-2 mb-3">
-                <span class="text-bb-orange">📜</span>
-                <span class="font-semibold">Your Script</span>
-              </div>
-              <div class="bg-gray-900 rounded-lg p-3 text-sm mb-3">
-                <div class="text-bb-orange text-xs mb-1">OPENING:</div>
+            <!-- Script -->
+            <details class="card rounded-xl p-4 border border-gray-800 mb-4" open>
+              <summary class="font-semibold cursor-pointer">📜 Script</summary>
+              <div class="mt-3 bg-gray-900 rounded-lg p-3 text-sm">
+                <div class="text-bb-orange text-xs mb-1">SAY:</div>
                 "${script.intro}"
               </div>
-              <details class="text-sm">
-                <summary class="text-gray-400 cursor-pointer">Probe questions →</summary>
-                <ul class="mt-2 space-y-2 text-gray-300">
-                  ${script.probes.map(p => `<li class="pl-3 border-l-2 border-gray-700">"${p}"</li>`).join('')}
-                </ul>
-              </details>
-              <details class="text-sm mt-2">
-                <summary class="text-gray-400 cursor-pointer">Technical questions →</summary>
-                <ul class="mt-2 space-y-2 text-gray-300">
-                  ${script.techQuestions.map(q => `<li class="pl-3 border-l-2 border-gray-700">"${q}"</li>`).join('')}
-                </ul>
-              </details>
-            </div>
+              <div class="mt-2 text-sm text-gray-400">
+                <div class="text-xs text-gray-500 mb-1">PROBES:</div>
+                ${script.probes.map(p => `<div class="pl-2 border-l border-gray-700 mb-1">"${p}"</div>`).join('')}
+              </div>
+            </details>
             
-            <!-- Evaluation Form -->
-            <div class="space-y-4">
-              <div class="card rounded-xl p-4 border border-gray-800">
-                <label class="block text-sm font-medium mb-3">Did they mention BASSBOSS?</label>
-                <div class="grid grid-cols-3 gap-2">
-                  ${['yes', 'prompted', 'no'].map(v => `
-                    <button onclick="setResponse('mentionedBassboss', '${v}')"
-                      class="py-2 px-3 rounded-lg text-sm ${state.responses.mentionedBassboss === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
-                      ${v === 'yes' ? '✅ Yes' : v === 'prompted' ? '🤷 Had to ask' : '❌ No'}
-                    </button>
-                  `).join('')}
-                </div>
-              </div>
+            <!-- Form -->
+            <div class="space-y-3">
+              ${renderQuestion('mentionedBassboss', 'Did they mention BASSBOSS?', [
+                ['yes', '✅ Yes'], ['prompted', '🤷 Had to ask'], ['no', '❌ No']
+              ])}
+              ${renderQuestion('recommendedBassboss', 'Did they recommend BASSBOSS?', [
+                ['yes', '✅ Yes'], ['partial', '🤷 Kinda'], ['no', '❌ No']
+              ])}
+              ${renderQuestion('triedToSwitch', 'Tried to switch to competitor?', [
+                ['no', '✅ No'], ['yes', '⚠️ Yes']
+              ])}
+              ${state.responses.triedToSwitch === 'yes' ? `
+                <input type="text" placeholder="Which competitor?"
+                  class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm"
+                  value="${state.responses.competitor || ''}"
+                  onchange="setResponse('competitor', this.value)">
+              ` : ''}
+              ${renderQuestion('knewProducts', 'Product knowledge?', [
+                ['excellent', '🌟'], ['good', '👍'], ['basic', '😐'], ['poor', '👎']
+              ])}
+              ${renderQuestion('knewSpecs', 'Spec knowledge?', [
+                ['excellent', '🌟'], ['good', '👍'], ['some', '😐'], ['none', '👎']
+              ])}
+              ${renderQuestion('enthusiasm', 'Enthusiasm?', [
+                ['high', '🔥'], ['medium', '😐'], ['low', '😴']
+              ])}
+              ${renderQuestion('followUp', 'Follow-up offered?', [
+                ['offered', '✅'], ['asked', '🤷'], ['none', '❌']
+              ])}
               
-              <div class="card rounded-xl p-4 border border-gray-800">
-                <label class="block text-sm font-medium mb-3">Did they recommend BASSBOSS?</label>
-                <div class="grid grid-cols-3 gap-2">
-                  ${['yes', 'partial', 'no'].map(v => `
-                    <button onclick="setResponse('recommendedBassboss', '${v}')"
-                      class="py-2 px-3 rounded-lg text-sm ${state.responses.recommendedBassboss === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
-                      ${v === 'yes' ? '✅ Yes' : v === 'partial' ? '🤷 Kinda' : '❌ No'}
-                    </button>
-                  `).join('')}
-                </div>
-              </div>
-              
-              <div class="card rounded-xl p-4 border border-gray-800">
-                <label class="block text-sm font-medium mb-3">Did they try to switch you to a competitor?</label>
-                <div class="grid grid-cols-2 gap-2">
-                  ${['no', 'yes'].map(v => `
-                    <button onclick="setResponse('triedToSwitch', '${v}')"
-                      class="py-2 px-3 rounded-lg text-sm ${state.responses.triedToSwitch === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
-                      ${v === 'no' ? '✅ No' : '⚠️ Yes'}
-                    </button>
-                  `).join('')}
-                </div>
-                ${state.responses.triedToSwitch === 'yes' ? `
-                  <input type="text" placeholder="Which competitor?" 
-                    class="w-full mt-3 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm"
-                    value="${state.responses.competitor || ''}"
-                    onchange="setResponse('competitor', this.value)">
-                ` : ''}
-              </div>
-              
-              <div class="card rounded-xl p-4 border border-gray-800">
-                <label class="block text-sm font-medium mb-3">Product knowledge level?</label>
-                <div class="grid grid-cols-4 gap-2">
-                  ${['excellent', 'good', 'basic', 'poor'].map(v => `
-                    <button onclick="setResponse('knewProducts', '${v}')"
-                      class="py-2 px-2 rounded-lg text-xs ${state.responses.knewProducts === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
-                      ${v.charAt(0).toUpperCase() + v.slice(1)}
-                    </button>
-                  `).join('')}
-                </div>
-              </div>
-              
-              <div class="card rounded-xl p-4 border border-gray-800">
-                <label class="block text-sm font-medium mb-3">Could they answer spec questions?</label>
-                <div class="grid grid-cols-4 gap-2">
-                  ${['excellent', 'good', 'some', 'none'].map(v => `
-                    <button onclick="setResponse('knewSpecs', '${v}')"
-                      class="py-2 px-2 rounded-lg text-xs ${state.responses.knewSpecs === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
-                      ${v.charAt(0).toUpperCase() + v.slice(1)}
-                    </button>
-                  `).join('')}
-                </div>
-              </div>
-              
-              <div class="card rounded-xl p-4 border border-gray-800">
-                <label class="block text-sm font-medium mb-3">Enthusiasm about BASSBOSS?</label>
-                <div class="grid grid-cols-3 gap-2">
-                  ${['high', 'medium', 'low'].map(v => `
-                    <button onclick="setResponse('enthusiasm', '${v}')"
-                      class="py-2 px-3 rounded-lg text-sm ${state.responses.enthusiasm === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
-                      ${v === 'high' ? '🔥 High' : v === 'medium' ? '😐 Medium' : '😴 Low'}
-                    </button>
-                  `).join('')}
-                </div>
-              </div>
-              
-              <div class="card rounded-xl p-4 border border-gray-800">
-                <label class="block text-sm font-medium mb-3">Follow-up offered?</label>
-                <div class="grid grid-cols-3 gap-2">
-                  ${['offered', 'asked', 'none'].map(v => `
-                    <button onclick="setResponse('followUp', '${v}')"
-                      class="py-2 px-3 rounded-lg text-sm ${state.responses.followUp === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
-                      ${v === 'offered' ? '✅ Offered' : v === 'asked' ? '🤷 Had to ask' : '❌ None'}
-                    </button>
-                  `).join('')}
-                </div>
-              </div>
-              
-              <div class="card rounded-xl p-4 border border-gray-800">
-                <label class="block text-sm font-medium mb-3">Notes</label>
-                <textarea 
-                  class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm h-24"
-                  placeholder="Any other observations..."
+              <div class="card rounded-xl p-3 border border-gray-800">
+                <label class="block text-sm mb-2">Notes</label>
+                <textarea class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm h-20"
+                  placeholder="Other observations..."
                   onchange="setResponse('notes', this.value)">${state.responses.notes || ''}</textarea>
               </div>
             </div>
             
-            <button onclick="finishCall()" 
-              class="w-full py-4 bg-green-600 text-white font-bold rounded-xl text-lg mt-6 hover:bg-green-500">
-              ✅ Finish & Save
+            <button onclick="finishCall()" class="w-full py-4 bg-green-600 rounded-xl font-bold mt-4">
+              ✅ Save & Finish
             </button>
-            
-            <button onclick="cancelCall()" 
-              class="w-full py-3 text-gray-500 mt-2">
-              Cancel
-            </button>
+            <button onclick="cancelCall()" class="w-full py-2 text-gray-500 mt-2 text-sm">Cancel</button>
           </div>
         `;
       }
       
-      else if (state.screen === 'results') {
-        const result = state.lastResult;
-        const score = result.score;
-        
-        app.innerHTML = `
-          <div class="py-4 text-center">
-            <div class="text-6xl mb-4">${score >= 80 ? '🌟' : score >= 50 ? '⚠️' : '🚨'}</div>
-            <div class="text-5xl font-bold ${getScoreClass(score)} mb-2">${score}</div>
-            <div class="text-xl ${getScoreClass(score)} mb-6">${getScoreLabel(score)}</div>
-            
-            <div class="card rounded-xl p-4 border border-gray-800 text-left mb-6">
-              <div class="text-sm text-gray-400 mb-1">Dealer</div>
-              <div class="font-semibold mb-3">${result.dealerName}</div>
-              
-              <div class="text-sm text-gray-400 mb-1">Scenario</div>
-              <div class="mb-3">${result.scenario === 'dj' ? '🎧 Mobile DJ' : '🎪 Event Producer'}</div>
-              
-              ${result.responses.competitor ? `
-                <div class="text-sm text-gray-400 mb-1">Pushed Competitor</div>
-                <div class="text-red-400 mb-3">${result.responses.competitor}</div>
-              ` : ''}
-              
-              ${result.notes ? `
-                <div class="text-sm text-gray-400 mb-1">Notes</div>
-                <div class="text-sm">${result.notes}</div>
-              ` : ''}
-            </div>
-            
-            <div class="space-y-3">
-              <button onclick="startNewCall()" class="w-full py-4 bg-bb-orange text-black font-bold rounded-xl">
-                📞 Next Call
-              </button>
-              <button onclick="goHome()" class="w-full py-3 bg-gray-800 rounded-xl">
-                🏠 Home
-              </button>
-            </div>
-          </div>
-        `;
-      }
-      
-      else if (state.screen === 'history') {
-        const sorted = [...state.allResults].reverse();
-        
+      else if (state.screen === 'settings') {
         app.innerHTML = `
           <div class="py-4">
             <button onclick="goHome()" class="text-gray-400 mb-4">← Back</button>
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-2xl font-bold">Results</h2>
-              ${state.allResults.length > 0 ? `
-                <button onclick="exportCSV()" class="px-4 py-2 bg-gray-800 rounded-lg text-sm">
-                  ⬇️ Export
-                </button>
-              ` : ''}
-            </div>
+            <h2 class="text-xl font-bold mb-4">Settings</h2>
             
-            ${sorted.length === 0 ? `
-              <div class="text-center text-gray-500 py-12">
-                No calls recorded yet
-              </div>
-            ` : `
-              <div class="space-y-3">
-                ${sorted.map(r => `
-                  <div class="card rounded-xl p-4 border border-gray-800 flex justify-between items-center">
-                    <div>
-                      <div class="font-semibold">${r.dealerName}</div>
-                      <div class="text-sm text-gray-400">${new Date(r.date).toLocaleDateString()} • ${r.scenario === 'dj' ? '🎧' : '🎪'}</div>
-                    </div>
-                    <div class="text-2xl font-bold ${getScoreClass(r.score)}">${r.score}</div>
+            <div class="card rounded-xl p-4 border border-gray-800 mb-4">
+              <h3 class="font-semibold mb-3">Team Members</h3>
+              <div class="space-y-2">
+                ${state.callers.map(c => `
+                  <div class="flex justify-between items-center bg-gray-900 rounded-lg px-3 py-2">
+                    <span>${c}</span>
+                    ${state.callers.length > 1 ? `
+                      <button onclick="removeCaller('${c}')" class="text-red-400 text-sm">Remove</button>
+                    ` : ''}
                   </div>
                 `).join('')}
               </div>
-              
-              <button onclick="clearHistory()" class="w-full py-3 text-red-400 mt-6 text-sm">
-                Clear All Data
+              <div class="flex gap-2 mt-3">
+                <input type="text" id="newCaller" placeholder="Add team member" 
+                  class="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm">
+                <button onclick="addCaller()" class="px-4 py-2 bg-bb-orange text-black rounded-lg text-sm font-semibold">Add</button>
+              </div>
+            </div>
+            
+            <div class="card rounded-xl p-4 border border-gray-800 mb-4">
+              <h3 class="font-semibold mb-3">Data</h3>
+              <button onclick="exportCSV()" class="w-full py-2 bg-gray-800 rounded-lg text-sm mb-2">
+                ⬇️ Export Results CSV
               </button>
-            `}
+              <button onclick="clearData()" class="w-full py-2 bg-red-900/50 text-red-400 rounded-lg text-sm">
+                🗑️ Clear All Data
+              </button>
+            </div>
           </div>
         `;
       }
     }
 
+    function renderQuestion(key, label, options) {
+      return `
+        <div class="card rounded-xl p-3 border border-gray-800">
+          <label class="block text-sm mb-2">${label}</label>
+          <div class="flex gap-2">
+            ${options.map(([val, text]) => `
+              <button onclick="setResponse('${key}', '${val}')"
+                class="flex-1 py-2 rounded-lg text-sm ${state.responses[key] === val ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
+                ${text}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
     // Actions
-    function goHome() {
-      state.screen = 'home';
+    function goHome() { state.screen = 'home'; render(); }
+    function showSettings() { state.screen = 'settings'; render(); }
+    
+    function switchCaller(name) {
+      state.currentCaller = name;
+      save();
       render();
     }
     
-    function startNewCall() {
-      state.dealerName = '';
-      state.dealerPhone = '';
-      state.scenario = '';
+    function addCaller() {
+      const input = document.getElementById('newCaller');
+      const name = input.value.trim();
+      if (name && !state.callers.includes(name)) {
+        state.callers.push(name);
+        save();
+        render();
+      }
+    }
+    
+    function removeCaller(name) {
+      state.callers = state.callers.filter(c => c !== name);
+      if (state.currentCaller === name) state.currentCaller = state.callers[0];
+      save();
+      render();
+    }
+    
+    function updateSearch(q) {
+      state.searchQuery = q;
+      render();
+    }
+    
+    function setFilter(f) {
+      state.filter = f;
+      render();
+    }
+    
+    function selectDealer(id) {
+      state.selectedDealer = id;
+      state.screen = 'dealer';
+      render();
+    }
+    
+    function startCall(scenario) {
+      state.scenario = scenario;
       state.responses = {};
-      state.screen = 'setup';
-      render();
-    }
-    
-    function selectScenario(s) {
-      state.scenario = s;
-      render();
-    }
-    
-    function startCall() {
-      state.dealerName = document.getElementById('dealerName').value;
-      state.dealerPhone = document.getElementById('dealerPhone').value;
       state.screen = 'call';
+      render();
+    }
+    
+    function recallDealer() {
+      state.responses = {};
+      state.screen = 'call';
+      state.scenario = 'dj';
       render();
     }
     
@@ -524,31 +493,72 @@
     }
     
     function finishCall() {
-      state.lastResult = saveResult();
-      state.screen = 'results';
+      const dealer = DEALERS.find(d => d.id === state.selectedDealer);
+      const result = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        dealerId: dealer.id,
+        dealerName: dealer.name,
+        dealerPhone: dealer.phone,
+        caller: state.currentCaller,
+        scenario: state.scenario,
+        responses: { ...state.responses },
+        score: calculateScore(state.responses),
+        notes: state.responses.notes || ''
+      };
+      
+      // Remove old result if exists
+      state.results = state.results.filter(r => r.dealerId !== dealer.id);
+      state.results.push(result);
+      save();
+      
+      state.screen = 'home';
       render();
     }
     
     function cancelCall() {
-      if (confirm('Discard this call?')) {
-        goHome();
-      }
+      if (confirm('Discard this call?')) goHome();
     }
     
-    function showHistory() {
-      state.screen = 'history';
-      render();
+    function exportCSV() {
+      const headers = ['Date', 'Caller', 'Dealer', 'Phone', 'Location', 'Scenario', 'Score', 'Rating', 'Mentioned BB', 'Recommended BB', 'Tried Switch', 'Competitor', 'Product Knowledge', 'Spec Knowledge', 'Enthusiasm', 'Follow-up', 'Notes'];
+      const rows = state.results.map(r => [
+        new Date(r.date).toLocaleDateString(),
+        r.caller,
+        r.dealerName,
+        r.dealerPhone,
+        DEALERS.find(d => d.id === r.dealerId)?.address || '',
+        r.scenario,
+        r.score,
+        r.score >= 80 ? 'Great' : r.score >= 50 ? 'Needs Training' : 'Problem',
+        r.responses.mentionedBassboss || '',
+        r.responses.recommendedBassboss || '',
+        r.responses.triedToSwitch || '',
+        r.responses.competitor || '',
+        r.responses.knewProducts || '',
+        r.responses.knewSpecs || '',
+        r.responses.enthusiasm || '',
+        r.responses.followUp || '',
+        (r.notes || '').replace(/"/g, '""')
+      ]);
+      
+      const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `bassboss-dealer-audit-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
     }
     
-    function clearHistory() {
-      if (confirm('Delete all recorded calls? This cannot be undone.')) {
-        state.allResults = [];
-        localStorage.removeItem('bb-audit-results');
+    function clearData() {
+      if (confirm('Delete ALL audit data? This cannot be undone.')) {
+        state.results = [];
+        state.assignments = {};
+        save();
         render();
       }
     }
 
-    // Initial render
     render();
   </script>
 </body>
