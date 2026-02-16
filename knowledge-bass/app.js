@@ -244,18 +244,14 @@ function App() {
             <div className="mt-6 pt-4 border-t border-gray-800">
               <p className="text-xs uppercase text-gray-500 font-semibold mb-2 tracking-wider">Tools</p>
               <a
-                href="https://freqloud.github.io/bassboss.github.io/v2.html"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="../v2.html"
                 className="w-full text-left px-3 py-2 rounded-lg mb-1 flex items-center gap-2 text-gray-300 hover:bg-gray-800 hover:text-bb-orange transition-colors"
               >
                 <span>🎛️</span>
                 <span className="text-sm">System Quoter</span>
               </a>
               <a
-                href="https://freqloud.github.io/bassboss.github.io/v3.html"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="../v3.html"
                 className="w-full text-left px-3 py-2 rounded-lg mb-1 flex items-center gap-2 text-gray-300 hover:bg-gray-800 hover:text-bb-orange transition-colors"
               >
                 <span>🔧</span>
