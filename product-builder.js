@@ -3,13 +3,13 @@
 
 // Top coverage capacity (people per PAIR of tops, for stereo setup)
 const TOP_CAPACITY = {
-  'SV9-MK3': { min: 0, max: 100, ideal: 75 },
-  'DiaMon-MK3': { min: 50, max: 200, ideal: 150 },
-  'DV12-MK3': { min: 100, max: 350, ideal: 250 },
-  'AT212-MK3': { min: 200, max: 600, ideal: 400 },
-  'AT312-MK3': { min: 400, max: 1200, ideal: 800 },
-  'MFLA-MK3': { min: 500, max: 2000, ideal: 1200, minUnits: 4 },  // Line array needs 4 min
-  'Krakatoa-MK3': { min: 2000, max: 10000, ideal: 5000 }
+  'SV9-MK3': { min: 0, max: 100, ideal: 75, maxUnits: 4, upgradeAt: 100, upgradeTo: 'DiaMon-MK3' },
+  'DiaMon-MK3': { min: 50, max: 200, ideal: 150, maxUnits: 4, upgradeAt: 200, upgradeTo: 'DV12-MK3' },
+  'DV12-MK3': { min: 100, max: 350, ideal: 250, maxUnits: 4, upgradeAt: 350, upgradeTo: 'AT212-MK3' },
+  'AT212-MK3': { min: 200, max: 600, ideal: 400, maxUnits: 6, upgradeAt: 600, upgradeTo: 'AT312-MK3' },
+  'AT312-MK3': { min: 400, max: 1200, ideal: 800, maxUnits: 8, upgradeAt: 1200, upgradeTo: 'MFLA-MK3' },
+  'MFLA-MK3': { min: 500, max: 2000, ideal: 1200, minUnits: 4, maxUnits: 12, upgradeAt: 3000, upgradeTo: 'Krakatoa-MK3' },
+  'Krakatoa-MK3': { min: 2000, max: 10000, ideal: 5000, maxUnits: 8 }
 };
 
 // Suggested sub pairings (in order of recommendation)
@@ -130,14 +130,41 @@ const App = () => {
     const crowd = CROWD_SIZES.find(c => c.id === crowdSize);
     const bassMultiplier = BASS_MULTIPLIER[selectedGenre];
 
+    // Check if crowd exceeds this model's sweet spot
+    let warning = null;
+    let suggestedUpgrade = null;
+    
+    if (crowd.value > capacity.max) {
+      const upgradeTo = capacity.upgradeTo ? getProduct(capacity.upgradeTo) : null;
+      warning = `${top.name} is designed for up to ${capacity.max.toLocaleString()} people.`;
+      if (upgradeTo) {
+        suggestedUpgrade = upgradeTo;
+        warning += ` For ${crowd.label}, we'd recommend ${upgradeTo.name}.`;
+      }
+    }
+
     // Calculate tops needed (minimum 2 for stereo)
     let topsNeeded = Math.ceil(crowd.value / capacity.ideal) * 2;
     topsNeeded = Math.max(topsNeeded, 2);
     
     // MFLA requires minimum 4
     if (selectedTop === 'MFLA-MK3') {
-      topsNeeded = Math.max(topsNeeded, 4);
+      topsNeeded = Math.max(topsNeeded, capacity.minUnits || 4);
       if (topsNeeded % 2 !== 0) topsNeeded++;
+    }
+
+    // Cap at maxUnits
+    let cappedTops = false;
+    if (capacity.maxUnits && topsNeeded > capacity.maxUnits) {
+      topsNeeded = capacity.maxUnits;
+      cappedTops = true;
+      if (!warning) {
+        const upgradeTo = capacity.upgradeTo ? getProduct(capacity.upgradeTo) : null;
+        warning = `We capped at ${topsNeeded} ${top.name}s — beyond this, you'd want to upgrade.`;
+        if (upgradeTo) {
+          suggestedUpgrade = upgradeTo;
+        }
+      }
     }
 
     // Calculate subs
@@ -164,7 +191,10 @@ const App = () => {
       subsPrice,
       totalPrice,
       crowd: crowd.label,
-      genreLabel: GENRES.find(g => g.id === selectedGenre)?.label
+      genreLabel: GENRES.find(g => g.id === selectedGenre)?.label,
+      warning,
+      suggestedUpgrade,
+      cappedTops
     });
     setGenre(selectedGenre);
     setStep(4);
@@ -417,6 +447,30 @@ const App = () => {
                 <span className="text-white font-medium"> {result.genreLabel}</span>
               </p>
             </div>
+            
+            {/* Warning / Upgrade Suggestion */}
+            {result.warning && (
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">⚠️</span>
+                  <div>
+                    <p className="text-yellow-200">{result.warning}</p>
+                    {result.suggestedUpgrade && (
+                      <button 
+                        onClick={() => { 
+                          setSelectedTop(result.suggestedUpgrade.id); 
+                          setStep(1); 
+                          setResult(null);
+                        }}
+                        className="mt-2 bg-bb-orange text-black px-4 py-2 rounded-lg font-semibold hover:bg-yellow-400 transition-colors"
+                      >
+                        Try {result.suggestedUpgrade.name} instead →
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="bg-gradient-to-br from-bb-orange/20 to-orange-600/10 border border-bb-orange/30 rounded-2xl p-6">
               <div className="text-center mb-6">
