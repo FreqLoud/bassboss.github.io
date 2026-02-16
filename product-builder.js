@@ -120,9 +120,53 @@ const App = () => {
     };
   };
 
-  const handleCalculate = () => {
-    const result = calculateSystem();
-    setResult(result);
+  const handleCalculate = (selectedGenre) => {
+    // Pass genre directly since setState is async
+    if (!selectedTop || !selectedSub || !crowdSize || !selectedGenre) return;
+
+    const top = getProduct(selectedTop);
+    const sub = getProduct(selectedSub);
+    const capacity = TOP_CAPACITY[selectedTop];
+    const crowd = CROWD_SIZES.find(c => c.id === crowdSize);
+    const bassMultiplier = BASS_MULTIPLIER[selectedGenre];
+
+    // Calculate tops needed (minimum 2 for stereo)
+    let topsNeeded = Math.ceil(crowd.value / capacity.ideal) * 2;
+    topsNeeded = Math.max(topsNeeded, 2);
+    
+    // MFLA requires minimum 4
+    if (selectedTop === 'MFLA-MK3') {
+      topsNeeded = Math.max(topsNeeded, 4);
+      if (topsNeeded % 2 !== 0) topsNeeded++;
+    }
+
+    // Calculate subs
+    const subCapacity = top.subCapacity || { single: 2, double: 1 };
+    const isDoubleSub = sub.driverClass === 'double' || sub.driverClass === 'quad';
+    const maxSubsPerTop = isDoubleSub ? subCapacity.double : subCapacity.single;
+    
+    let subsNeeded = Math.round(topsNeeded * bassMultiplier);
+    subsNeeded = Math.max(subsNeeded, 2);
+    
+    const maxSubs = topsNeeded * maxSubsPerTop;
+    subsNeeded = Math.min(subsNeeded, maxSubs);
+
+    const topsPrice = top.price * topsNeeded;
+    const subsPrice = sub.price * subsNeeded;
+    const totalPrice = topsPrice + subsPrice;
+
+    setResult({
+      top,
+      sub,
+      topsNeeded,
+      subsNeeded,
+      topsPrice,
+      subsPrice,
+      totalPrice,
+      crowd: crowd.label,
+      genreLabel: GENRES.find(g => g.id === selectedGenre)?.label
+    });
+    setGenre(selectedGenre);
     setStep(4);
   };
 
@@ -335,7 +379,7 @@ const App = () => {
               {GENRES.map(g => (
                 <button
                   key={g.id}
-                  onClick={() => { setGenre(g.id); handleCalculate(); }}
+                  onClick={() => handleCalculate(g.id)}
                   className="bg-gray-800 hover:bg-gray-700 border-2 border-transparent hover:border-bb-orange rounded-xl p-4 text-left transition-all"
                 >
                   <div className="flex items-center gap-3">
