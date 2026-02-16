@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BASSBOSS Dealer Audit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'bb-orange': '#F9C017',
+            'bb-black': '#0a0a0a',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .card { background: linear-gradient(145deg, #1a1a1a, #0f0f0f); }
+    .score-green { color: #22c55e; }
+    .score-yellow { color: #eab308; }
+    .score-red { color: #ef4444; }
+  </style>
+</head>
+<body class="bg-bb-black min-h-screen text-white">
+  <div id="app" class="max-w-2xl mx-auto p-4 pb-24"></div>
+
+  <script>
+    // State
+    let state = {
+      screen: 'home', // home, setup, call, results, history
+      dealerName: '',
+      dealerPhone: '',
+      scenario: '',
+      responses: {},
+      allResults: JSON.parse(localStorage.getItem('bb-audit-results') || '[]')
+    };
+
+    // Scoring weights
+    const SCORING = {
+      mentionedBassboss: { yes: 20, prompted: 10, no: 0 },
+      recommendedBassboss: { yes: 25, partial: 15, no: 0 },
+      triedToSwitch: { no: 15, yes: 0 },
+      knewProducts: { excellent: 20, good: 15, basic: 10, poor: 0 },
+      knewSpecs: { excellent: 15, good: 10, some: 5, none: 0 },
+      enthusiasm: { high: 10, medium: 5, low: 0 },
+      followUp: { offered: 10, asked: 5, none: 0 }
+    };
+
+    // Script prompts based on scenario
+    const SCRIPTS = {
+      dj: {
+        intro: "Hi, I'm a mobile DJ looking to upgrade my sound system. I do a lot of weddings and corporate events, usually 100-300 people. What would you recommend?",
+        probes: [
+          "I've heard good things about BASSBOSS — do you carry their stuff?",
+          "What's the difference between their subs? I need something punchy for dance music.",
+          "How does the SV9 compare to other 9-inch tops on the market?",
+          "What kind of power do I need for 300 people outdoors?"
+        ],
+        techQuestions: [
+          "What's the frequency response on those subs?",
+          "Are they bi-amped or do I need an external crossover?",
+          "How do they handle in humid conditions?"
+        ]
+      },
+      producer: {
+        intro: "Hi, I'm an event producer and we're outfitting a new warehouse venue. We need a system that can handle 500-1000 people for EDM and live shows. What do you recommend?",
+        probes: [
+          "Someone mentioned BASSBOSS to me — are they any good for this scale?",
+          "I need serious sub-bass. What's your most powerful subwoofer?",
+          "We're looking at line arrays vs point source. What's your take?",
+          "What about the MFLA or AT312 for mains?"
+        ],
+        techQuestions: [
+          "What kind of SPL can we expect at 50 meters?",
+          "How's the rigging on the line array options?",
+          "What's the power draw? We need to plan our electrical."
+        ]
+      }
+    };
+
+    function calculateScore(responses) {
+      let score = 0;
+      let max = 0;
+      
+      for (const [key, value] of Object.entries(responses)) {
+        if (SCORING[key] && SCORING[key][value] !== undefined) {
+          score += SCORING[key][value];
+        }
+      }
+      
+      // Max possible: 20+25+15+20+15+10+10 = 115 → normalize to 100
+      return Math.round((score / 115) * 100);
+    }
+
+    function getScoreClass(score) {
+      if (score >= 80) return 'score-green';
+      if (score >= 50) return 'score-yellow';
+      return 'score-red';
+    }
+
+    function getScoreLabel(score) {
+      if (score >= 80) return '✅ Great Dealer';
+      if (score >= 50) return '⚠️ Needs Training';
+      return '🚨 Problem Dealer';
+    }
+
+    function saveResult() {
+      const result = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        dealerName: state.dealerName,
+        dealerPhone: state.dealerPhone,
+        scenario: state.scenario,
+        responses: { ...state.responses },
+        score: calculateScore(state.responses),
+        notes: state.responses.notes || ''
+      };
+      
+      state.allResults.push(result);
+      localStorage.setItem('bb-audit-results', JSON.stringify(state.allResults));
+      return result;
+    }
+
+    function exportCSV() {
+      const headers = ['Date', 'Dealer', 'Phone', 'Scenario', 'Score', 'Rating', 'Mentioned BB', 'Recommended BB', 'Tried to Switch', 'Product Knowledge', 'Spec Knowledge', 'Enthusiasm', 'Follow-up', 'Competitor', 'Notes'];
+      
+      const rows = state.allResults.map(r => [
+        new Date(r.date).toLocaleDateString(),
+        r.dealerName,
+        r.dealerPhone,
+        r.scenario,
+        r.score,
+        r.score >= 80 ? 'Great' : r.score >= 50 ? 'Needs Training' : 'Problem',
+        r.responses.mentionedBassboss || '',
+        r.responses.recommendedBassboss || '',
+        r.responses.triedToSwitch || '',
+        r.responses.knewProducts || '',
+        r.responses.knewSpecs || '',
+        r.responses.enthusiasm || '',
+        r.responses.followUp || '',
+        r.responses.competitor || '',
+        (r.responses.notes || '').replace(/"/g, '""')
+      ]);
+      
+      const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bassboss-dealer-audit-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+    }
+
+    function render() {
+      const app = document.getElementById('app');
+      
+      if (state.screen === 'home') {
+        app.innerHTML = `
+          <div class="text-center py-8">
+            <h1 class="text-3xl font-bold mb-2">
+              <span class="text-bb-orange">BASSBOSS</span> Dealer Audit
+            </h1>
+            <p class="text-gray-400 mb-8">Mystery Shopper Tool</p>
+            
+            <div class="space-y-4">
+              <button onclick="startNewCall()" class="w-full py-4 bg-bb-orange text-black font-bold rounded-xl text-lg hover:bg-yellow-400 transition">
+                📞 Start New Call
+              </button>
+              
+              <button onclick="showHistory()" class="w-full py-4 bg-gray-800 text-white font-semibold rounded-xl hover:bg-gray-700 transition">
+                📊 View Results (${state.allResults.length} calls)
+              </button>
+              
+              ${state.allResults.length > 0 ? `
+                <button onclick="exportCSV()" class="w-full py-3 bg-gray-900 text-gray-400 rounded-xl hover:bg-gray-800 transition">
+                  ⬇️ Export CSV
+                </button>
+              ` : ''}
+            </div>
+            
+            ${state.allResults.length > 0 ? `
+              <div class="mt-8 card rounded-xl p-4 border border-gray-800">
+                <h3 class="text-sm text-gray-400 mb-3">Quick Stats</h3>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div class="text-2xl font-bold text-bb-orange">${state.allResults.length}</div>
+                    <div class="text-xs text-gray-500">Total Calls</div>
+                  </div>
+                  <div>
+                    <div class="text-2xl font-bold text-green-400">${state.allResults.filter(r => r.score >= 80).length}</div>
+                    <div class="text-xs text-gray-500">Great</div>
+                  </div>
+                  <div>
+                    <div class="text-2xl font-bold text-red-400">${state.allResults.filter(r => r.score < 50).length}</div>
+                    <div class="text-xs text-gray-500">Problem</div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+      
+      else if (state.screen === 'setup') {
+        app.innerHTML = `
+          <div class="py-4">
+            <button onclick="goHome()" class="text-gray-400 mb-4">← Back</button>
+            <h2 class="text-2xl font-bold mb-6">Call Setup</h2>
+            
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm text-gray-400 mb-2">Dealer Name</label>
+                <input type="text" id="dealerName" value="${state.dealerName}" 
+                  class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white"
+                  placeholder="e.g., Guitar Center Austin">
+              </div>
+              
+              <div>
+                <label class="block text-sm text-gray-400 mb-2">Phone Number</label>
+                <input type="tel" id="dealerPhone" value="${state.dealerPhone}"
+                  class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white"
+                  placeholder="(512) 555-1234">
+              </div>
+              
+              <div>
+                <label class="block text-sm text-gray-400 mb-3">Your Scenario</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button onclick="selectScenario('dj')" 
+                    class="p-4 rounded-xl border-2 ${state.scenario === 'dj' ? 'border-bb-orange bg-bb-orange/10' : 'border-gray-700'} text-left">
+                    <div class="text-2xl mb-2">🎧</div>
+                    <div class="font-semibold">Mobile DJ</div>
+                    <div class="text-xs text-gray-400">Weddings, corporate</div>
+                  </button>
+                  <button onclick="selectScenario('producer')"
+                    class="p-4 rounded-xl border-2 ${state.scenario === 'producer' ? 'border-bb-orange bg-bb-orange/10' : 'border-gray-700'} text-left">
+                    <div class="text-2xl mb-2">🎪</div>
+                    <div class="font-semibold">Event Producer</div>
+                    <div class="text-xs text-gray-400">Venues, festivals</div>
+                  </button>
+                </div>
+              </div>
+              
+              <button onclick="startCall()" 
+                class="w-full py-4 bg-bb-orange text-black font-bold rounded-xl text-lg mt-6 disabled:opacity-50"
+                ${!state.dealerName || !state.scenario ? 'disabled' : ''}>
+                Start Call →
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      
+      else if (state.screen === 'call') {
+        const script = SCRIPTS[state.scenario];
+        const score = calculateScore(state.responses);
+        
+        app.innerHTML = `
+          <div class="py-4">
+            <div class="flex justify-between items-center mb-4">
+              <div>
+                <div class="text-sm text-gray-400">Calling</div>
+                <div class="font-bold">${state.dealerName}</div>
+              </div>
+              <div class="text-right">
+                <div class="text-sm text-gray-400">Live Score</div>
+                <div class="text-2xl font-bold ${getScoreClass(score)}">${score}</div>
+              </div>
+            </div>
+            
+            <!-- Script Card -->
+            <div class="card rounded-xl p-4 border border-gray-800 mb-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-bb-orange">📜</span>
+                <span class="font-semibold">Your Script</span>
+              </div>
+              <div class="bg-gray-900 rounded-lg p-3 text-sm mb-3">
+                <div class="text-bb-orange text-xs mb-1">OPENING:</div>
+                "${script.intro}"
+              </div>
+              <details class="text-sm">
+                <summary class="text-gray-400 cursor-pointer">Probe questions →</summary>
+                <ul class="mt-2 space-y-2 text-gray-300">
+                  ${script.probes.map(p => `<li class="pl-3 border-l-2 border-gray-700">"${p}"</li>`).join('')}
+                </ul>
+              </details>
+              <details class="text-sm mt-2">
+                <summary class="text-gray-400 cursor-pointer">Technical questions →</summary>
+                <ul class="mt-2 space-y-2 text-gray-300">
+                  ${script.techQuestions.map(q => `<li class="pl-3 border-l-2 border-gray-700">"${q}"</li>`).join('')}
+                </ul>
+              </details>
+            </div>
+            
+            <!-- Evaluation Form -->
+            <div class="space-y-4">
+              <div class="card rounded-xl p-4 border border-gray-800">
+                <label class="block text-sm font-medium mb-3">Did they mention BASSBOSS?</label>
+                <div class="grid grid-cols-3 gap-2">
+                  ${['yes', 'prompted', 'no'].map(v => `
+                    <button onclick="setResponse('mentionedBassboss', '${v}')"
+                      class="py-2 px-3 rounded-lg text-sm ${state.responses.mentionedBassboss === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
+                      ${v === 'yes' ? '✅ Yes' : v === 'prompted' ? '🤷 Had to ask' : '❌ No'}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="card rounded-xl p-4 border border-gray-800">
+                <label class="block text-sm font-medium mb-3">Did they recommend BASSBOSS?</label>
+                <div class="grid grid-cols-3 gap-2">
+                  ${['yes', 'partial', 'no'].map(v => `
+                    <button onclick="setResponse('recommendedBassboss', '${v}')"
+                      class="py-2 px-3 rounded-lg text-sm ${state.responses.recommendedBassboss === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
+                      ${v === 'yes' ? '✅ Yes' : v === 'partial' ? '🤷 Kinda' : '❌ No'}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="card rounded-xl p-4 border border-gray-800">
+                <label class="block text-sm font-medium mb-3">Did they try to switch you to a competitor?</label>
+                <div class="grid grid-cols-2 gap-2">
+                  ${['no', 'yes'].map(v => `
+                    <button onclick="setResponse('triedToSwitch', '${v}')"
+                      class="py-2 px-3 rounded-lg text-sm ${state.responses.triedToSwitch === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
+                      ${v === 'no' ? '✅ No' : '⚠️ Yes'}
+                    </button>
+                  `).join('')}
+                </div>
+                ${state.responses.triedToSwitch === 'yes' ? `
+                  <input type="text" placeholder="Which competitor?" 
+                    class="w-full mt-3 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm"
+                    value="${state.responses.competitor || ''}"
+                    onchange="setResponse('competitor', this.value)">
+                ` : ''}
+              </div>
+              
+              <div class="card rounded-xl p-4 border border-gray-800">
+                <label class="block text-sm font-medium mb-3">Product knowledge level?</label>
+                <div class="grid grid-cols-4 gap-2">
+                  ${['excellent', 'good', 'basic', 'poor'].map(v => `
+                    <button onclick="setResponse('knewProducts', '${v}')"
+                      class="py-2 px-2 rounded-lg text-xs ${state.responses.knewProducts === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
+                      ${v.charAt(0).toUpperCase() + v.slice(1)}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="card rounded-xl p-4 border border-gray-800">
+                <label class="block text-sm font-medium mb-3">Could they answer spec questions?</label>
+                <div class="grid grid-cols-4 gap-2">
+                  ${['excellent', 'good', 'some', 'none'].map(v => `
+                    <button onclick="setResponse('knewSpecs', '${v}')"
+                      class="py-2 px-2 rounded-lg text-xs ${state.responses.knewSpecs === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
+                      ${v.charAt(0).toUpperCase() + v.slice(1)}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="card rounded-xl p-4 border border-gray-800">
+                <label class="block text-sm font-medium mb-3">Enthusiasm about BASSBOSS?</label>
+                <div class="grid grid-cols-3 gap-2">
+                  ${['high', 'medium', 'low'].map(v => `
+                    <button onclick="setResponse('enthusiasm', '${v}')"
+                      class="py-2 px-3 rounded-lg text-sm ${state.responses.enthusiasm === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
+                      ${v === 'high' ? '🔥 High' : v === 'medium' ? '😐 Medium' : '😴 Low'}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="card rounded-xl p-4 border border-gray-800">
+                <label class="block text-sm font-medium mb-3">Follow-up offered?</label>
+                <div class="grid grid-cols-3 gap-2">
+                  ${['offered', 'asked', 'none'].map(v => `
+                    <button onclick="setResponse('followUp', '${v}')"
+                      class="py-2 px-3 rounded-lg text-sm ${state.responses.followUp === v ? 'bg-bb-orange text-black font-semibold' : 'bg-gray-800'}">
+                      ${v === 'offered' ? '✅ Offered' : v === 'asked' ? '🤷 Had to ask' : '❌ None'}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="card rounded-xl p-4 border border-gray-800">
+                <label class="block text-sm font-medium mb-3">Notes</label>
+                <textarea 
+                  class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm h-24"
+                  placeholder="Any other observations..."
+                  onchange="setResponse('notes', this.value)">${state.responses.notes || ''}</textarea>
+              </div>
+            </div>
+            
+            <button onclick="finishCall()" 
+              class="w-full py-4 bg-green-600 text-white font-bold rounded-xl text-lg mt-6 hover:bg-green-500">
+              ✅ Finish & Save
+            </button>
+            
+            <button onclick="cancelCall()" 
+              class="w-full py-3 text-gray-500 mt-2">
+              Cancel
+            </button>
+          </div>
+        `;
+      }
+      
+      else if (state.screen === 'results') {
+        const result = state.lastResult;
+        const score = result.score;
+        
+        app.innerHTML = `
+          <div class="py-4 text-center">
+            <div class="text-6xl mb-4">${score >= 80 ? '🌟' : score >= 50 ? '⚠️' : '🚨'}</div>
+            <div class="text-5xl font-bold ${getScoreClass(score)} mb-2">${score}</div>
+            <div class="text-xl ${getScoreClass(score)} mb-6">${getScoreLabel(score)}</div>
+            
+            <div class="card rounded-xl p-4 border border-gray-800 text-left mb-6">
+              <div class="text-sm text-gray-400 mb-1">Dealer</div>
+              <div class="font-semibold mb-3">${result.dealerName}</div>
+              
+              <div class="text-sm text-gray-400 mb-1">Scenario</div>
+              <div class="mb-3">${result.scenario === 'dj' ? '🎧 Mobile DJ' : '🎪 Event Producer'}</div>
+              
+              ${result.responses.competitor ? `
+                <div class="text-sm text-gray-400 mb-1">Pushed Competitor</div>
+                <div class="text-red-400 mb-3">${result.responses.competitor}</div>
+              ` : ''}
+              
+              ${result.notes ? `
+                <div class="text-sm text-gray-400 mb-1">Notes</div>
+                <div class="text-sm">${result.notes}</div>
+              ` : ''}
+            </div>
+            
+            <div class="space-y-3">
+              <button onclick="startNewCall()" class="w-full py-4 bg-bb-orange text-black font-bold rounded-xl">
+                📞 Next Call
+              </button>
+              <button onclick="goHome()" class="w-full py-3 bg-gray-800 rounded-xl">
+                🏠 Home
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      
+      else if (state.screen === 'history') {
+        const sorted = [...state.allResults].reverse();
+        
+        app.innerHTML = `
+          <div class="py-4">
+            <button onclick="goHome()" class="text-gray-400 mb-4">← Back</button>
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-2xl font-bold">Results</h2>
+              ${state.allResults.length > 0 ? `
+                <button onclick="exportCSV()" class="px-4 py-2 bg-gray-800 rounded-lg text-sm">
+                  ⬇️ Export
+                </button>
+              ` : ''}
+            </div>
+            
+            ${sorted.length === 0 ? `
+              <div class="text-center text-gray-500 py-12">
+                No calls recorded yet
+              </div>
+            ` : `
+              <div class="space-y-3">
+                ${sorted.map(r => `
+                  <div class="card rounded-xl p-4 border border-gray-800 flex justify-between items-center">
+                    <div>
+                      <div class="font-semibold">${r.dealerName}</div>
+                      <div class="text-sm text-gray-400">${new Date(r.date).toLocaleDateString()} • ${r.scenario === 'dj' ? '🎧' : '🎪'}</div>
+                    </div>
+                    <div class="text-2xl font-bold ${getScoreClass(r.score)}">${r.score}</div>
+                  </div>
+                `).join('')}
+              </div>
+              
+              <button onclick="clearHistory()" class="w-full py-3 text-red-400 mt-6 text-sm">
+                Clear All Data
+              </button>
+            `}
+          </div>
+        `;
+      }
+    }
+
+    // Actions
+    function goHome() {
+      state.screen = 'home';
+      render();
+    }
+    
+    function startNewCall() {
+      state.dealerName = '';
+      state.dealerPhone = '';
+      state.scenario = '';
+      state.responses = {};
+      state.screen = 'setup';
+      render();
+    }
+    
+    function selectScenario(s) {
+      state.scenario = s;
+      render();
+    }
+    
+    function startCall() {
+      state.dealerName = document.getElementById('dealerName').value;
+      state.dealerPhone = document.getElementById('dealerPhone').value;
+      state.screen = 'call';
+      render();
+    }
+    
+    function setResponse(key, value) {
+      state.responses[key] = value;
+      render();
+    }
+    
+    function finishCall() {
+      state.lastResult = saveResult();
+      state.screen = 'results';
+      render();
+    }
+    
+    function cancelCall() {
+      if (confirm('Discard this call?')) {
+        goHome();
+      }
+    }
+    
+    function showHistory() {
+      state.screen = 'history';
+      render();
+    }
+    
+    function clearHistory() {
+      if (confirm('Delete all recorded calls? This cannot be undone.')) {
+        state.allResults = [];
+        localStorage.removeItem('bb-audit-results');
+        render();
+      }
+    }
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
