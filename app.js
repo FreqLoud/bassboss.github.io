@@ -720,6 +720,13 @@ const App = () => {
             <div>
               <span className="text-gray-500">Power Draw</span>
               <div className="font-semibold">{stats.totalAmperage.toFixed(1)}A @ 120V</div>
+              <div className="text-xs text-gray-400">
+                {(() => {
+                  const circuits = Math.ceil(stats.totalAmperage / 15);
+                  const safetyNote = circuits > 2 ? ' (distribute subs across circuits)' : '';
+                  return `⚡ ${circuits} × 20A circuit${circuits > 1 ? 's' : ''} recommended${safetyNote}`;
+                })()}
+              </div>
             </div>
           </div>
         </div>

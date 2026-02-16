@@ -182,6 +182,12 @@ const App = () => {
     const subsPrice = sub.price * subsNeeded;
     const totalPrice = topsPrice + subsPrice;
 
+    // Calculate power requirements
+    const topAmperage = (top.amperage || 3) * topsNeeded;
+    const subAmperage = (sub.amperage || 5) * subsNeeded;
+    const totalAmperage = topAmperage + subAmperage;
+    const circuitsNeeded = Math.ceil(totalAmperage / 15);
+
     setResult({
       top,
       sub,
@@ -190,6 +196,8 @@ const App = () => {
       topsPrice,
       subsPrice,
       totalPrice,
+      totalAmperage,
+      circuitsNeeded,
       crowd: crowd.label,
       genreLabel: GENRES.find(g => g.id === selectedGenre)?.label,
       warning,
@@ -523,6 +531,32 @@ const App = () => {
                   </a>
                 </div>
               </div>
+              
+              {/* Power Requirements */}
+              <div className="mt-4 p-4 bg-black/20 rounded-xl flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">⚡</span>
+                  <div>
+                    <div className="text-white font-medium">Power Requirements</div>
+                    <div className="text-sm text-gray-400">
+                      {result.totalAmperage.toFixed(1)}A @ 120V
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-bb-orange font-bold text-lg">
+                    {result.circuitsNeeded} × 20A
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    circuit{result.circuitsNeeded > 1 ? 's' : ''} needed
+                  </div>
+                </div>
+              </div>
+              {result.circuitsNeeded > 2 && (
+                <div className="mt-2 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-sm text-yellow-200">
+                  💡 Tip: Distribute subs across different circuits to avoid tripping breakers
+                </div>
+              )}
             </div>
             
             {/* Cross-link */}
