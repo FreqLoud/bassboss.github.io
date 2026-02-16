@@ -755,6 +755,12 @@ const App = () => {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">Your BASSBOSS Systems</h2>
           <p className="text-gray-400">Three tiers to match your goals and budget</p>
+          <button
+            onClick={() => window.print()}
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition-colors print:hidden"
+          >
+            🖨️ Print / Save as PDF
+          </button>
         </div>
 
         {/* Recap of choices */}

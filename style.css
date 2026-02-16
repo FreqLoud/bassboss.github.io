@@ -80,10 +80,72 @@ select:focus-visible {
 /* Print styles */
 @media print {
   body {
-    background: white;
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   
-  button {
-    display: none;
+  /* Hide non-essential elements */
+  button, 
+  .print\\:hidden,
+  a[href="v3.html"],
+  a[href="v2.html"] {
+    display: none !important;
+  }
+  
+  /* Force backgrounds to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Make cards visible on white background */
+  .bg-white, 
+  .bg-gray-50,
+  .bg-gray-800,
+  .bg-black\\/30 {
+    background: #f9f9f9 !important;
+    border: 1px solid #ddd !important;
+  }
+  
+  /* Ensure text is readable */
+  .text-white {
+    color: #1a1a1a !important;
+  }
+  
+  .text-gray-400,
+  .text-gray-500,
+  .text-gray-600 {
+    color: #666 !important;
+  }
+  
+  /* Keep BB orange visible */
+  .text-bb-orange,
+  .bg-bb-orange {
+    color: #D4A000 !important;
+  }
+  
+  /* Page breaks */
+  .page-break-before {
+    page-break-before: always;
+  }
+  
+  /* Header styling for print */
+  h2, h3, h4 {
+    color: #1a1a1a !important;
+  }
+  
+  /* Ensure links show URL */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+  
+  /* Don't break cards across pages */
+  .rounded-2xl,
+  .rounded-xl {
+    page-break-inside: avoid;
   }
 }

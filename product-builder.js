@@ -356,7 +356,15 @@ const App = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white">Your Custom System</h2>
-              <button onClick={reset} className="text-bb-orange hover:underline">Start Over</button>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => window.print()} 
+                  className="text-gray-400 hover:text-white text-sm print:hidden"
+                >
+                  🖨️ Print
+                </button>
+                <button onClick={reset} className="text-bb-orange hover:underline print:hidden">Start Over</button>
+              </div>
             </div>
             
             <div className="bg-gray-800 rounded-xl p-4">
