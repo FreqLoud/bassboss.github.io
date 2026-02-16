@@ -241,7 +241,7 @@ const App = () => {
             <p className="text-gray-400 mt-1">Pick your gear, we'll tell you how much you need</p>
           </div>
           <a 
-            href="v2.html" 
+            href="quotebass.html" 
             className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-bb-orange/20 to-orange-600/10 border border-bb-orange/40 rounded-lg text-bb-orange hover:border-bb-orange hover:bg-bb-orange/20 transition-all group"
           >
             <span className="font-bold group-hover:-translate-x-1 transition-transform">←</span>
@@ -567,7 +567,7 @@ const App = () => {
             {/* Cross-link */}
             <div className="bg-gray-800 rounded-xl p-4 text-center">
               <p className="text-gray-400 mb-2">Want to see alternative configurations?</p>
-              <a href="v2.html" className="text-bb-orange hover:underline font-medium">
+              <a href="quotebass.html" className="text-bb-orange hover:underline font-medium">
                 Try the System Quoter →
               </a>
             </div>

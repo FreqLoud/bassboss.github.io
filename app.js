@@ -1031,7 +1031,7 @@ const App = () => {
         />
         <p className="text-gray-500 text-sm">System Builder</p>
         <a 
-          href="v3.html" 
+          href="buildbass.html" 
           className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-bb-orange/20 to-orange-600/10 border border-bb-orange/40 rounded-lg text-bb-orange hover:border-bb-orange hover:bg-bb-orange/20 transition-all group"
         >
           <span className="text-lg">🔧</span>
