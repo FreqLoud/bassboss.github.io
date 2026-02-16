@@ -1025,9 +1025,11 @@ const App = () => {
         <p className="text-gray-500 text-sm">System Builder</p>
         <a 
           href="v3.html" 
-          className="inline-block mt-2 text-xs text-bb-orange hover:underline"
+          className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-bb-orange/20 to-orange-600/10 border border-bb-orange/40 rounded-lg text-bb-orange hover:border-bb-orange hover:bg-bb-orange/20 transition-all group"
         >
-          🔧 Already know what you want? Try the Product Builder →
+          <span className="text-lg">🔧</span>
+          <span className="font-medium">Already know what you want?</span>
+          <span className="font-bold group-hover:translate-x-1 transition-transform">Product Builder →</span>
         </a>
       </div>
 
