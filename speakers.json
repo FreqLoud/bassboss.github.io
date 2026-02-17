@@ -174,22 +174,24 @@
       "type": "top",
       "sizeClass": "xl",
       "topClass": "festival",
-      "dispersion": "N/A",
-      "amperage": 15,
-      "dimensions": "48 x 48 x 24",
+      "dispersion": "60x40",
+      "amperage": 13.75,
+      "dimensions": "48 x 48 x 36",
       "url": "https://bassboss.com/krakatoa",
       "specs": {
         "frequency": "25 – 19,000Hz",
         "splContinuous": "142 dB",
-        "weight": "470 lbs (213 kg)"
+        "splPeak": "145 dB",
+        "weight": "470 lbs (213 kg)",
+        "volume": 48
       },
       "subCapacity": {
         "single": 24,
         "double": 12,
-        "note": "We have no freq'ing idea. 12 double 18\" subs per unit would not be impossible."
+        "note": "The ultimate point source - handles massive sub arrays"
       },
-      "description": "Festival flagship top",
-      "shortDesc": "Festival point source"
+      "description": "4-Way Quintuple 18\" Powered Co-axial Point Source - THE festival flagship",
+      "shortDesc": "Quintuple 18\" point source"
     }
   ],
   "subs": [
@@ -382,21 +384,23 @@
       "type": "column",
       "sizeClass": "medium",
       "builtInSub": "18\"",
-      "amperage": 8,
-      "dimensions": "18 x 18 x 108",
+      "amperage": 5.4,
+      "dimensions": "19.75 x 24 x 106 (assembled)",
       "height": "9 ft",
       "url": "https://bassboss.com/sublim8",
       "specs": {
         "frequency": "35Hz – 19,000Hz",
         "splContinuous": "130 dB",
-        "weight": "200 lbs (90.7 kg)"
+        "splPeak": "133 dB",
+        "weight": "200 lbs (90.7 kg)",
+        "volume": 15
       },
       "subCapacity": {
         "single": 6,
         "double": 3,
         "note": "6 single or 3 double driver subs per unit"
       },
-      "description": "The Column Crusher - full-range with built-in 18\" sub",
+      "description": "3-Way Active Full Range Column - built-in 18\" sub, 2x8\" mids, compression HF",
       "shortDesc": "Column system w/ 18\" sub"
     }
   ],
@@ -514,13 +518,15 @@
     { "category": "top", "text": "MFLA can be ground-stacked, pole-mounted, or flown — true modular flexibility." },
     { "category": "top", "text": "DiaMon's coaxial design means perfect time alignment at any listening position." },
     { "category": "top", "text": "AT312's three 12\" drivers deliver point-source clarity with line-array power." },
+    { "category": "top", "text": "Krakatoa packs FIVE 18\" drivers into a single point source — 142 dB sustained from one box." },
+    { "category": "top", "text": "Sublim8 is a full-range column with a built-in 18\" sub — no separate bass stacks needed for medium events." },
     { "category": "system", "text": "Double-driver subs (SSP215, SSP218, ZV28, Makara) give you 2× the output in one box." },
     { "category": "system", "text": "A single person can move an SV9 + DJ18S system. Start small, grow big." },
     { "category": "system", "text": "BASSBOSS presets are designed to work together — no phase issues when mixing models." }
   ],
   "meta": {
-    "version": "2.2",
-    "lastUpdated": "2026-02-15",
+    "version": "2.3",
+    "lastUpdated": "2026-02-17",
     "currency": "USD",
     "phaseCoherent": true,
     "priceType": "Retail (MAP)",
