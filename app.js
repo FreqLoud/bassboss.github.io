@@ -582,7 +582,7 @@ const App = () => {
     }
   };
 
-  const SystemCard = ({ tier, data, highlight }) => {
+  const SystemCard = ({ tier, data, highlight, accessories, accessoriesTotal, onRemoveAccessory }) => {
     const tierInfo = TIERS[tier];
     const { stats } = data;
     
@@ -602,6 +602,8 @@ const App = () => {
       orange: 'bg-orange-500', 
       red: 'bg-red-500'
     };
+    
+    const totalWithAccessories = stats.totalPrice + (accessoriesTotal || 0);
 
     return (
       <div className={`rounded-2xl border-2 overflow-hidden ${highlight ? colorClasses[tierInfo.color] : 'border-gray-200 bg-white'} transition-all hover:shadow-lg`}>
@@ -615,7 +617,7 @@ const App = () => {
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold">${stats.totalPrice.toLocaleString()}</div>
+              <div className="text-2xl font-bold">${totalWithAccessories.toLocaleString()}</div>
               <div className="text-sm opacity-90">Retail</div>
             </div>
           </div>
@@ -709,6 +711,47 @@ const App = () => {
             </div>
           )}
           
+          {/* Selected Accessories */}
+          {accessories && accessories.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-gray-500 uppercase mb-2">Accessories</h4>
+              <ul className="space-y-2">
+                {accessories.map((acc, i) => (
+                  <li key={i} className="bg-amber-50 rounded-lg p-3">
+                    <div className="flex justify-between text-gray-700">
+                      <span className="font-medium flex items-center gap-2">
+                        {acc.qty}× {acc.name}
+                        {onRemoveAccessory && (
+                          <button 
+                            onClick={() => onRemoveAccessory(acc.id)}
+                            className="text-red-400 hover:text-red-600 text-xs"
+                            title="Remove"
+                          >✕</button>
+                        )}
+                      </span>
+                      <span className="text-gray-500">${acc.lineTotal.toLocaleString()}</span>
+                    </div>
+                    <div className="text-xs text-gray-500">{acc.description}</div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {/* Subtotals when accessories present */}
+          {accessoriesTotal > 0 && (
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm">
+              <div className="flex justify-between text-gray-600">
+                <span>Speakers:</span>
+                <span>${stats.totalPrice.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-gray-600">
+                <span>Accessories:</span>
+                <span>${accessoriesTotal.toLocaleString()}</span>
+              </div>
+            </div>
+          )}
+
           <div className="border-t pt-4 mt-4 grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-gray-500">Est. Volume</span>
@@ -825,9 +868,33 @@ const App = () => {
 
         {/* System cards */}
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {Object.entries(tiers).map(([tier, data]) => (
-            <SystemCard key={tier} tier={tier} data={data} highlight={tier === 'knocks'} />
-          ))}
+          {Object.entries(tiers).map(([tier, data]) => {
+            // Only show accessories on the selected tier
+            const isSelected = tier === selectedTier;
+            const tierAccessoriesTotal = isSelected ? Object.entries(selectedAccessories).reduce((sum, [accId, qty]) => {
+              const acc = getAccessoryById(accId);
+              return sum + (acc?.price || 0) * qty;
+            }, 0) : 0;
+            const tierAccessoriesList = isSelected ? Object.entries(selectedAccessories).map(([accId, qty]) => {
+              const acc = getAccessoryById(accId);
+              return acc ? { ...acc, qty, lineTotal: acc.price * qty } : null;
+            }).filter(Boolean) : [];
+            
+            return (
+              <SystemCard 
+                key={tier} 
+                tier={tier} 
+                data={data} 
+                highlight={tier === 'knocks'}
+                accessories={tierAccessoriesList}
+                accessoriesTotal={tierAccessoriesTotal}
+                onRemoveAccessory={isSelected ? (accId) => {
+                  const { [accId]: _, ...rest } = selectedAccessories;
+                  setSelectedAccessories(rest);
+                } : null}
+              />
+            );
+          })}
         </div>
 
         {/* Booth monitors */}
