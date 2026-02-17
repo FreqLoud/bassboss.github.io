@@ -24,6 +24,11 @@
         body { font-family: 'Inter', sans-serif; }
         .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .source-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; }
+        .source-cetec { background: #1e40af; color: white; }
+        .source-quickbase { background: #047857; color: white; }
+        .source-container { background: #7c3aed; color: white; }
+        .source-legacy { background: #b45309; color: white; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-900 via-black to-gray-900 min-h-screen text-white">
@@ -137,12 +142,21 @@
             traceData = await response.json();
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('stats').classList.remove('hidden');
+            
+            const sources = traceData.sources || ['cetec'];
             document.getElementById('stats').innerHTML = `
-                Loaded ${Object.keys(traceData.orders).length.toLocaleString()} orders • 
-                ${Object.keys(traceData.serialIndex).length.toLocaleString()} serials indexed •
-                Data from CETEC ERP
+                <div class="mb-2">
+                    Loaded ${Object.keys(traceData.orders || {}).length.toLocaleString()} orders • 
+                    ${Object.keys(traceData.serialIndex || {}).length.toLocaleString()} serials
+                </div>
+                <div class="flex gap-2 justify-center flex-wrap">
+                    <span class="source-badge source-cetec">CETEC ERP</span>
+                    <span class="source-badge source-quickbase">QuickBase</span>
+                    <span class="source-badge source-container">2023-2025</span>
+                    <span class="source-badge source-legacy">Legacy</span>
+                </div>
             `;
-            document.getElementById('searchHint').textContent = 'Example: 142038, 501.1, Danny Asadi';
+            document.getElementById('searchHint').textContent = 'Example: 142038, TLL-32100227, 501.1, Danny Asadi';
         } catch (err) {
             document.getElementById('loading').innerHTML = `
                 <div class="text-red-400">Failed to load data: ${err.message}</div>
@@ -150,116 +164,207 @@
         }
     }
 
+    function getSourceClass(source) {
+        if (!source) return 'source-legacy';
+        if (source.includes('cetec')) return 'source-cetec';
+        if (source.includes('quickbase')) return 'source-quickbase';
+        if (source.includes('container') || source.includes('2023')) return 'source-container';
+        return 'source-legacy';
+    }
+
+    function getSourceLabel(source) {
+        if (!source) return 'Unknown';
+        if (source.includes('cetec')) return 'CETEC';
+        if (source.includes('quickbase-legacy')) return 'QB Legacy';
+        if (source.includes('quickbase')) return 'QuickBase';
+        if (source.includes('container')) return '2023-25';
+        return 'Legacy';
+    }
+
     function search(query) {
         if (!traceData || !query.trim()) return;
         
-        query = query.trim();
-        let order = null;
-
-        // Check if it's a serial number (now returns array of orders)
-        if (traceData.serialIndex[query]) {
-            const ordernums = traceData.serialIndex[query];
-            if (ordernums.length === 1) {
-                order = traceData.orders[ordernums[0]];
-            } else {
-                showSerialHistory(query, ordernums);
-                return;
-            }
+        query = query.trim().toUpperCase();
+        
+        // Check serial index first
+        const serialKey = Object.keys(traceData.serialIndex || {}).find(k => k.toUpperCase() === query);
+        if (serialKey) {
+            showSerialHistory(serialKey, traceData.serialIndex[serialKey]);
+            return;
         }
+        
         // Check if it's an order number
-        else if (traceData.orders[query]) {
-            order = traceData.orders[query];
+        const orderKey = Object.keys(traceData.orders || {}).find(k => k.toUpperCase() === query);
+        if (orderKey) {
+            showOrder(traceData.orders[orderKey]);
+            return;
         }
-        // Check if partial match on order number or customer name
-        else {
-            const queryLower = query.toLowerCase();
-            const matches = Object.keys(traceData.orders).filter(o => {
-                const ord = traceData.orders[o];
-                return o.includes(query) || 
-                       (ord.custname && ord.custname.toLowerCase().includes(queryLower));
+        
+        // Partial match search
+        const queryLower = query.toLowerCase();
+        
+        // Search serials
+        const serialMatches = Object.keys(traceData.serialIndex || {}).filter(s => 
+            s.toUpperCase().includes(query)
+        );
+        
+        // Search orders by number or customer
+        const orderMatches = Object.keys(traceData.orders || {}).filter(o => {
+            const ord = traceData.orders[o];
+            return o.toUpperCase().includes(query) || 
+                   (ord.custname && ord.custname.toLowerCase().includes(queryLower));
+        });
+        
+        // Search serial index entries by customer or product
+        const serialEntriesMatches = [];
+        Object.entries(traceData.serialIndex || {}).forEach(([serial, entries]) => {
+            entries.forEach(entry => {
+                if ((entry.custname && entry.custname.toLowerCase().includes(queryLower)) ||
+                    (entry.product && entry.product.toLowerCase().includes(queryLower))) {
+                    if (!serialEntriesMatches.find(m => m.serial === serial)) {
+                        serialEntriesMatches.push({ serial, entries });
+                    }
+                }
             });
-            if (matches.length === 1) {
-                order = traceData.orders[matches[0]];
-            } else if (matches.length > 1) {
-                showMultipleResults(matches, query);
-                return;
-            }
+        });
+        
+        if (serialMatches.length === 1 && orderMatches.length === 0) {
+            showSerialHistory(serialMatches[0], traceData.serialIndex[serialMatches[0]]);
+            return;
         }
-
-        if (order) {
-            showOrder(order);
-        } else {
-            document.getElementById('results').classList.add('hidden');
-            document.getElementById('noResults').classList.remove('hidden');
+        
+        if (orderMatches.length === 1 && serialMatches.length === 0) {
+            showOrder(traceData.orders[orderMatches[0]]);
+            return;
         }
+        
+        // Show combined results
+        if (serialMatches.length > 0 || orderMatches.length > 0 || serialEntriesMatches.length > 0) {
+            showSearchResults(query, serialMatches, orderMatches, serialEntriesMatches);
+            return;
+        }
+        
+        document.getElementById('results').classList.add('hidden');
+        document.getElementById('noResults').classList.remove('hidden');
     }
 
-    function showSerialHistory(serial, ordernums) {
+    function showSearchResults(query, serialMatches, orderMatches, serialEntriesMatches) {
         document.getElementById('noResults').classList.add('hidden');
         const results = document.getElementById('results');
         results.classList.remove('hidden');
         
-        // Sort orders by date (newest first)
-        const sortedOrders = ordernums
-            .map(o => traceData.orders[o])
-            .filter(o => o)
-            .sort((a, b) => (b.orderdate || '').localeCompare(a.orderdate || ''));
+        let html = `<div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+            <h2 class="text-xl font-semibold mb-4">Results for "${query}"</h2>`;
         
-        results.innerHTML = `
+        // Serial matches
+        if (serialMatches.length > 0) {
+            html += `<div class="mb-6">
+                <h3 class="text-sm text-gray-400 uppercase tracking-wide mb-2">Serials (${serialMatches.length})</h3>
+                <div class="space-y-2">
+                    ${serialMatches.slice(0, 30).map(serial => {
+                        const entries = traceData.serialIndex[serial];
+                        const firstEntry = entries[0] || {};
+                        return `<button onclick="search('${serial}')" class="block w-full text-left px-4 py-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-bb-orange">${serial}</span>
+                                <span class="source-badge ${getSourceClass(firstEntry.source)}">${getSourceLabel(firstEntry.source)}</span>
+                            </div>
+                            <p class="text-sm text-gray-400">${firstEntry.product || ''}</p>
+                        </button>`;
+                    }).join('')}
+                    ${serialMatches.length > 30 ? `<p class="text-gray-500 text-sm">...and ${serialMatches.length - 30} more</p>` : ''}
+                </div>
+            </div>`;
+        }
+        
+        // Serial entries matches (by customer/product)
+        if (serialEntriesMatches.length > 0) {
+            html += `<div class="mb-6">
+                <h3 class="text-sm text-gray-400 uppercase tracking-wide mb-2">By Customer/Product (${serialEntriesMatches.length})</h3>
+                <div class="space-y-2">
+                    ${serialEntriesMatches.slice(0, 30).map(({serial, entries}) => {
+                        const firstEntry = entries[0] || {};
+                        return `<button onclick="search('${serial}')" class="block w-full text-left px-4 py-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-bb-orange">${serial}</span>
+                                <span class="source-badge ${getSourceClass(firstEntry.source)}">${getSourceLabel(firstEntry.source)}</span>
+                            </div>
+                            <p class="text-sm text-gray-400">${firstEntry.custname || ''} - ${firstEntry.product || ''}</p>
+                        </button>`;
+                    }).join('')}
+                </div>
+            </div>`;
+        }
+        
+        // Order matches
+        if (orderMatches.length > 0) {
+            html += `<div>
+                <h3 class="text-sm text-gray-400 uppercase tracking-wide mb-2">Orders (${orderMatches.length})</h3>
+                <div class="space-y-2">
+                    ${orderMatches.slice(0, 20).map(ordernum => {
+                        const order = traceData.orders[ordernum];
+                        return `<button onclick="search('${ordernum}')" class="block w-full text-left px-4 py-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Order ${ordernum}</span>
+                                <span class="text-gray-400 text-sm">${order.orderdate || ''}</span>
+                            </div>
+                            <p class="text-sm text-gray-400">${order.custname || 'Customer #' + order.custnum}</p>
+                        </button>`;
+                    }).join('')}
+                </div>
+            </div>`;
+        }
+        
+        html += '</div>';
+        results.innerHTML = html;
+    }
+
+    function showSerialHistory(serial, entries) {
+        document.getElementById('noResults').classList.add('hidden');
+        const results = document.getElementById('results');
+        results.classList.remove('hidden');
+        
+        // Sort by date (newest first)
+        const sortedEntries = [...entries].sort((a, b) => 
+            (b.orderdate || '').localeCompare(a.orderdate || '')
+        );
+        
+        const html = `
             <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
                 <div class="mb-6 pb-4 border-b border-gray-700">
                     <h2 class="text-2xl font-bold">Serial: <span class="text-bb-orange font-mono">${serial}</span></h2>
-                    <p class="text-gray-400">Found in ${sortedOrders.length} orders (service history)</p>
+                    <p class="text-gray-400">${sortedEntries.length} record${sortedEntries.length > 1 ? 's' : ''} found</p>
                 </div>
-                <div class="space-y-3">
-                    ${sortedOrders.map(o => `
-                        <button onclick="search('${o.ordernum}')" class="block w-full text-left px-4 py-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
-                            <div class="flex justify-between items-center">
+                <div class="space-y-4">
+                    ${sortedEntries.map(entry => `
+                        <div class="bg-gray-700/30 rounded-lg p-4 ${entry.ordernum ? 'cursor-pointer hover:bg-gray-700/50' : ''}" 
+                             ${entry.ordernum && traceData.orders[entry.ordernum] ? `onclick="showOrder(traceData.orders['${entry.ordernum}'])"` : ''}>
+                            <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <span class="font-semibold text-white">Order ${o.ordernum}</span>
-                                    <span class="text-gray-400 ml-2">${o.custname || 'Customer #' + o.custnum}</span>
+                                    ${entry.ordernum ? `<span class="font-semibold text-white">Order ${entry.ordernum}</span>` : ''}
+                                    ${entry.custname ? `<span class="text-gray-400 ml-2">${entry.custname}</span>` : ''}
                                 </div>
-                                <div class="text-right text-sm">
-                                    <span class="text-gray-400">${o.orderdate || 'No date'}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-400 text-sm">${entry.orderdate || ''}</span>
+                                    <span class="source-badge ${getSourceClass(entry.source)}">${getSourceLabel(entry.source)}</span>
                                 </div>
                             </div>
-                            <p class="text-sm text-gray-500 mt-1">${o.lines.map(l => l.prcpart).join(', ')}</p>
-                        </button>
+                            <p class="text-gray-300">${entry.product || 'No product info'}</p>
+                            ${entry.components && entry.components.length > 0 ? `
+                                <div class="mt-3 pl-4 border-l-2 border-gray-600">
+                                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Components</p>
+                                    ${entry.components.slice(0, 10).map(c => `
+                                        <div class="text-sm text-gray-400">${c.name || c.prcpart} ${c.qty ? `×${c.qty}` : ''}</div>
+                                    `).join('')}
+                                    ${entry.components.length > 10 ? `<p class="text-xs text-gray-500">...and ${entry.components.length - 10} more</p>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
                     `).join('')}
                 </div>
             </div>
         `;
-    }
-
-    function showMultipleResults(ordernums, query) {
-        document.getElementById('noResults').classList.add('hidden');
-        const results = document.getElementById('results');
-        results.classList.remove('hidden');
-        
-        const sortedOrders = ordernums
-            .map(o => traceData.orders[o])
-            .filter(o => o)
-            .sort((a, b) => (b.orderdate || '').localeCompare(a.orderdate || ''));
-        
-        results.innerHTML = `
-            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
-                <h2 class="text-xl font-semibold mb-4">${sortedOrders.length} results for "${query}"</h2>
-                <div class="space-y-2">
-                    ${sortedOrders.slice(0, 50).map(o => `
-                        <button onclick="search('${o.ordernum}')" class="block w-full text-left px-4 py-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <span class="font-semibold text-white">Order ${o.ordernum}</span>
-                                    <span class="text-gray-400 ml-2">${o.custname || 'Customer #' + o.custnum}</span>
-                                </div>
-                                <span class="text-gray-400 text-sm">${o.orderdate || ''}</span>
-                            </div>
-                        </button>
-                    `).join('')}
-                    ${sortedOrders.length > 50 ? `<p class="text-gray-500 text-sm text-center pt-2">...and ${sortedOrders.length - 50} more</p>` : ''}
-                </div>
-            </div>
-        `;
+        results.innerHTML = html;
     }
 
     function showOrder(order) {
@@ -267,7 +372,7 @@
         const results = document.getElementById('results');
         results.classList.remove('hidden');
 
-        const serialsHtml = order.serials.length > 0 ? `
+        const serialsHtml = order.serials && order.serials.length > 0 ? `
             <div class="mt-6">
                 <h3 class="text-lg font-semibold mb-3 text-bb-orange">Serial Numbers & Lot Codes</h3>
                 <div class="bg-gray-700/30 rounded-lg overflow-hidden">
@@ -277,16 +382,15 @@
                                 <th class="px-4 py-2 text-left">Serial #</th>
                                 <th class="px-4 py-2 text-left">Lot Code</th>
                                 <th class="px-4 py-2 text-left">Date Code</th>
-                                <th class="px-4 py-2 text-left">Generated</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${order.serials.map(s => `
-                                <tr class="border-t border-gray-700/50 hover:bg-gray-700/30 cursor-pointer" onclick="${s.serial ? `search('${s.serial}')` : ''}">
+                                <tr class="border-t border-gray-700/50 hover:bg-gray-700/30 ${s.serial ? 'cursor-pointer' : ''}" 
+                                    ${s.serial ? `onclick="search('${s.serial}')"` : ''}>
                                     <td class="px-4 py-2 font-mono ${s.serial ? 'text-bb-orange' : ''}">${s.serial || '—'}</td>
                                     <td class="px-4 py-2 font-mono">${s.lotcode || '—'}</td>
                                     <td class="px-4 py-2">${s.date_code || '—'}</td>
-                                    <td class="px-4 py-2 text-gray-500">${s.date_generated || '—'}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -295,21 +399,21 @@
             </div>
         ` : '';
 
-        const linesHtml = order.lines.map(line => {
-            const componentsHtml = line.components.length > 0 ? `
+        const linesHtml = order.lines ? order.lines.map(line => {
+            const componentsHtml = line.components && line.components.length > 0 ? `
                 <div class="mt-3 ml-4 pl-4 border-l-2 border-gray-700">
                     <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Components Used</p>
                     <div class="space-y-1">
                         ${line.components.map(c => `
                             <div class="flex justify-between text-sm">
-                                <span class="text-gray-300">${c.prcpart}</span>
-                                <span class="text-gray-500">×${parseFloat(c.qty).toFixed(0)}</span>
+                                <span class="text-gray-300">${c.prcpart || c.name}</span>
+                                <span class="text-gray-500">×${parseFloat(c.qty || 1).toFixed(0)}</span>
                             </div>
                             ${c.description ? `<p class="text-xs text-gray-500 -mt-1">${c.description}</p>` : ''}
                         `).join('')}
                     </div>
                 </div>
-            ` : '<p class="text-gray-500 text-sm mt-2 ml-4">No component breakdown available</p>';
+            ` : '';
 
             return `
                 <div class="bg-gray-700/30 rounded-lg p-4">
@@ -319,23 +423,16 @@
                             <p class="text-sm text-gray-400">Line ${line.lineitem} • Rev: ${line.revision || 'N/A'}${line.shipdate ? ' • Shipped: ' + line.shipdate : ''}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-bb-orange font-semibold">Qty: ${parseFloat(line.qty).toFixed(0)}</p>
-                            <p class="text-xs text-gray-500">Shipped: ${parseFloat(line.shipqty).toFixed(0)}</p>
+                            <p class="text-bb-orange font-semibold">Qty: ${parseFloat(line.qty || 1).toFixed(0)}</p>
                         </div>
                     </div>
                     ${componentsHtml}
                 </div>
             `;
-        }).join('');
+        }).join('') : '<p class="text-gray-500">No line items</p>';
 
         results.innerHTML = `
             <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
-                <!-- Back button if coming from serial search -->
-                <button onclick="history.back()" class="text-gray-400 hover:text-white text-sm mb-4 flex items-center gap-1">
-                    ← Back to results
-                </button>
-                
-                <!-- Order Header -->
                 <div class="flex justify-between items-start mb-6 pb-6 border-b border-gray-700">
                     <div>
                         <h2 class="text-2xl font-bold">Order ${order.ordernum}</h2>
@@ -344,10 +441,10 @@
                     <div class="text-right">
                         <p class="text-gray-400">Order Date</p>
                         <p class="font-semibold">${order.orderdate || 'N/A'}</p>
+                        <span class="source-badge source-cetec mt-2 inline-block">CETEC</span>
                     </div>
                 </div>
 
-                <!-- Line Items -->
                 <div>
                     <h3 class="text-lg font-semibold mb-3 text-bb-orange">Products</h3>
                     <div class="space-y-4">
