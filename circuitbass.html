@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CircuitBASS - Power Calculator</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'bb-orange': '#F9C017',
+            'bb-orange-dark': '#E5AD00',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .qty-btn { transition: all 0.15s; }
+    .qty-btn:active { transform: scale(0.95); }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-black to-gray-900 min-h-screen text-white">
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+
+    // Power specs from BASSBOSS Product Specs sheet
+    const SPEAKERS = [
+      // Tops
+      { id: 'sv9', name: 'SV9-MK3', type: 'top', watts: 1200, amps120: 2, amps240: 1 },
+      { id: 'diamon', name: 'DiaMon-MK3', type: 'top', watts: 1200, amps120: 2, amps240: 1 },
+      { id: 'dv12', name: 'DV12-MK3', type: 'top', watts: 3200, amps120: 3.6, amps240: 1.8 },
+      { id: 'at212', name: 'AT212-MK3', type: 'top', watts: 3200, amps120: 3.6, amps240: 1.8 },
+      { id: 'at312', name: 'AT312-MK3', type: 'top', watts: 4000, amps120: 4.6, amps240: 2.3 },
+      { id: 'mfla', name: 'MFLA-MK3', type: 'top', watts: 3200, amps120: 3.6, amps240: 1.8 },
+      // Subs
+      { id: 'bb15', name: 'BB15-MK3', type: 'sub', watts: 2500, amps120: 4.6, amps240: 2.3 },
+      { id: 'dj18s', name: 'DJ18S-MK3', type: 'sub', watts: 2500, amps120: 4.6, amps240: 2.3 },
+      { id: 'ssp118', name: 'SSP118-MK3', type: 'sub', watts: 2500, amps120: 4.6, amps240: 2.3 },
+      { id: 'vs21', name: 'VS21-MK3', type: 'sub', watts: 2500, amps120: 4.6, amps240: 2.3 },
+      { id: 'ssp215', name: 'SSP215-MK3', type: 'sub', watts: 5000, amps120: 9, amps240: 4.6 },
+      { id: 'ssp218', name: 'SSP218-MK3', type: 'sub', watts: 5000, amps120: 9, amps240: 4.6 },
+      { id: 'zv28', name: 'ZV28-MK3', type: 'sub', watts: 5000, amps120: 9, amps240: 4.6 },
+      { id: 'kraken', name: 'Kraken-MK3', type: 'sub', watts: 10000, amps120: 18, amps240: 9 },
+    ];
+
+    const CIRCUIT_TYPES = {
+      '120v-15a': { label: '15A @ 120V', capacity: 15, voltage: 120, safeCapacity: 12 },
+      '120v-20a': { label: '20A @ 120V', capacity: 20, voltage: 120, safeCapacity: 16 },
+      '240v-20a': { label: '20A @ 240V', capacity: 20, voltage: 240, safeCapacity: 16 },
+      '240v-30a': { label: '30A @ 240V (Generator)', capacity: 30, voltage: 240, safeCapacity: 24 },
+    };
+
+    function App() {
+      const [quantities, setQuantities] = useState({});
+      const [circuitType, setCircuitType] = useState('120v-20a');
+      
+      const circuit = CIRCUIT_TYPES[circuitType];
+      const is240 = circuit.voltage === 240;
+
+      const updateQty = (id, delta) => {
+        setQuantities(prev => ({
+          ...prev,
+          [id]: Math.max(0, (prev[id] || 0) + delta)
+        }));
+      };
+
+      const results = useMemo(() => {
+        let totalAmps = 0;
+        const items = [];
+        
+        SPEAKERS.forEach(speaker => {
+          const qty = quantities[speaker.id] || 0;
+          if (qty > 0) {
+            const amps = is240 ? speaker.amps240 : speaker.amps120;
+            const speakerTotal = amps * qty;
+            totalAmps += speakerTotal;
+            items.push({ ...speaker, qty, amps, speakerTotal });
+          }
+        });
+
+        const circuitsNeeded = Math.ceil(totalAmps / circuit.safeCapacity);
+        const utilizationPct = circuitsNeeded > 0 ? (totalAmps / (circuitsNeeded * circuit.safeCapacity)) * 100 : 0;
+        
+        return { totalAmps, circuitsNeeded, items, utilizationPct };
+      }, [quantities, circuitType, is240, circuit.safeCapacity]);
+
+      const hasItems = results.items.length > 0;
+
+      return (
+        <div className="max-w-2xl mx-auto p-4 pb-32">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <a href="index.html" className="text-gray-400 text-sm hover:text-bb-orange">← Back to Tools</a>
+            <h1 className="text-3xl font-bold mt-2">
+              <span className="text-bb-orange">Circuit</span>BASS
+            </h1>
+            <p className="text-gray-400">Power Calculator</p>
+          </div>
+
+          {/* Circuit Type Toggle */}
+          <div className="bg-gray-800/50 rounded-xl p-4 mb-6">
+            <label className="block text-sm text-gray-400 mb-2">⚡ Power Type</label>
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(CIRCUIT_TYPES).map(([key, ct]) => (
+                <button
+                  key={key}
+                  onClick={() => setCircuitType(key)}
+                  className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                    circuitType === key
+                      ? 'bg-bb-orange text-black'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  {ct.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Safe capacity: {circuit.safeCapacity}A (80% of {circuit.capacity}A rated)
+            </p>
+          </div>
+
+          {/* Speaker Selection */}
+          <div className="space-y-4">
+            {/* Tops */}
+            <div>
+              <h2 className="text-lg font-semibold mb-3 text-gray-300">🔊 Tops</h2>
+              <div className="space-y-2">
+                {SPEAKERS.filter(s => s.type === 'top').map(speaker => (
+                  <SpeakerRow 
+                    key={speaker.id} 
+                    speaker={speaker} 
+                    qty={quantities[speaker.id] || 0}
+                    is240={is240}
+                    onUpdate={(delta) => updateQty(speaker.id, delta)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Subs */}
+            <div>
+              <h2 className="text-lg font-semibold mb-3 text-gray-300">💥 Subs</h2>
+              <div className="space-y-2">
+                {SPEAKERS.filter(s => s.type === 'sub').map(speaker => (
+                  <SpeakerRow 
+                    key={speaker.id} 
+                    speaker={speaker} 
+                    qty={quantities[speaker.id] || 0}
+                    is240={is240}
+                    onUpdate={(delta) => updateQty(speaker.id, delta)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Results */}
+          {hasItems && (
+            <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 p-4 backdrop-blur">
+              <div className="max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <div className="text-sm text-gray-400">Total Draw</div>
+                    <div className="text-2xl font-bold">{results.totalAmps.toFixed(1)}A</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-400">Circuits Needed</div>
+                    <div className="text-4xl font-bold text-bb-orange">{results.circuitsNeeded}</div>
+                  </div>
+                </div>
+                
+                {/* Circuit breakdown */}
+                <div className="bg-gray-800 rounded-lg p-3">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-400">Average load per circuit</span>
+                    <span>{(results.totalAmps / results.circuitsNeeded).toFixed(1)}A / {circuit.safeCapacity}A</span>
+                  </div>
+                  <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full ${
+                        results.utilizationPct > 90 ? 'bg-red-500' : 
+                        results.utilizationPct > 75 ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}
+                      style={{ width: `${Math.min(100, results.utilizationPct)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    💡 Tip: Distribute subs across circuits evenly. They draw the most on heavy bass hits.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function SpeakerRow({ speaker, qty, is240, onUpdate }) {
+      const amps = is240 ? speaker.amps240 : speaker.amps120;
+      
+      return (
+        <div className={`flex items-center justify-between bg-gray-800/50 rounded-lg p-3 ${qty > 0 ? 'ring-1 ring-bb-orange/50' : ''}`}>
+          <div className="flex-1">
+            <div className="font-medium">{speaker.name}</div>
+            <div className="text-sm text-gray-400">{amps}A @ {is240 ? '240V' : '120V'}</div>
+          </div>
+          
+          {qty > 0 && (
+            <div className="text-right mr-4">
+              <div className="text-bb-orange font-semibold">{(amps * qty).toFixed(1)}A</div>
+            </div>
+          )}
+          
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => onUpdate(-1)}
+              className="qty-btn w-8 h-8 rounded-lg bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-lg"
+              disabled={qty === 0}
+            >
+              −
+            </button>
+            <span className="w-8 text-center font-semibold">{qty}</span>
+            <button 
+              onClick={() => onUpdate(1)}
+              className="qty-btn w-8 h-8 rounded-lg bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-lg"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
