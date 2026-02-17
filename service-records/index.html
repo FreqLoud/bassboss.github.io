@@ -156,7 +156,7 @@
                     <span class="source-badge source-legacy">Legacy</span>
                 </div>
             `;
-            document.getElementById('searchHint').textContent = 'Example: 142038, TLL-32100227, 501.1, Danny Asadi';
+            document.getElementById('searchHint').textContent = 'Example: 142038, TLL-32100227, 501.1, Danny Asadi, C22';
         } catch (err) {
             document.getElementById('loading').innerHTML = `
                 <div class="text-red-400">Failed to load data: ${err.message}</div>
@@ -185,6 +185,12 @@
         if (!traceData || !query.trim()) return;
         
         query = query.trim().toUpperCase();
+        
+        // Check if it's a container search (C1, C2, C22, etc.)
+        if (/^C\d+$/i.test(query) && traceData.containers && traceData.containers[query]) {
+            showContainer(query);
+            return;
+        }
         
         // Check serial index first
         const serialKey = Object.keys(traceData.serialIndex || {}).find(k => k.toUpperCase() === query);
@@ -319,6 +325,80 @@
         results.innerHTML = html;
     }
 
+    function showContainer(containerName) {
+        document.getElementById('noResults').classList.add('hidden');
+        const results = document.getElementById('results');
+        results.classList.remove('hidden');
+        
+        const container = traceData.containers[containerName];
+        
+        // Find all serials from this container
+        const containerSerials = Object.entries(traceData.serialIndex || {})
+            .filter(([serial, entries]) => entries.some(e => e.container === containerName))
+            .map(([serial, entries]) => ({
+                serial,
+                product: entries.find(e => e.container === containerName)?.product || ''
+            }));
+        
+        // Group by product
+        const byProduct = {};
+        containerSerials.forEach(({serial, product}) => {
+            if (!byProduct[product]) byProduct[product] = [];
+            byProduct[product].push(serial);
+        });
+        
+        const html = `
+            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+                <div class="mb-6 pb-4 border-b border-gray-700">
+                    <h2 class="text-2xl font-bold">Container <span class="text-bb-orange">${containerName}</span></h2>
+                    <p class="text-gray-400">${containerSerials.length} units tracked</p>
+                </div>
+                
+                <!-- Container Details -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-gray-700/30 rounded-lg p-3">
+                        <p class="text-xs text-gray-500 uppercase">Departed</p>
+                        <p class="font-semibold">${container.departed || 'N/A'}</p>
+                    </div>
+                    <div class="bg-gray-700/30 rounded-lg p-3">
+                        <p class="text-xs text-gray-500 uppercase">Arrived (Southaven)</p>
+                        <p class="font-semibold text-bb-orange">${container.arrived || 'N/A'}</p>
+                    </div>
+                    <div class="bg-gray-700/30 rounded-lg p-3">
+                        <p class="text-xs text-gray-500 uppercase">Transit Days</p>
+                        <p class="font-semibold">${container.transit_days || 'N/A'}</p>
+                    </div>
+                    <div class="bg-gray-700/30 rounded-lg p-3">
+                        <p class="text-xs text-gray-500 uppercase">BOL #</p>
+                        <p class="font-mono text-sm">${container.bol || 'N/A'}</p>
+                    </div>
+                </div>
+                
+                <!-- Products in Container -->
+                <h3 class="text-lg font-semibold mb-3 text-bb-orange">Products in this Container</h3>
+                <div class="space-y-3">
+                    ${Object.entries(byProduct).map(([product, serials]) => `
+                        <div class="bg-gray-700/30 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold">${product}</span>
+                                <span class="text-bb-orange">${serials.length} units</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                ${serials.slice(0, 20).map(s => `
+                                    <button onclick="search('${s}')" class="text-xs font-mono bg-gray-600/50 hover:bg-gray-600 px-2 py-1 rounded transition-colors">
+                                        ${s}
+                                    </button>
+                                `).join('')}
+                                ${serials.length > 20 ? `<span class="text-xs text-gray-500">+${serials.length - 20} more</span>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        results.innerHTML = html;
+    }
+
     function showSerialHistory(serial, entries) {
         document.getElementById('noResults').classList.add('hidden');
         const results = document.getElementById('results');
@@ -350,6 +430,13 @@
                                 </div>
                             </div>
                             <p class="text-gray-300">${entry.product || 'No product info'}</p>
+                            ${entry.container ? `
+                                <div class="mt-2 flex items-center gap-4 text-sm">
+                                    <span class="text-gray-500">📦 Container:</span>
+                                    <button onclick="search('${entry.container}')" class="text-bb-orange hover:underline">${entry.container}</button>
+                                    ${entry.container_arrived ? `<span class="text-gray-400">Arrived: ${entry.container_arrived}</span>` : ''}
+                                </div>
+                            ` : ''}
                             ${entry.components && entry.components.length > 0 ? `
                                 <div class="mt-3 pl-4 border-l-2 border-gray-600">
                                     <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Components</p>
