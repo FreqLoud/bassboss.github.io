@@ -400,7 +400,7 @@ const App = () => {
   }
 
   const renderProgress = () => (
-    <div className="w-full max-w-2xl mx-auto mb-8">
+    <div className="w-full max-w-2xl mx-auto mb-8 print-hide">
       <div className="flex justify-between text-sm text-gray-400 mb-2">
         <span>Build Your System</span>
         <span>{Math.min(step + 1, 6)} of 6</span>
@@ -948,7 +948,7 @@ const App = () => {
           if (uniqueTops.length === 0) return null;
           
           return (
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-3xl mx-auto print-hide">
               <div className="bg-white border border-bb-orange/30 rounded-xl p-6 shadow-lg">
                 <h3 className="font-bold text-lg mb-2 flex items-center gap-2 text-gray-900">
                   🚀 Ready to Grow?
@@ -988,7 +988,7 @@ const App = () => {
           };
           
           return (
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-3xl mx-auto print-hide">
               <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl p-6 shadow-lg text-white">
                 <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
                   {categoryEmoji[fact.category] || '💡'} Did You Know?
@@ -1017,7 +1017,7 @@ const App = () => {
           }, 0);
           
           return (
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-3xl mx-auto print-hide">
               <div className="bg-white rounded-xl p-6 shadow-lg">
                 <h3 className="font-bold text-lg mb-4 text-gray-900 flex items-center gap-2">
                   🛒 Recommended Accessories
@@ -1098,7 +1098,7 @@ const App = () => {
         })()}
 
         {/* Actions */}
-        <div className="flex justify-center gap-4 pt-4">
+        <div className="flex justify-center gap-4 pt-4 print-hide">
           <button
             onClick={restart}
             className="px-6 py-3 rounded-xl border-2 border-gray-600 text-gray-300 font-semibold hover:bg-gray-800 transition-colors"
@@ -1140,7 +1140,7 @@ const App = () => {
         <p className="text-gray-500 text-sm">System Builder</p>
         <a 
           href="buildbass.html" 
-          className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-bb-orange/20 to-orange-600/10 border border-bb-orange/40 rounded-lg text-bb-orange hover:border-bb-orange hover:bg-bb-orange/20 transition-all group"
+          className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-bb-orange/20 to-orange-600/10 border border-bb-orange/40 rounded-lg text-bb-orange hover:border-bb-orange hover:bg-bb-orange/20 transition-all group print-hide"
         >
           <span className="text-lg">🔧</span>
           <span className="font-medium">Already know what you want?</span>

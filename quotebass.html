@@ -36,6 +36,49 @@
     
     <!-- Babel for JSX Transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Print Styles -->
+    <style>
+      @media print {
+        /* B/W print - remove colors */
+        body {
+          background: white !important;
+          color: black !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        
+        /* Make all text black */
+        * {
+          color: black !important;
+          background: white !important;
+          border-color: #ccc !important;
+        }
+        
+        /* Hide navigation and action buttons */
+        .print-hide,
+        [class*="hover:"],
+        a[href="buildbass.html"],
+        button:not([onclick*="print"]) {
+          display: none !important;
+        }
+        
+        /* Keep card borders visible */
+        [class*="border"] {
+          border: 1px solid #ccc !important;
+        }
+        
+        /* Make headers stand out */
+        h1, h2, h3, h4 {
+          font-weight: bold !important;
+        }
+        
+        /* Ensure content fits on page */
+        .max-w-6xl, .max-w-3xl, .max-w-2xl {
+          max-width: 100% !important;
+        }
+      }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-gray-900 to-black min-h-screen font-['Inter']">
     <div id="root"></div>
