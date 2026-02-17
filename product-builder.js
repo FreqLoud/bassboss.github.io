@@ -6,6 +6,7 @@ const TOP_CAPACITY = {
   'SV9-MK3': { min: 0, max: 100, ideal: 75, maxUnits: 4, upgradeAt: 100, upgradeTo: 'DiaMon-MK3' },
   'DiaMon-MK3': { min: 50, max: 200, ideal: 150, maxUnits: 4, upgradeAt: 200, upgradeTo: 'DV12-MK3' },
   'DV12-MK3': { min: 100, max: 350, ideal: 250, maxUnits: 4, upgradeAt: 350, upgradeTo: 'AT212-MK3' },
+  'Sublim8': { min: 100, max: 800, ideal: 400, maxUnits: 4, upgradeAt: 800, upgradeTo: 'AT312-MK3', isColumn: true },
   'AT212-MK3': { min: 200, max: 600, ideal: 400, maxUnits: 6, upgradeAt: 600, upgradeTo: 'AT312-MK3' },
   'AT312-MK3': { min: 400, max: 1200, ideal: 800, maxUnits: 8, upgradeAt: 1200, upgradeTo: 'MFLA-MK3' },
   'MFLA-MK3': { min: 500, max: 2000, ideal: 1200, minUnits: 4, maxUnits: 12, upgradeAt: 3000, upgradeTo: 'Krakatoa-MK3' },
@@ -17,6 +18,7 @@ const SUB_PAIRINGS = {
   'SV9-MK3': ['BB15-MK3', 'DJ18S-MK3'],
   'DiaMon-MK3': ['DJ18S-MK3', 'SSP118-MK3', 'BB15-MK3'],
   'DV12-MK3': ['SSP118-MK3', 'VS21-MK3', 'DJ18S-MK3', 'SSP215-MK3'],
+  'Sublim8': ['DJ18S-MK3', 'SSP118-MK3', 'VS21-MK3', 'SSP218-MK3'],
   'AT212-MK3': ['VS21-MK3', 'SSP218-MK3', 'SSP215-MK3', 'ZV28-MK3'],
   'AT312-MK3': ['SSP218-MK3', 'ZV28-MK3', 'Makara-MK3', 'VS21-MK3'],
   'MFLA-MK3': ['Makara-MK3', 'ZV28-MK3', 'SSP218-MK3', 'Kraken-MK3'],
@@ -43,7 +45,8 @@ const CROWD_SIZES = [
   { id: 'small', label: '100 – 300', value: 200 },
   { id: 'medium', label: '300 – 500', value: 400 },
   { id: 'large', label: '500 – 1,500', value: 1000 },
-  { id: 'xlarge', label: '1,500 – 5,000', value: 3000 },
+  { id: 'xlarge', label: '1,500 – 3,500', value: 2500 },
+  { id: 'xxlarge', label: '3,500 – 5,000', value: 4250 },
   { id: 'massive', label: '5,000+', value: 7500 }
 ];
 
@@ -441,7 +444,8 @@ const App = () => {
     );
   }
 
-  const availableTops = catalog.tops.filter(t => t.type === 'top' && TOP_CAPACITY[t.id]);
+  // Include both tops and columns that have TOP_CAPACITY entries
+  const availableTops = [...catalog.tops, ...(catalog.columns || [])].filter(t => TOP_CAPACITY[t.id]);
   const suggestedSubs = selectedTop ? SUB_PAIRINGS[selectedTop] || [] : [];
   const allSubs = catalog.subs;
 

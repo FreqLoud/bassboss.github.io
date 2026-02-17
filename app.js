@@ -19,7 +19,8 @@ const CROWD_SIZES = [
   { id: 'small', label: '100 – 300', range: [100, 300], icon: '👥👥' },
   { id: 'medium', label: '300 – 500', range: [300, 500], icon: '👥👥👥' },
   { id: 'large', label: '500 – 1,500', range: [500, 1500], icon: '🏟️' },
-  { id: 'xlarge', label: '1,500 – 5,000', range: [1500, 5000], icon: '🎪' },
+  { id: 'xlarge', label: '1,500 – 3,500', range: [1500, 3500], icon: '🎪' },
+  { id: 'xxlarge', label: '3,500 – 5,000', range: [3500, 5000], icon: '🏟️' },
   { id: 'massive', label: '5,000+', range: [5000, Infinity], icon: '🏟️🏟️' }
 ];
 
@@ -91,16 +92,30 @@ const DECISION_MATRIX = {
   },
   xlarge: {
     deep:  { bangs: { tops: ['AT312-MK3', 'AT312-MK3', 'AT312-MK3', 'AT312-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
-             knocks: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
-             destroys: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Kraken-MK3', 'Kraken-MK3', 'Kraken-MK3', 'Kraken-MK3'] } },
+             knocks: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
+             destroys: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } },
     some:  { bangs: { tops: ['AT312-MK3', 'AT312-MK3', 'AT312-MK3', 'AT312-MK3'], subs: ['SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3'] },
              knocks: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3'] },
-             destroys: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } },
+             destroys: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } },
     less:  { bangs: { tops: ['AT312-MK3', 'AT312-MK3', 'AT312-MK3', 'AT312-MK3'], subs: ['SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3'] },
              knocks: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3'] },
-             destroys: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } },
+             destroys: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } },
     mixed: { bangs: { tops: ['AT312-MK3', 'AT312-MK3', 'AT312-MK3', 'AT312-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
              knocks: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
+             destroys: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } }
+  },
+  xxlarge: {
+    deep:  { bangs: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
+             knocks: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
+             destroys: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Kraken-MK3', 'Kraken-MK3', 'Kraken-MK3', 'Kraken-MK3'] } },
+    some:  { bangs: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3'] },
+             knocks: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
+             destroys: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } },
+    less:  { bangs: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3'] },
+             knocks: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3', 'SSP218-MK3'] },
+             destroys: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] } },
+    mixed: { bangs: { tops: ['MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3', 'MFLA-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
+             knocks: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3', 'Makara-MK3'] },
              destroys: { tops: ['Krakatoa-MK3', 'Krakatoa-MK3'], subs: ['Kraken-MK3', 'Kraken-MK3', 'Kraken-MK3', 'Kraken-MK3'] } }
   },
   massive: {
