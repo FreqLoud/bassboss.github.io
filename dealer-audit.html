@@ -41,7 +41,7 @@
       selectedDealer: null,
       scenario: '',
       responses: {},
-      filter: 'all', // all, mine, uncalled, called
+      filter: 'all', // all, mine, uncalled, called, followup
       searchQuery: ''
     };
     
@@ -144,6 +144,11 @@
         dealers = dealers.filter(d => getDealerStatus(d.id).status === 'uncalled');
       } else if (state.filter === 'called') {
         dealers = dealers.filter(d => getDealerStatus(d.id).status === 'called');
+      } else if (state.filter === 'followup') {
+        dealers = dealers.filter(d => {
+          const status = getDealerStatus(d.id);
+          return status.status === 'called' && status.result.score < 50;
+        });
       }
       
       return dealers;
@@ -157,7 +162,8 @@
       const avgScore = state.results.length > 0 
         ? Math.round(state.results.reduce((a, r) => a + r.score, 0) / state.results.length) 
         : 0;
-      return { withPhone, called, myAssigned, myCalled, avgScore };
+      const needsFollowup = state.results.filter(r => r.score < 50).length;
+      return { withPhone, called, myAssigned, myCalled, avgScore, needsFollowup };
     }
 
     function render() {
@@ -205,6 +211,10 @@
                 <div class="text-2xl font-bold ${getScoreClass(stats.avgScore)}">${stats.avgScore || '-'}</div>
                 <div class="text-xs text-gray-500">Avg Score</div>
               </div>
+              <div class="card rounded-xl p-3 border ${stats.needsFollowup > 0 ? 'border-red-800 bg-red-900/20' : 'border-gray-800'} text-center">
+                <div class="text-2xl font-bold ${stats.needsFollowup > 0 ? 'text-red-400' : 'text-gray-500'}">${stats.needsFollowup}</div>
+                <div class="text-xs text-gray-500">2nd Pass</div>
+              </div>
             </div>
             
             <!-- Search & Filter -->
@@ -217,6 +227,7 @@
                 <option value="all" ${state.filter === 'all' ? 'selected' : ''}>All (${stats.withPhone})</option>
                 <option value="uncalled" ${state.filter === 'uncalled' ? 'selected' : ''}>Uncalled</option>
                 <option value="called" ${state.filter === 'called' ? 'selected' : ''}>Called</option>
+                <option value="followup" ${state.filter === 'followup' ? 'selected' : ''}>⚠️ Needs Follow-up</option>
               </select>
             </div>
             
