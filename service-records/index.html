@@ -438,12 +438,22 @@
                                 </div>
                             ` : ''}
                             ${entry.components && entry.components.length > 0 ? `
-                                <div class="mt-3 pl-4 border-l-2 border-gray-600">
-                                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Components</p>
-                                    ${entry.components.slice(0, 10).map(c => `
-                                        <div class="text-sm text-gray-400">${c.name || c.prcpart} ${c.qty ? `×${c.qty}` : ''}</div>
-                                    `).join('')}
-                                    ${entry.components.length > 10 ? `<p class="text-xs text-gray-500">...and ${entry.components.length - 10} more</p>` : ''}
+                                <div class="mt-3 pl-4 border-l-2 border-bb-orange">
+                                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Components Used</p>
+                                    <div class="grid gap-1">
+                                        ${entry.components.map(c => `
+                                            <div class="flex items-center gap-2 text-sm">
+                                                <span class="px-1.5 py-0.5 rounded text-xs ${
+                                                    c.category === 'Drivers' ? 'bg-red-900/50 text-red-300' :
+                                                    c.category === 'Amplifiers' ? 'bg-blue-900/50 text-blue-300' :
+                                                    c.category === 'Cabinets' ? 'bg-green-900/50 text-green-300' :
+                                                    'bg-gray-700 text-gray-400'
+                                                }">${c.category || 'Part'}</span>
+                                                <span class="text-gray-200 font-mono">${c.name}</span>
+                                                ${c.vendor ? `<span class="text-gray-500 text-xs">(${c.vendor})</span>` : ''}
+                                            </div>
+                                        `).join('')}
+                                    </div>
                                 </div>
                             ` : ''}
                         </div>
