@@ -442,6 +442,13 @@
         "description": "Horizontal transport cart"
       },
       {
+        "id": "BB-CART-SSP215-H",
+        "name": "SSP215 Horizontal",
+        "price": 395,
+        "forProducts": ["SSP215-MK3"],
+        "description": "Horizontal transport cart"
+      },
+      {
         "id": "BB-CART-SSP218-H",
         "name": "SSP218 Cart",
         "price": 395,
@@ -480,10 +487,11 @@
     "stands": [
       {
         "id": "BB-PSA-SB-DV12",
-        "name": "DV12 Speaker Bracket",
+        "name": "DV12 Stack Bracket",
         "price": 225,
         "forProducts": ["DV12-MK3"],
-        "description": "Mounting bracket"
+        "minQty": 4,
+        "description": "Stack bracket for pairing DV12s"
       },
       {
         "id": "BB-PSA-VSLA",

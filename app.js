@@ -182,9 +182,21 @@ const App = () => {
       ...(catalog.accessories.carts || []),
       ...(catalog.accessories.stands || [])
     ];
-    return allAccessories.filter(acc => 
-      acc.forProducts.some(p => productIds.includes(p))
-    );
+    // Count how many of each product
+    const productCounts = {};
+    productIds.forEach(p => {
+      productCounts[p] = (productCounts[p] || 0) + 1;
+    });
+    return allAccessories.filter(acc => {
+      const hasMatchingProduct = acc.forProducts.some(p => productIds.includes(p));
+      if (!hasMatchingProduct) return false;
+      // Check minQty if specified
+      if (acc.minQty) {
+        const matchingCount = acc.forProducts.reduce((sum, p) => sum + (productCounts[p] || 0), 0);
+        return matchingCount >= acc.minQty;
+      }
+      return true;
+    });
   };
 
   const toggleAccessory = (accId, suggestedQty = 1) => {
