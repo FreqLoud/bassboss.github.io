@@ -146,7 +146,7 @@ const App = () => {
   });
   const [recommendation, setRecommendation] = React.useState(null);
   const [selectedTier, setSelectedTier] = React.useState('knocks');
-  const [selectedAccessories, setSelectedAccessories] = React.useState([]);
+  const [selectedAccessories, setSelectedAccessories] = React.useState({}); // { accId: quantity }
 
   React.useEffect(() => {
     fetch('speakers.json')
@@ -172,12 +172,21 @@ const App = () => {
     );
   };
 
-  const toggleAccessory = (accId) => {
-    setSelectedAccessories(prev => 
-      prev.includes(accId) 
-        ? prev.filter(id => id !== accId)
-        : [...prev, accId]
-    );
+  const toggleAccessory = (accId, suggestedQty = 1) => {
+    setSelectedAccessories(prev => {
+      if (prev[accId]) {
+        const { [accId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [accId]: suggestedQty };
+    });
+  };
+  
+  const updateAccessoryQty = (accId, qty) => {
+    setSelectedAccessories(prev => ({
+      ...prev,
+      [accId]: Math.max(1, qty)
+    }));
   };
 
   const getAccessoryById = (id) => {
@@ -920,9 +929,9 @@ const App = () => {
           
           if (availableAccessories.length === 0) return null;
           
-          const accessoriesTotal = selectedAccessories.reduce((sum, accId) => {
+          const accessoriesTotal = Object.entries(selectedAccessories).reduce((sum, [accId, qty]) => {
             const acc = getAccessoryById(accId);
-            return sum + (acc?.price || 0);
+            return sum + (acc?.price || 0) * qty;
           }, 0);
           
           return (
@@ -942,7 +951,7 @@ const App = () => {
                       key={tier}
                       onClick={() => {
                         setSelectedTier(tier);
-                        setSelectedAccessories([]);
+                        setSelectedAccessories({});
                       }}
                       className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                         selectedTier === tier 
@@ -956,29 +965,46 @@ const App = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  {availableAccessories.map(acc => (
-                    <label 
-                      key={acc.id}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedAccessories.includes(acc.id)}
-                        onChange={() => toggleAccessory(acc.id)}
-                        className="w-5 h-5 rounded border-gray-300 text-bb-orange focus:ring-bb-orange"
-                      />
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900">{acc.name}</div>
-                        <div className="text-sm text-gray-500">{acc.description}</div>
+                  {availableAccessories.map(acc => {
+                    const isSelected = !!selectedAccessories[acc.id];
+                    const qty = selectedAccessories[acc.id] || 1;
+                    return (
+                      <div 
+                        key={acc.id}
+                        className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isSelected ? 'bg-amber-50 border border-amber-200' : 'hover:bg-gray-50'}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleAccessory(acc.id)}
+                          className="w-5 h-5 rounded border-gray-300 text-bb-orange focus:ring-bb-orange cursor-pointer"
+                        />
+                        <div className="flex-1 cursor-pointer" onClick={() => toggleAccessory(acc.id)}>
+                          <div className="font-medium text-gray-900">{acc.name}</div>
+                          <div className="text-sm text-gray-500">{acc.description}</div>
+                        </div>
+                        {isSelected && (
+                          <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                            <button 
+                              onClick={() => updateAccessoryQty(acc.id, qty - 1)}
+                              className="w-7 h-7 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 font-bold"
+                            >-</button>
+                            <span className="w-8 text-center font-medium">{qty}</span>
+                            <button 
+                              onClick={() => updateAccessoryQty(acc.id, qty + 1)}
+                              className="w-7 h-7 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 font-bold"
+                            >+</button>
+                          </div>
+                        )}
+                        <div className="font-semibold text-gray-700 w-20 text-right">
+                          {acc.price === 0 ? 'FREE' : `$${(acc.price * (isSelected ? qty : 1)).toLocaleString()}`}
+                        </div>
                       </div>
-                      <div className="font-semibold text-gray-700">
-                        {acc.price === 0 ? 'FREE' : `$${acc.price.toLocaleString()}`}
-                      </div>
-                    </label>
-                  ))}
+                    );
+                  })}
                 </div>
                 
-                {selectedAccessories.length > 0 && (
+                {Object.keys(selectedAccessories).length > 0 && (
                   <div className="mt-4 pt-4 border-t flex justify-between items-center">
                     <span className="text-gray-600">Accessories Total:</span>
                     <span className="font-bold text-lg text-gray-900">${accessoriesTotal.toLocaleString()}</span>
