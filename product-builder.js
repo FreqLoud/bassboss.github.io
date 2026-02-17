@@ -47,82 +47,83 @@ const CROWD_SIZES = [
   { id: 'massive', label: '5,000+', value: 7500 }
 ];
 
+// Helper: Get all accessories as flat array
+const getAllAccessories = (catalog) => {
+  if (!catalog?.accessories) return [];
+  return [
+    ...(catalog.accessories.carts || []),
+    ...(catalog.accessories.stands || [])
+  ];
+};
+
+// Helper: Find applicable accessories for selected products
+const getApplicableAccessories = (catalog, selectedTop, selectedSub, topsNeeded, subsNeeded) => {
+  const accessories = { carts: [], stands: [] };
+  
+  if (!catalog?.accessories) return accessories;
+  
+  // Match by product ID (strip -MK3 suffix for matching)
+  const topBase = selectedTop?.id?.replace('-MK3', '');
+  const subBase = selectedSub?.id?.replace('-MK3', '');
+  
+  // Find carts for subs
+  catalog.accessories.carts?.forEach(cart => {
+    const matches = cart.forProducts?.some(p => {
+      const pBase = p.replace('-MK3', '');
+      return pBase === subBase || pBase === topBase;
+    });
+    if (matches) {
+      accessories.carts.push({
+        ...cart,
+        suggestedQty: cart.forProducts?.some(p => p.includes(subBase)) ? subsNeeded : topsNeeded
+      });
+    }
+  });
+  
+  // Find stands/brackets for tops
+  catalog.accessories.stands?.forEach(stand => {
+    const matches = stand.forProducts?.some(p => {
+      const pBase = p.replace('-MK3', '');
+      return pBase === topBase;
+    });
+    if (matches) {
+      accessories.stands.push({
+        ...stand,
+        suggestedQty: topsNeeded
+      });
+    }
+  });
+  
+  return accessories;
+};
+
 // Accessories Section Component
-const AccessoriesSection = ({ catalog, selectedTop, selectedSub, topsNeeded, subsNeeded }) => {
-  const [selectedAccessories, setSelectedAccessories] = React.useState({});
-  
-  // Find applicable accessories for selected products
-  const getApplicableAccessories = () => {
-    const accessories = { carts: [], stands: [] };
-    
-    if (!catalog.accessories) return accessories;
-    
-    // Match by product ID (strip -MK3 suffix for matching)
-    const topBase = selectedTop?.id?.replace('-MK3', '');
-    const subBase = selectedSub?.id?.replace('-MK3', '');
-    
-    // Find carts for subs
-    catalog.accessories.carts?.forEach(cart => {
-      const matches = cart.forProducts?.some(p => {
-        const pBase = p.replace('-MK3', '');
-        return pBase === subBase || pBase === topBase;
-      });
-      if (matches) {
-        accessories.carts.push({
-          ...cart,
-          suggestedQty: cart.forProducts?.some(p => p.includes(subBase)) ? subsNeeded : topsNeeded
-        });
-      }
-    });
-    
-    // Find stands/brackets for tops
-    catalog.accessories.stands?.forEach(stand => {
-      const matches = stand.forProducts?.some(p => {
-        const pBase = p.replace('-MK3', '');
-        return pBase === topBase;
-      });
-      if (matches) {
-        accessories.stands.push({
-          ...stand,
-          suggestedQty: topsNeeded
-        });
-      }
-    });
-    
-    return accessories;
-  };
-  
-  const applicable = getApplicableAccessories();
+const AccessoriesSection = ({ catalog, selectedTop, selectedSub, topsNeeded, subsNeeded, selectedAccessories, onAccessoriesChange }) => {
+  const applicable = getApplicableAccessories(catalog, selectedTop, selectedSub, topsNeeded, subsNeeded);
   const hasAccessories = applicable.carts.length > 0 || applicable.stands.length > 0;
   
   if (!hasAccessories) return null;
   
   const toggleAccessory = (id, suggestedQty) => {
-    setSelectedAccessories(prev => {
-      if (prev[id]) {
-        const { [id]: _, ...rest } = prev;
-        return rest;
-      }
-      return { ...prev, [id]: suggestedQty };
-    });
+    if (selectedAccessories[id]) {
+      const { [id]: _, ...rest } = selectedAccessories;
+      onAccessoriesChange(rest);
+    } else {
+      onAccessoriesChange({ ...selectedAccessories, [id]: suggestedQty });
+    }
   };
   
   const updateQty = (id, qty) => {
-    setSelectedAccessories(prev => ({
-      ...prev,
+    onAccessoriesChange({
+      ...selectedAccessories,
       [id]: Math.max(1, qty)
-    }));
+    });
   };
-  
-  const accessoriesTotal = Object.entries(selectedAccessories).reduce((total, [id, qty]) => {
-    const acc = [...(catalog.accessories.carts || []), ...(catalog.accessories.stands || [])].find(a => a.id === id);
-    return total + (acc?.price || 0) * qty;
-  }, 0);
   
   return (
     <div className="bg-gray-800 rounded-2xl p-6">
       <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-        <span>🎒</span> Recommended Accessories
+        <span>🎒</span> Add Accessories
       </h3>
       
       {/* Carts */}
@@ -223,13 +224,7 @@ const AccessoriesSection = ({ catalog, selectedTop, selectedSub, topsNeeded, sub
         </div>
       )}
       
-      {/* Accessories Total */}
-      {accessoriesTotal > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-700 flex justify-between items-center">
-          <span className="text-gray-400">Accessories Subtotal:</span>
-          <span className="text-bb-orange font-bold text-lg">${accessoriesTotal.toLocaleString()}</span>
-        </div>
-      )}
+      <p className="text-gray-500 text-xs mt-4">Click to add accessories to your quote above</p>
     </div>
   );
 };
@@ -242,6 +237,7 @@ const App = () => {
   const [crowdSize, setCrowdSize] = React.useState(null);
   const [genre, setGenre] = React.useState(null);
   const [result, setResult] = React.useState(null);
+  const [selectedAccessories, setSelectedAccessories] = React.useState({});
 
   React.useEffect(() => {
     fetch('speakers.json')
@@ -402,6 +398,21 @@ const App = () => {
     setCrowdSize(null);
     setGenre(null);
     setResult(null);
+    setSelectedAccessories({});
+  };
+  
+  // Calculate accessories total
+  const accessoriesTotal = Object.entries(selectedAccessories).reduce((total, [id, qty]) => {
+    const acc = getAllAccessories(catalog).find(a => a.id === id);
+    return total + (acc?.price || 0) * qty;
+  }, 0);
+  
+  // Get selected accessories as array for display
+  const getSelectedAccessoriesList = () => {
+    return Object.entries(selectedAccessories).map(([id, qty]) => {
+      const acc = getAllAccessories(catalog).find(a => a.id === id);
+      return acc ? { ...acc, qty, lineTotal: acc.price * qty } : null;
+    }).filter(Boolean);
   };
 
   if (!catalog) {
@@ -674,7 +685,7 @@ const App = () => {
             
             <div className="bg-gradient-to-br from-bb-orange/20 to-orange-600/10 border border-bb-orange/30 rounded-2xl p-6">
               <div className="text-center mb-6">
-                <div className="text-4xl font-bold text-white">${result.totalPrice.toLocaleString()}</div>
+                <div className="text-4xl font-bold text-white">${(result.totalPrice + accessoriesTotal).toLocaleString()}</div>
                 <div className="text-gray-400">Total System Price (Retail)</div>
               </div>
               
@@ -722,6 +733,48 @@ const App = () => {
                     Learn more →
                   </a>
                 </div>
+                
+                {/* Selected Accessories in Quote */}
+                {getSelectedAccessoriesList().map(acc => (
+                  <div key={acc.id} className="bg-black/30 rounded-xl p-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-lg font-bold text-white flex items-center gap-2">
+                          {acc.qty}× {acc.name}
+                          <button 
+                            onClick={() => {
+                              const { [acc.id]: _, ...rest } = selectedAccessories;
+                              setSelectedAccessories(rest);
+                            }}
+                            className="text-red-400 hover:text-red-300 text-sm ml-2"
+                            title="Remove from quote"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <div className="text-gray-400 text-sm">{acc.description}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-bb-orange font-bold">${acc.lineTotal.toLocaleString()}</div>
+                        <div className="text-xs text-gray-500">${acc.price.toLocaleString()} each</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Subtotals breakdown if accessories added */}
+                {accessoriesTotal > 0 && (
+                  <div className="pt-4 border-t border-gray-700/50 space-y-1 text-sm">
+                    <div className="flex justify-between text-gray-400">
+                      <span>Speakers:</span>
+                      <span>${result.totalPrice.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-400">
+                      <span>Accessories:</span>
+                      <span>${accessoriesTotal.toLocaleString()}</span>
+                    </div>
+                  </div>
+                )}
               </div>
               
               {/* Power Requirements */}
@@ -759,6 +812,8 @@ const App = () => {
                 selectedSub={result.sub}
                 topsNeeded={result.topsNeeded}
                 subsNeeded={result.subsNeeded}
+                selectedAccessories={selectedAccessories}
+                onAccessoriesChange={setSelectedAccessories}
               />
             )}
             
