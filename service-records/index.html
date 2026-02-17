@@ -455,7 +455,7 @@
                                     ${entry.custname ? `<span class="text-gray-400 ml-2">${entry.custname}</span>` : ''}
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-gray-400 text-sm">${entry.orderdate || ''}</span>
+                                    ${entry.orderdate ? `<span class="text-gray-400 text-sm">Purchase Date: <span class="text-white">${entry.orderdate}</span></span>` : ''}
                                     <span class="source-badge ${getSourceClass(entry.source)}">${getSourceLabel(entry.source)}</span>
                                 </div>
                             </div>
