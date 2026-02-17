@@ -1033,7 +1033,6 @@ const App = () => {
                       key={tier}
                       onClick={() => {
                         setSelectedTier(tier);
-                        setSelectedAccessories({});
                       }}
                       className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                         selectedTier === tier 
