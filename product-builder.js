@@ -47,6 +47,193 @@ const CROWD_SIZES = [
   { id: 'massive', label: '5,000+', value: 7500 }
 ];
 
+// Accessories Section Component
+const AccessoriesSection = ({ catalog, selectedTop, selectedSub, topsNeeded, subsNeeded }) => {
+  const [selectedAccessories, setSelectedAccessories] = React.useState({});
+  
+  // Find applicable accessories for selected products
+  const getApplicableAccessories = () => {
+    const accessories = { carts: [], stands: [] };
+    
+    if (!catalog.accessories) return accessories;
+    
+    // Match by product ID (strip -MK3 suffix for matching)
+    const topBase = selectedTop?.id?.replace('-MK3', '');
+    const subBase = selectedSub?.id?.replace('-MK3', '');
+    
+    // Find carts for subs
+    catalog.accessories.carts?.forEach(cart => {
+      const matches = cart.forProducts?.some(p => {
+        const pBase = p.replace('-MK3', '');
+        return pBase === subBase || pBase === topBase;
+      });
+      if (matches) {
+        accessories.carts.push({
+          ...cart,
+          suggestedQty: cart.forProducts?.some(p => p.includes(subBase)) ? subsNeeded : topsNeeded
+        });
+      }
+    });
+    
+    // Find stands/brackets for tops
+    catalog.accessories.stands?.forEach(stand => {
+      const matches = stand.forProducts?.some(p => {
+        const pBase = p.replace('-MK3', '');
+        return pBase === topBase;
+      });
+      if (matches) {
+        accessories.stands.push({
+          ...stand,
+          suggestedQty: topsNeeded
+        });
+      }
+    });
+    
+    return accessories;
+  };
+  
+  const applicable = getApplicableAccessories();
+  const hasAccessories = applicable.carts.length > 0 || applicable.stands.length > 0;
+  
+  if (!hasAccessories) return null;
+  
+  const toggleAccessory = (id, suggestedQty) => {
+    setSelectedAccessories(prev => {
+      if (prev[id]) {
+        const { [id]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [id]: suggestedQty };
+    });
+  };
+  
+  const updateQty = (id, qty) => {
+    setSelectedAccessories(prev => ({
+      ...prev,
+      [id]: Math.max(1, qty)
+    }));
+  };
+  
+  const accessoriesTotal = Object.entries(selectedAccessories).reduce((total, [id, qty]) => {
+    const acc = [...(catalog.accessories.carts || []), ...(catalog.accessories.stands || [])].find(a => a.id === id);
+    return total + (acc?.price || 0) * qty;
+  }, 0);
+  
+  return (
+    <div className="bg-gray-800 rounded-2xl p-6">
+      <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+        <span>🎒</span> Recommended Accessories
+      </h3>
+      
+      {/* Carts */}
+      {applicable.carts.length > 0 && (
+        <div className="mb-4">
+          <h4 className="text-sm font-semibold text-gray-400 uppercase mb-2">Transport Carts</h4>
+          <div className="space-y-2">
+            {applicable.carts.map(cart => (
+              <div 
+                key={cart.id}
+                className={`flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer ${
+                  selectedAccessories[cart.id] 
+                    ? 'bg-bb-orange/10 border-bb-orange' 
+                    : 'bg-gray-700/50 border-gray-700 hover:border-gray-500'
+                }`}
+                onClick={() => toggleAccessory(cart.id, cart.suggestedQty)}
+              >
+                <div className="flex items-center gap-3">
+                  <input 
+                    type="checkbox" 
+                    checked={!!selectedAccessories[cart.id]}
+                    onChange={() => {}}
+                    className="w-4 h-4 accent-bb-orange"
+                  />
+                  <div>
+                    <div className="text-white font-medium">{cart.name}</div>
+                    <div className="text-gray-400 text-xs">{cart.description}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  {selectedAccessories[cart.id] && (
+                    <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                      <button 
+                        onClick={() => updateQty(cart.id, selectedAccessories[cart.id] - 1)}
+                        className="w-6 h-6 bg-gray-600 rounded text-white text-sm hover:bg-gray-500"
+                      >-</button>
+                      <span className="w-8 text-center text-white">{selectedAccessories[cart.id]}</span>
+                      <button 
+                        onClick={() => updateQty(cart.id, selectedAccessories[cart.id] + 1)}
+                        className="w-6 h-6 bg-gray-600 rounded text-white text-sm hover:bg-gray-500"
+                      >+</button>
+                    </div>
+                  )}
+                  <span className="text-bb-orange font-bold">${cart.price}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Stands/Brackets */}
+      {applicable.stands.length > 0 && (
+        <div className="mb-4">
+          <h4 className="text-sm font-semibold text-gray-400 uppercase mb-2">Stands & Rigging</h4>
+          <div className="space-y-2">
+            {applicable.stands.map(stand => (
+              <div 
+                key={stand.id}
+                className={`flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer ${
+                  selectedAccessories[stand.id] 
+                    ? 'bg-bb-orange/10 border-bb-orange' 
+                    : 'bg-gray-700/50 border-gray-700 hover:border-gray-500'
+                }`}
+                onClick={() => toggleAccessory(stand.id, stand.suggestedQty)}
+              >
+                <div className="flex items-center gap-3">
+                  <input 
+                    type="checkbox" 
+                    checked={!!selectedAccessories[stand.id]}
+                    onChange={() => {}}
+                    className="w-4 h-4 accent-bb-orange"
+                  />
+                  <div>
+                    <div className="text-white font-medium">{stand.name}</div>
+                    <div className="text-gray-400 text-xs">{stand.description}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  {selectedAccessories[stand.id] && (
+                    <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                      <button 
+                        onClick={() => updateQty(stand.id, selectedAccessories[stand.id] - 1)}
+                        className="w-6 h-6 bg-gray-600 rounded text-white text-sm hover:bg-gray-500"
+                      >-</button>
+                      <span className="w-8 text-center text-white">{selectedAccessories[stand.id]}</span>
+                      <button 
+                        onClick={() => updateQty(stand.id, selectedAccessories[stand.id] + 1)}
+                        className="w-6 h-6 bg-gray-600 rounded text-white text-sm hover:bg-gray-500"
+                      >+</button>
+                    </div>
+                  )}
+                  <span className="text-bb-orange font-bold">${stand.price.toLocaleString()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Accessories Total */}
+      {accessoriesTotal > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-700 flex justify-between items-center">
+          <span className="text-gray-400">Accessories Subtotal:</span>
+          <span className="text-bb-orange font-bold text-lg">${accessoriesTotal.toLocaleString()}</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const App = () => {
   const [catalog, setCatalog] = React.useState(null);
   const [step, setStep] = React.useState(0);
@@ -563,6 +750,17 @@ const App = () => {
                 </div>
               )}
             </div>
+            
+            {/* Accessories */}
+            {catalog.accessories && (
+              <AccessoriesSection 
+                catalog={catalog}
+                selectedTop={result.top}
+                selectedSub={result.sub}
+                topsNeeded={result.topsNeeded}
+                subsNeeded={result.subsNeeded}
+              />
+            )}
             
             {/* Cross-link */}
             <div className="bg-gray-800 rounded-xl p-4 text-center">
