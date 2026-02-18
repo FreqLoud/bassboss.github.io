@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BASSBOSS CEO Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bass: {
+                            red: '#E31937',
+                            dark: '#1a1a1a',
+                            gray: '#2d2d2d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .metric-card { transition: transform 0.2s; }
+        .metric-card:hover { transform: translateY(-2px); }
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .trend-neutral { color: #6b7280; }
+        .moi-critical { background: #fecaca; color: #991b1b; }
+        .moi-warning { background: #fef3c7; color: #92400e; }
+        .moi-healthy { background: #d1fae5; color: #065f46; }
+        .tab-active { border-bottom: 2px solid #E31937; color: #E31937; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="min-h-screen flex items-center justify-center bg-bass-dark">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-bold text-bass-dark">🔒 BASSBOSS CEO Dashboard</h1>
+                <p class="text-gray-500 mt-2">Enter password to continue</p>
+            </div>
+            <form onsubmit="authenticate(event)">
+                <input type="password" id="password" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bass-red focus:border-transparent"
+                    placeholder="Password" autofocus>
+                <button type="submit" 
+                    class="w-full mt-4 bg-bass-red text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition">
+                    Access Dashboard
+                </button>
+            </form>
+            <p id="auth-error" class="text-red-500 text-center mt-4 hidden">Incorrect password</p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden">
+        <!-- Header -->
+        <header class="bg-bass-dark text-white py-4 px-6 shadow-lg no-print">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-bold">📊 BASSBOSS CEO Dashboard</h1>
+                    <p class="text-gray-400 text-sm">Financial Overview</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="last-updated" class="text-gray-400 text-sm"></span>
+                    <button onclick="window.print()" class="bg-bass-gray px-4 py-2 rounded hover:bg-gray-600 transition">
+                        🖨️ Print
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="bg-white border-b no-print">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex gap-6">
+                    <button onclick="showTab('overview')" id="tab-overview" class="py-4 px-2 font-medium tab-active">
+                        Overview
+                    </button>
+                    <button onclick="showTab('inventory')" id="tab-inventory" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
+                        Inventory
+                    </button>
+                    <button onclick="showTab('sales')" id="tab-sales" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
+                        Sales
+                    </button>
+                    <button onclick="showTab('cashflow')" id="tab-cashflow" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
+                        Cash Flow
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <main class="max-w-7xl mx-auto px-6 py-8">
+            <!-- Overview Tab -->
+            <div id="content-overview">
+                <!-- Key Metrics Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="metric-card bg-white rounded-lg shadow p-6">
+                        <div class="text-gray-500 text-sm font-medium">Cash Position (Jan Actual)</div>
+                        <div id="metric-cash" class="text-3xl font-bold mt-2">—</div>
+                        <div id="metric-cash-trend" class="text-sm mt-1">—</div>
+                    </div>
+                    <div class="metric-card bg-white rounded-lg shadow p-6">
+                        <div class="text-gray-500 text-sm font-medium">YTD Units Sold</div>
+                        <div id="metric-units" class="text-3xl font-bold mt-2">—</div>
+                        <div id="metric-units-trend" class="text-sm mt-1">—</div>
+                    </div>
+                    <div class="metric-card bg-white rounded-lg shadow p-6">
+                        <div class="text-gray-500 text-sm font-medium">Total QOH</div>
+                        <div id="metric-qoh" class="text-3xl font-bold mt-2">—</div>
+                        <div class="text-sm text-gray-500 mt-1">All locations</div>
+                    </div>
+                    <div class="metric-card bg-white rounded-lg shadow p-6">
+                        <div class="text-gray-500 text-sm font-medium">Inventory Alerts</div>
+                        <div id="metric-alerts" class="text-3xl font-bold mt-2">—</div>
+                        <div class="text-sm text-gray-500 mt-1">MOI &lt; 3 months</div>
+                    </div>
+                </div>
+
+                <!-- Two Column Layout -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Monthly Revenue -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="font-semibold text-lg mb-4">📈 AM&S Monthly Revenue (2024-2025)</h3>
+                        <div id="monthly-revenue-chart" class="space-y-2"></div>
+                    </div>
+
+                    <!-- Top Products -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="font-semibold text-lg mb-4">🏆 Top Products by Units Sold</h3>
+                        <div id="top-products" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- Brent Forecast Summary -->
+                <div class="bg-white rounded-lg shadow p-6 mt-6">
+                    <h3 class="font-semibold text-lg mb-4">🎯 2026 Forecast Summary (Brent Model)</h3>
+                    <div id="brent-summary" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                </div>
+            </div>
+
+            <!-- Inventory Tab -->
+            <div id="content-inventory" class="hidden">
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 class="font-semibold text-lg mb-4">📦 Inventory by Location</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-3 px-4 font-semibold">Model</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Austin FG</th>
+                                    <th class="text-right py-3 px-4 font-semibold">AM&S</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Canada</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Demo</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-location-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="font-semibold text-lg mb-4">⚠️ Inventory Health (MOI)</h3>
+                    <div class="mb-4 flex gap-4 text-sm">
+                        <span class="px-3 py-1 rounded moi-critical">🔴 Critical (&lt;3 mo)</span>
+                        <span class="px-3 py-1 rounded moi-warning">🟡 Warning (3-4 mo)</span>
+                        <span class="px-3 py-1 rounded moi-healthy">🟢 Healthy (&gt;4 mo)</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-3 px-4 font-semibold">SKU</th>
+                                    <th class="text-right py-3 px-4 font-semibold">QOH</th>
+                                    <th class="text-right py-3 px-4 font-semibold">On Order</th>
+                                    <th class="text-right py-3 px-4 font-semibold">On Water</th>
+                                    <th class="text-right py-3 px-4 font-semibold">6-Mo Avg</th>
+                                    <th class="text-right py-3 px-4 font-semibold">MOI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-moi-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Tab -->
+            <div id="content-sales" class="hidden">
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 class="font-semibold text-lg mb-4">📊 Year-over-Year Sales</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-3 px-4 font-semibold">Model</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Total Units</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Current QOH</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Open PO</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Units Received</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Backorders</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yoy-sales-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="font-semibold text-lg mb-4">💰 Revenue by Product</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-3 px-4 font-semibold">Model</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Units Sold</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Monthly Avg</th>
+                                    <th class="text-right py-3 px-4 font-semibold">BB Revenue</th>
+                                    <th class="text-right py-3 px-4 font-semibold">BB Gross Profit</th>
+                                    <th class="text-right py-3 px-4 font-semibold">BB Net Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody id="revenue-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cash Flow Tab -->
+            <div id="content-cashflow" class="hidden">
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 class="font-semibold text-lg mb-4">💵 2026 Cash Flow: Projected vs Actual</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-3 px-4 font-semibold">Month</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Projected</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Actual</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Variance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cashflow-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="font-semibold text-lg mb-4">📤 Sources of Cash</h3>
+                        <div id="cash-sources" class="space-y-3"></div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="font-semibold text-lg mb-4">📥 Uses of Cash</h3>
+                        <div id="cash-uses" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-bass-dark text-gray-400 py-4 px-6 mt-8 no-print">
+            <div class="max-w-7xl mx-auto text-center text-sm">
+                <p>BASSBOSS CEO Dashboard • Confidential • Data snapshot from Google Sheets</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Data will be loaded from JSON files
+        let DATA = {
+            yoySales: null,
+            inventoryAms: null,
+            monthlySalesReport: null,
+            amsMonthly: null,
+            cashFlow: null,
+            brentSummary: null,
+            onHandLocations: null,
+            aggregateSalesValue: null
+        };
+
+        // Password check (SHA256 of 'bassboss')
+        const HASH = '8c0c587d5e8c5f8e9f7d6c5b4a3928170615243342516071889a0b1c2d3e4f5a';
+        
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function authenticate(e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            // Simple check - in production use proper auth
+            if (password === 'bassboss') {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadData();
+            } else {
+                document.getElementById('auth-error').classList.remove('hidden');
+            }
+        }
+
+        async function loadData() {
+            try {
+                const files = [
+                    ['yoySales', 'data/yoy-sales.json'],
+                    ['inventoryAms', 'data/inventory-ams.json'],
+                    ['monthlySalesReport', 'data/monthly-sales-report.json'],
+                    ['amsMonthly', 'data/ams-monthly.json'],
+                    ['cashFlow', 'data/cash-flow.json'],
+                    ['brentSummary', 'data/brent-summary.json'],
+                    ['onHandLocations', 'data/on-hand-locations.json'],
+                    ['aggregateSalesValue', 'data/aggregate-sales-value.json']
+                ];
+
+                for (const [key, file] of files) {
+                    try {
+                        const res = await fetch(file);
+                        DATA[key] = await res.json();
+                    } catch (err) {
+                        console.warn(`Could not load ${file}:`, err);
+                    }
+                }
+
+                document.getElementById('last-updated').textContent = 'Data: Feb 17, 2026';
+                renderDashboard();
+            } catch (err) {
+                console.error('Error loading data:', err);
+            }
+        }
+
+        function renderDashboard() {
+            renderOverview();
+            renderInventory();
+            renderSales();
+            renderCashFlow();
+        }
+
+        function parseNumber(str) {
+            if (!str) return 0;
+            return parseFloat(str.toString().replace(/[$,\(\)]/g, '').replace(/^\-/, '-')) || 0;
+        }
+
+        function formatCurrency(num) {
+            if (num === null || num === undefined) return '—';
+            const abs = Math.abs(num);
+            const formatted = abs >= 1000000 
+                ? '$' + (abs / 1000000).toFixed(1) + 'M'
+                : abs >= 1000 
+                    ? '$' + (abs / 1000).toFixed(0) + 'K'
+                    : '$' + abs.toFixed(0);
+            return num < 0 ? '-' + formatted : formatted;
+        }
+
+        function formatNumber(num) {
+            if (num === null || num === undefined) return '—';
+            return num.toLocaleString();
+        }
+
+        function renderOverview() {
+            // Cash Position from Cash Flow
+            if (DATA.cashFlow?.values) {
+                const row = DATA.cashFlow.values[1]; // Ending Cash Balance row
+                if (row) {
+                    const actual = parseNumber(row[2]); // January Actual
+                    document.getElementById('metric-cash').textContent = formatCurrency(actual);
+                    document.getElementById('metric-cash-trend').innerHTML = actual < 0 
+                        ? '<span class="trend-down">⚠️ Negative balance</span>'
+                        : '<span class="trend-up">✓ Positive</span>';
+                }
+            }
+
+            // YTD Units from YOY Sales
+            if (DATA.yoySales?.values) {
+                const totalRow = DATA.yoySales.values.find(r => r[0]?.includes('Total'));
+                if (totalRow) {
+                    const units = parseNumber(totalRow[1]);
+                    document.getElementById('metric-units').textContent = formatNumber(units);
+                    document.getElementById('metric-units-trend').innerHTML = '<span class="text-gray-500">All products YTD</span>';
+                }
+            }
+
+            // QOH from On Hand Locations
+            if (DATA.onHandLocations?.values) {
+                const totalRow = DATA.onHandLocations.values.find(r => r[1] === 'TOTAL');
+                if (totalRow) {
+                    const austinFG = parseNumber(totalRow[3]);
+                    const ams = parseNumber(totalRow[4]);
+                    const canada = parseNumber(totalRow[5]);
+                    const demo = parseNumber(totalRow[6]);
+                    const total = austinFG + ams + canada + demo;
+                    document.getElementById('metric-qoh').textContent = formatNumber(total);
+                }
+            }
+
+            // Inventory Alerts from Inventory AMS
+            if (DATA.inventoryAms?.values) {
+                let alerts = 0;
+                DATA.inventoryAms.values.slice(5).forEach(row => {
+                    const moi = parseNumber(row[31]); // MOI column (AF)
+                    if (moi > 0 && moi < 3) alerts++;
+                });
+                document.getElementById('metric-alerts').textContent = alerts;
+                document.getElementById('metric-alerts').className = alerts > 0 
+                    ? 'text-3xl font-bold mt-2 text-red-600' 
+                    : 'text-3xl font-bold mt-2 text-green-600';
+            }
+
+            // Monthly Revenue Chart
+            if (DATA.amsMonthly?.values) {
+                const container = document.getElementById('monthly-revenue-chart');
+                const months2024 = [];
+                const months2025 = [];
+                let in2024 = false, in2025 = false;
+                
+                DATA.amsMonthly.values.forEach(row => {
+                    if (row[1] === '2024') { in2024 = true; in2025 = false; return; }
+                    if (row[1] === '2025') { in2025 = true; in2024 = false; return; }
+                    if (in2024 && row[1] && row[2]) {
+                        months2024.push({ month: row[1], revenue: parseNumber(row[2]) });
+                    }
+                    if (in2025 && row[1] && row[2]) {
+                        months2025.push({ month: row[1], revenue: parseNumber(row[2]), yoy: row[0] });
+                    }
+                });
+
+                const maxRev = Math.max(...months2024.map(m => m.revenue), ...months2025.map(m => m.revenue));
+                
+                let html = '<div class="grid grid-cols-2 gap-4"><div><h4 class="font-medium mb-2">2024</h4>';
+                months2024.forEach(m => {
+                    const width = (m.revenue / maxRev * 100).toFixed(0);
+                    html += `<div class="flex items-center gap-2 mb-1">
+                        <span class="w-8 text-xs text-gray-500">${m.month.slice(0,3)}</span>
+                        <div class="flex-1 bg-gray-200 rounded h-4">
+                            <div class="bg-gray-400 h-4 rounded" style="width:${width}%"></div>
+                        </div>
+                        <span class="text-xs w-16 text-right">${formatCurrency(m.revenue)}</span>
+                    </div>`;
+                });
+                html += '</div><div><h4 class="font-medium mb-2">2025</h4>';
+                months2025.forEach(m => {
+                    const width = (m.revenue / maxRev * 100).toFixed(0);
+                    const yoyClass = m.yoy?.includes('-') ? 'text-red-600' : 'text-green-600';
+                    html += `<div class="flex items-center gap-2 mb-1">
+                        <span class="w-8 text-xs text-gray-500">${m.month.slice(0,3)}</span>
+                        <div class="flex-1 bg-gray-200 rounded h-4">
+                            <div class="bg-bass-red h-4 rounded" style="width:${width}%"></div>
+                        </div>
+                        <span class="text-xs w-16 text-right">${formatCurrency(m.revenue)}</span>
+                        <span class="text-xs w-12 ${yoyClass}">${m.yoy || ''}</span>
+                    </div>`;
+                });
+                html += '</div></div>';
+                container.innerHTML = html;
+            }
+
+            // Top Products
+            if (DATA.yoySales?.values) {
+                const products = DATA.yoySales.values.slice(3)
+                    .filter(r => r[0] && !r[0].includes('Total') && parseNumber(r[1]) > 0)
+                    .map(r => ({
+                        name: r[0].replace('BB-TOP-', '').replace('BB-SUB-', '').replace('-MK3', ''),
+                        units: parseNumber(r[1])
+                    }))
+                    .sort((a, b) => b.units - a.units)
+                    .slice(0, 10);
+
+                const maxUnits = products[0]?.units || 1;
+                const container = document.getElementById('top-products');
+                container.innerHTML = products.map(p => `
+                    <div class="flex items-center gap-2">
+                        <span class="w-24 text-sm font-medium">${p.name}</span>
+                        <div class="flex-1 bg-gray-200 rounded h-4">
+                            <div class="bg-bass-red h-4 rounded" style="width:${(p.units/maxUnits*100).toFixed(0)}%"></div>
+                        </div>
+                        <span class="text-sm w-16 text-right">${formatNumber(p.units)}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Brent Summary
+            if (DATA.brentSummary?.values) {
+                const container = document.getElementById('brent-summary');
+                const metrics = [];
+                DATA.brentSummary.values.forEach(row => {
+                    if (row[0] && row[1] && row[1].includes('$')) {
+                        metrics.push({ label: row[0], value: row[1] });
+                    }
+                });
+                container.innerHTML = metrics.slice(0, 8).map(m => `
+                    <div class="p-3 bg-gray-50 rounded">
+                        <div class="text-xs text-gray-500">${m.label}</div>
+                        <div class="text-lg font-semibold">${m.value}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderInventory() {
+            // Inventory by Location
+            if (DATA.onHandLocations?.values) {
+                const tbody = document.getElementById('inventory-location-table');
+                const rows = DATA.onHandLocations.values.slice(2)
+                    .filter(r => r[0] && r[1])
+                    .map(r => {
+                        const austin = parseNumber(r[3]);
+                        const ams = parseNumber(r[4]);
+                        const canada = parseNumber(r[5]);
+                        const demo = parseNumber(r[6]);
+                        return {
+                            model: r[1],
+                            austin, ams, canada, demo,
+                            total: austin + ams + canada + demo
+                        };
+                    });
+
+                tbody.innerHTML = rows.map(r => `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="py-2 px-4 font-medium">${r.model}</td>
+                        <td class="py-2 px-4 text-right">${r.austin || '—'}</td>
+                        <td class="py-2 px-4 text-right">${r.ams || '—'}</td>
+                        <td class="py-2 px-4 text-right">${r.canada || '—'}</td>
+                        <td class="py-2 px-4 text-right">${r.demo || '—'}</td>
+                        <td class="py-2 px-4 text-right font-semibold">${r.total}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // MOI Table
+            if (DATA.inventoryAms?.values) {
+                const tbody = document.getElementById('inventory-moi-table');
+                const headers = DATA.inventoryAms.values[1];
+                const rows = DATA.inventoryAms.values.slice(5)
+                    .filter(r => r[0] && r[0].includes('BB-'))
+                    .map(r => {
+                        const qoh = parseNumber(r[15]); // QOH column
+                        const onOrder = parseNumber(r[13]); // Open PO
+                        const onWater = parseNumber(r[16]); // On Water
+                        const avg6mo = parseNumber(r[11]); // 6 Mo Avg
+                        const moi = parseNumber(r[31]); // MOI
+                        return { sku: r[0], qoh, onOrder, onWater, avg6mo, moi };
+                    })
+                    .filter(r => r.qoh > 0 || r.onOrder > 0)
+                    .sort((a, b) => a.moi - b.moi);
+
+                tbody.innerHTML = rows.map(r => {
+                    let moiClass = 'moi-healthy';
+                    if (r.moi < 3) moiClass = 'moi-critical';
+                    else if (r.moi < 4) moiClass = 'moi-warning';
+                    
+                    return `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="py-2 px-4 font-medium">${r.sku.replace('BB-TOP-','').replace('BB-SUB-','')}</td>
+                            <td class="py-2 px-4 text-right">${r.qoh}</td>
+                            <td class="py-2 px-4 text-right">${r.onOrder}</td>
+                            <td class="py-2 px-4 text-right">${r.onWater}</td>
+                            <td class="py-2 px-4 text-right">${r.avg6mo.toFixed(1)}</td>
+                            <td class="py-2 px-4 text-right"><span class="px-2 py-1 rounded ${moiClass}">${r.moi.toFixed(1)}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderSales() {
+            // YOY Sales
+            if (DATA.yoySales?.values) {
+                const tbody = document.getElementById('yoy-sales-table');
+                const rows = DATA.yoySales.values.slice(2)
+                    .filter(r => r[0])
+                    .map(r => ({
+                        model: r[0].replace('BB-TOP-','').replace('BB-SUB-','').replace('-MK3',''),
+                        units: parseNumber(r[1]),
+                        qoh: parseNumber(r[2]),
+                        openPO: parseNumber(r[3]),
+                        received: parseNumber(r[4]),
+                        backorders: parseNumber(r[5])
+                    }));
+
+                tbody.innerHTML = rows.map(r => `
+                    <tr class="border-b hover:bg-gray-50 ${r.model.includes('Total') ? 'bg-gray-100 font-semibold' : ''}">
+                        <td class="py-2 px-4">${r.model}</td>
+                        <td class="py-2 px-4 text-right">${formatNumber(r.units)}</td>
+                        <td class="py-2 px-4 text-right">${formatNumber(r.qoh)}</td>
+                        <td class="py-2 px-4 text-right">${formatNumber(r.openPO)}</td>
+                        <td class="py-2 px-4 text-right">${formatNumber(r.received)}</td>
+                        <td class="py-2 px-4 text-right ${r.backorders > 0 ? 'text-red-600 font-semibold' : ''}">${r.backorders}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Revenue Table
+            if (DATA.aggregateSalesValue?.values) {
+                const tbody = document.getElementById('revenue-table');
+                const rows = DATA.aggregateSalesValue.values.slice(1)
+                    .filter(r => r[0])
+                    .map(r => ({
+                        model: r[0].replace('BB-TOP-','').replace('BB-SUB-','').replace('-MK3',''),
+                        units: parseNumber(r[6]),
+                        monthlyAvg: parseNumber(r[7]),
+                        revenue: parseNumber(r[8]),
+                        grossProfit: parseNumber(r[9]),
+                        netProfit: parseNumber(r[11])
+                    }));
+
+                tbody.innerHTML = rows.map(r => `
+                    <tr class="border-b hover:bg-gray-50 ${r.model.includes('Total') ? 'bg-gray-100 font-semibold' : ''}">
+                        <td class="py-2 px-4">${r.model}</td>
+                        <td class="py-2 px-4 text-right">${formatNumber(r.units)}</td>
+                        <td class="py-2 px-4 text-right">${r.monthlyAvg.toFixed(1)}</td>
+                        <td class="py-2 px-4 text-right">${formatCurrency(r.revenue)}</td>
+                        <td class="py-2 px-4 text-right">${formatCurrency(r.grossProfit)}</td>
+                        <td class="py-2 px-4 text-right ${r.netProfit < 0 ? 'text-red-600' : ''}">${formatCurrency(r.netProfit)}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function renderCashFlow() {
+            if (!DATA.cashFlow?.values) return;
+
+            const headers = DATA.cashFlow.values[0];
+            const cashBalanceRow = DATA.cashFlow.values[1];
+            
+            // Monthly Cash Flow Table
+            const months = ['January', 'February', 'March', 'April', 'May'];
+            const tbody = document.getElementById('cashflow-table');
+            
+            let html = '';
+            months.forEach((month, i) => {
+                const projectedIdx = i * 3 + 1;
+                const actualIdx = i * 3 + 2;
+                const diffIdx = i * 3 + 3;
+                
+                if (cashBalanceRow[projectedIdx] || cashBalanceRow[actualIdx]) {
+                    const projected = parseNumber(cashBalanceRow[projectedIdx]);
+                    const actual = parseNumber(cashBalanceRow[actualIdx]);
+                    const diff = actual - projected;
+                    
+                    html += `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="py-3 px-4 font-medium">${month}</td>
+                            <td class="py-3 px-4 text-right">${formatCurrency(projected)}</td>
+                            <td class="py-3 px-4 text-right ${actual < 0 ? 'text-red-600 font-semibold' : ''}">${cashBalanceRow[actualIdx] ? formatCurrency(actual) : '—'}</td>
+                            <td class="py-3 px-4 text-right ${diff < 0 ? 'text-red-600' : 'text-green-600'}">${cashBalanceRow[actualIdx] ? formatCurrency(diff) : '—'}</td>
+                        </tr>
+                    `;
+                }
+            });
+            tbody.innerHTML = html;
+
+            // Cash Sources & Uses
+            const sourcesContainer = document.getElementById('cash-sources');
+            const usesContainer = document.getElementById('cash-uses');
+            
+            let inSources = false, inUses = false;
+            let sourcesHtml = '', usesHtml = '';
+            
+            DATA.cashFlow.values.forEach(row => {
+                if (row[0] === 'Sources of Cash:') { inSources = true; inUses = false; return; }
+                if (row[0] === 'Uses of Cash:') { inUses = true; inSources = false; return; }
+                if (row[0] === 'B. Total Sources of Cash') inSources = false;
+                if (row[0] === 'C. Total Uses of Cash:') inUses = false;
+                
+                if (inSources && row[0] && row[4]) {
+                    sourcesHtml += `<div class="flex justify-between"><span>${row[0]}</span><span class="font-medium">${row[4]}</span></div>`;
+                }
+                if (inUses && row[0] && row[1] && !row[0].includes('Variable')) {
+                    usesHtml += `<div class="flex justify-between"><span>${row[0]}</span><span class="font-medium">${row[1]}</span></div>`;
+                }
+            });
+            
+            sourcesContainer.innerHTML = sourcesHtml || '<p class="text-gray-500">No data</p>';
+            usesContainer.innerHTML = usesHtml || '<p class="text-gray-500">No data</p>';
+        }
+
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
+            // Show selected content
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            
+            // Update tab styles
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('tab-active');
+                el.classList.add('text-gray-500');
+            });
+            document.getElementById('tab-' + tabName).classList.add('tab-active');
+            document.getElementById('tab-' + tabName).classList.remove('text-gray-500');
+        }
+
+        // Check if already authenticated (for development)
+        if (window.location.hash === '#dev') {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            loadData();
+        }
+    </script>
+</body>
+</html>

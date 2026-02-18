@@ -1,0 +1,142 @@
+{
+  "range": "Summary!A1:H40",
+  "values": [
+    [],
+    [],
+    [
+      "Forecasted Cash Flow"
+    ],
+    [
+      "Existing Model"
+    ],
+    [
+      "AM&S Sales",
+      "$4,435,500"
+    ],
+    [
+      "Inventory Purchases",
+      "$2,253,969"
+    ],
+    [
+      "Operating Expenses",
+      "$1,495,653"
+    ],
+    [
+      "Net Income",
+      "$685,878"
+    ],
+    [],
+    [
+      "New Model"
+    ],
+    [
+      "Channel Sales",
+      "$5,268,136"
+    ],
+    [
+      "New Inventory Purchase",
+      "$2,253,969"
+    ],
+    [
+      "Tariffs",
+      "$428,254",
+      "",
+      "Could Change"
+    ],
+    [
+      "Freight",
+      "$94,311"
+    ],
+    [
+      "Existing Opex Less Interest",
+      "$1,352,452"
+    ],
+    [
+      "Profit Before 3PL Fees",
+      "$1,139,149"
+    ],
+    [
+      "New OPEX Payroll",
+      "$400,000",
+      "3PL Manager, Demand Planner, Channel Sales, Accounts Receivable"
+    ],
+    [
+      "3PL Fees",
+      "$653,366",
+      "12.4%"
+    ],
+    [
+      "Income Before Debt Service",
+      "$85,784",
+      "1.6%",
+      "EBITDA"
+    ],
+    [
+      "Delta to Normal",
+      "-$600,094",
+      "-87.5%"
+    ],
+    [
+      "Interest Rate"
+    ],
+    [],
+    [
+      "Existing Inventory",
+      "$2,144,801"
+    ],
+    [
+      "Liabilities",
+      "$860,000"
+    ],
+    [
+      "Total Debt",
+      "$3,004,801"
+    ],
+    [],
+    [
+      "Interest Rate",
+      "8%"
+    ],
+    [
+      "Amortization Months",
+      "60"
+    ],
+    [
+      "Monthly Payment",
+      "$60,926.54 "
+    ],
+    [
+      "Annual Payment",
+      "$731,118.47 "
+    ],
+    [],
+    [
+      "Net Income",
+      "-$645,335"
+    ],
+    [],
+    [],
+    [],
+    [],
+    [
+      "Models:",
+      "",
+      "2026 Revenue"
+    ],
+    [
+      "Assumption: Current Price, Cur. Velocity, Revenue at MAP +35% Selling Costs (Brent Model)",
+      "",
+      "$5,268,136"
+    ],
+    [
+      "Assumption: New Price, Cur. Velocity, Revenue at MAP +35% Selling Costs",
+      "",
+      "$5,580,700"
+    ],
+    [
+      "Assumption: Current Price and Velocity, Revenue at MAP +10% Selling Costs (Direct Model)",
+      "",
+      "$8,401,059"
+    ]
+  ]
+}
