@@ -256,10 +256,15 @@
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-semibold">📅 Monthly Unit Sales Tracker</h2>
-                        <div class="flex gap-4 text-sm">
-                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-gray-200 rounded"></span> 2025 Actual</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-100 rounded"></span> 2026 Projected</span>
-                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-100 border-2 border-green-300 rounded"></span> 2026 Actual (editable)</span>
+                        <div class="flex items-center gap-4">
+                            <button onclick="loadJanuary2026Actuals()" class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200 no-print">
+                                📊 Load Jan 2026 Actuals
+                            </button>
+                            <div class="flex gap-4 text-sm">
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-gray-200 rounded"></span> 2025</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-100 rounded"></span> Proj</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-100 border-2 border-green-300 rounded"></span> Actual</span>
+                            </div>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
@@ -320,7 +325,8 @@
 
         <footer class="bg-bass-dark text-gray-400 py-4 px-6 mt-8 no-print">
             <div class="max-w-7xl mx-auto text-center text-sm">
-                <p>BASSBOSS Scenario Modeler • Scenarios saved in browser</p>
+                <p>BASSBOSS Scenario Modeler • Built by Wren 🐦 for BASSBOSS • Feb 2026</p>
+                <p class="text-gray-500 mt-1">Scenarios saved in browser localStorage</p>
             </div>
         </footer>
     </div>
@@ -423,26 +429,26 @@
     <script>
         const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         
-        // Base product data with 2025 historical
+        // Base product data with 2025 historical and Jan 2026 actuals from AM&S Raw Sales Reports
         const BASE_PRODUCTS = [
-            { sku: 'SSP118-MK3', map: 3995, cogs: 873.43, baseRunRate: 10, hist2025: [11,6,6,8,18,14,6,3,16,8,11,8] },
-            { sku: 'VS21-MK3', map: 4995, cogs: 1167.20, baseRunRate: 9, hist2025: [7,10,16,5,15,9,2,9,12,8,12,3] },
-            { sku: 'AT212-MK3', map: 4995, cogs: 1112.34, baseRunRate: 5, hist2025: [2,3,6,-1,6,11,3,5,8,9,5,4] },
-            { sku: 'MAKARA-MK3', map: 7995, cogs: 2083.47, baseRunRate: 5, hist2025: [6,4,2,4,12,9,3,1,11,5,9,3] },
-            { sku: 'KRAKEN-MK3', map: 17995, cogs: 3432.51, baseRunRate: 1, hist2025: [0,0,0,2,1,1,0,1,2,2,1,0] },
-            { sku: 'CCM12-MK3', map: 2295, cogs: 614.26, baseRunRate: 15, hist2025: [22,1,8,1,36,12,5,6,19,11,13,4] },
-            { sku: 'MFLA-MK3', map: 6995, cogs: 1947.32, baseRunRate: 3, hist2025: [3,0,6,0,12,8,3,2,6,3,6,2] },
-            { sku: 'DIAMON-MK3', map: 2795, cogs: 593.28, baseRunRate: 8, hist2025: [4,2,8,3,16,8,6,3,8,4,4,2] },
-            { sku: 'ZV28-MK3', map: 5995, cogs: 1752.82, baseRunRate: 6, hist2025: [7,0,7,3,15,10,7,2,19,7,9,4] },
-            { sku: 'AT312-MK3', map: 5495, cogs: 1243.41, baseRunRate: 3, hist2025: [2,0,4,0,5,5,3,1,4,2,3,3] },
-            { sku: 'DV12-MK3', map: 3495, cogs: 946.08, baseRunRate: 18, hist2025: [21,4,12,3,33,16,10,12,31,16,22,8] },
-            { sku: 'SSP218-MK3', map: 5995, cogs: 1562.04, baseRunRate: 5, hist2025: [2,1,2,0,7,7,3,5,8,5,8,2] },
-            { sku: 'DJ18S-MK3', map: 3495, cogs: 838.14, baseRunRate: 8, hist2025: [8,2,8,4,12,14,7,5,8,4,10,2] },
-            { sku: 'SSP215-MK3', map: 5495, cogs: 1541.86, baseRunRate: 2, hist2025: [1,0,1,0,2,0,0,0,1,0,1,0] },
-            { sku: 'KRAKATOA-MK3', map: 17995, cogs: 3724.15, baseRunRate: 1, hist2025: [0,0,0,0,0,1,0,0,1,1,0,0] },
-            { sku: 'BB15-MK3', map: 2995, cogs: 734.91, baseRunRate: 15, hist2025: [12,6,11,3,29,18,13,10,25,14,22,8] },
-            { sku: 'SV9-MK3', map: 1595, cogs: 549.16, baseRunRate: 25, hist2025: [23,13,17,8,42,32,22,23,56,32,49,28] },
-            { sku: 'SUBLIM8-MK3', map: 7995, cogs: 1925.28, baseRunRate: 8, hist2025: [5,2,4,2,8,6,4,5,10,6,9,5] },
+            { sku: 'SSP118-MK3', map: 3995, cogs: 873.43, baseRunRate: 10, hist2025: [11,6,6,8,18,14,6,3,16,8,11,8], jan2026: 8 },
+            { sku: 'VS21-MK3', map: 4995, cogs: 1167.20, baseRunRate: 9, hist2025: [7,10,16,5,15,9,2,9,12,8,12,3], jan2026: 3 },
+            { sku: 'AT212-MK3', map: 4995, cogs: 1112.34, baseRunRate: 5, hist2025: [2,3,6,-1,6,11,3,5,8,9,5,4], jan2026: 0 },
+            { sku: 'MAKARA-MK3', map: 7995, cogs: 2083.47, baseRunRate: 5, hist2025: [6,4,2,4,12,9,3,1,11,5,9,3], jan2026: 0 },
+            { sku: 'KRAKEN-MK3', map: 17995, cogs: 3432.51, baseRunRate: 1, hist2025: [0,0,0,2,1,1,0,1,2,2,1,0], jan2026: 2 },
+            { sku: 'CCM12-MK3', map: 2295, cogs: 614.26, baseRunRate: 15, hist2025: [22,1,8,1,36,12,5,6,19,11,13,4], jan2026: 20 },
+            { sku: 'MFLA-MK3', map: 6995, cogs: 1947.32, baseRunRate: 3, hist2025: [3,0,6,0,12,8,3,2,6,3,6,2], jan2026: 0 },
+            { sku: 'DIAMON-MK3', map: 2795, cogs: 593.28, baseRunRate: 8, hist2025: [4,2,8,3,16,8,6,3,8,4,4,2], jan2026: 0 },
+            { sku: 'ZV28-MK3', map: 5995, cogs: 1752.82, baseRunRate: 6, hist2025: [7,0,7,3,15,10,7,2,19,7,9,4], jan2026: 1 },
+            { sku: 'AT312-MK3', map: 5495, cogs: 1243.41, baseRunRate: 3, hist2025: [2,0,4,0,5,5,3,1,4,2,3,3], jan2026: 0 },
+            { sku: 'DV12-MK3', map: 3495, cogs: 946.08, baseRunRate: 18, hist2025: [21,4,12,3,33,16,10,12,31,16,22,8], jan2026: 4 },
+            { sku: 'SSP218-MK3', map: 5995, cogs: 1562.04, baseRunRate: 5, hist2025: [2,1,2,0,7,7,3,5,8,5,8,2], jan2026: 2 },
+            { sku: 'DJ18S-MK3', map: 3495, cogs: 838.14, baseRunRate: 8, hist2025: [8,2,8,4,12,14,7,5,8,4,10,2], jan2026: 1 },
+            { sku: 'SSP215-MK3', map: 5495, cogs: 1541.86, baseRunRate: 2, hist2025: [1,0,1,0,2,0,0,0,1,0,1,0], jan2026: 6 },
+            { sku: 'KRAKATOA-MK3', map: 17995, cogs: 3724.15, baseRunRate: 1, hist2025: [0,0,0,0,0,1,0,0,1,1,0,0], jan2026: 0 },
+            { sku: 'BB15-MK3', map: 2995, cogs: 734.91, baseRunRate: 15, hist2025: [12,6,11,3,29,18,13,10,25,14,22,8], jan2026: 8 },
+            { sku: 'SV9-MK3', map: 1595, cogs: 549.16, baseRunRate: 25, hist2025: [23,13,17,8,42,32,22,23,56,32,49,28], jan2026: 9 },
+            { sku: 'SUBLIM8-MK3', map: 7995, cogs: 1925.28, baseRunRate: 8, hist2025: [5,2,4,2,8,6,4,5,10,6,9,5], jan2026: 6 },
         ];
 
         const BASELINE_REVENUE = 5268136;
@@ -465,7 +471,7 @@
                     discount: null,
                     cogs: p.cogs,
                     runRate: p.baseRunRate,
-                    actuals2026: [0,0,0,0,0,0,0,0,0,0,0,0]
+                    actuals2026: [p.jan2026 || 0, 0,0,0,0,0,0,0,0,0,0,0]
                 }))
             };
         }
@@ -657,6 +663,18 @@
                 saveScenarios();
                 renderMonthlyTracker();
             }
+        }
+
+        function loadJanuary2026Actuals() {
+            const s = getCurrentScenario();
+            s.products.forEach(p => {
+                const base = BASE_PRODUCTS.find(b => b.sku === p.sku);
+                if (base && base.jan2026 !== undefined) {
+                    p.actuals2026[0] = base.jan2026;
+                }
+            });
+            saveScenarios();
+            renderMonthlyTracker();
         }
 
         function applyGlobalDiscount() {
