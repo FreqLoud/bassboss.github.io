@@ -24,6 +24,11 @@
         .slider { -webkit-appearance: none; appearance: none; height: 8px; border-radius: 4px; background: #e5e7eb; outline: none; }
         .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #E31937; cursor: pointer; }
         .changed { background-color: #fef3c7 !important; }
+        .scenario-tab { transition: all 0.2s; }
+        .scenario-tab.active { background: #E31937; color: white; }
+        .scenario-tab:not(.active):hover { background: #f3f4f6; }
+        .editable-cell { min-width: 70px; }
+        .editable-cell:focus { outline: 2px solid #E31937; outline-offset: -2px; }
         @media print { .no-print { display: none !important; } }
     </style>
 </head>
@@ -56,59 +61,62 @@
                     <p class="text-gray-400 text-sm">2026 Revenue Projections</p>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="resetToDefaults()" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-500">Reset</button>
-                    <button onclick="window.print()" class="bg-bass-gray px-4 py-2 rounded hover:bg-gray-600">🖨️ Print</button>
+                    <button onclick="exportScenarios()" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-500 text-sm">📥 Export</button>
+                    <button onclick="document.getElementById('import-file').click()" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-500 text-sm">📤 Import</button>
+                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="importScenarios(event)">
+                    <button onclick="window.print()" class="bg-bass-gray px-4 py-2 rounded hover:bg-gray-600">🖨️</button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Scenario Tabs -->
+        <div class="bg-white border-b shadow-sm no-print">
+            <div class="max-w-7xl mx-auto px-6 py-3">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm text-gray-500 mr-2">Scenarios:</span>
+                    <div id="scenario-tabs" class="flex gap-2 flex-wrap"></div>
+                    <button onclick="createScenario()" class="scenario-tab px-3 py-1.5 rounded border-2 border-dashed border-gray-300 text-gray-500 hover:border-bass-red hover:text-bass-red text-sm">
+                        + New
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <main class="max-w-7xl mx-auto px-6 py-6">
             <!-- Global Parameters -->
             <div class="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 class="text-lg font-semibold mb-4">📊 Global Parameters</h2>
+                <h2 class="text-lg font-semibold mb-4">📊 Global Parameters <span class="text-sm font-normal text-gray-500">(affect all products unless overridden)</span></h2>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            MAP Discount
-                            <span class="text-gray-400 font-normal">(Channel buys at MAP minus this %)</span>
-                        </label>
-                        <div class="flex items-center gap-3">
-                            <input type="range" id="param-discount" class="slider flex-1" min="30" max="55" step="0.5" value="42.73" oninput="updateFromSlider('discount')">
-                            <input type="number" id="param-discount-val" class="w-20 px-2 py-1 border rounded text-right" value="42.73" step="0.5" onchange="updateFromInput('discount')">
-                            <span class="text-gray-500">%</span>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Default MAP Discount</label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="param-discount" class="slider flex-1" min="30" max="55" step="0.5" value="42.73" oninput="updateGlobalParam('discount')">
+                            <input type="number" id="param-discount-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="42.73" step="0.5" onchange="updateGlobalParamFromInput('discount')">
+                            <span class="text-gray-500 text-sm">%</span>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            2026 Growth Rate
-                            <span class="text-gray-400 font-normal">(YoY unit growth)</span>
-                        </label>
-                        <div class="flex items-center gap-3">
-                            <input type="range" id="param-growth" class="slider flex-1" min="-20" max="30" step="1" value="5" oninput="updateFromSlider('growth')">
-                            <input type="number" id="param-growth-val" class="w-20 px-2 py-1 border rounded text-right" value="5" step="1" onchange="updateFromInput('growth')">
-                            <span class="text-gray-500">%</span>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Default Growth Rate</label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="param-growth" class="slider flex-1" min="-20" max="30" step="1" value="5" oninput="updateGlobalParam('growth')">
+                            <input type="number" id="param-growth-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="5" step="1" onchange="updateGlobalParamFromInput('growth')">
+                            <span class="text-gray-500 text-sm">%</span>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Tariff Rate
-                            <span class="text-gray-400 font-normal">(On imports)</span>
-                        </label>
-                        <div class="flex items-center gap-3">
-                            <input type="range" id="param-tariff" class="slider flex-1" min="0" max="50" step="1" value="19" oninput="updateFromSlider('tariff')">
-                            <input type="number" id="param-tariff-val" class="w-20 px-2 py-1 border rounded text-right" value="19" step="1" onchange="updateFromInput('tariff')">
-                            <span class="text-gray-500">%</span>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tariff Rate</label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="param-tariff" class="slider flex-1" min="0" max="50" step="1" value="19" oninput="updateGlobalParam('tariff')">
+                            <input type="number" id="param-tariff-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="19" step="1" onchange="updateGlobalParamFromInput('tariff')">
+                            <span class="text-gray-500 text-sm">%</span>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            3PL Fee Rate
-                            <span class="text-gray-400 font-normal">(% of revenue)</span>
-                        </label>
-                        <div class="flex items-center gap-3">
-                            <input type="range" id="param-3pl" class="slider flex-1" min="5" max="20" step="0.5" value="12.4" oninput="updateFromSlider('3pl')">
-                            <input type="number" id="param-3pl-val" class="w-20 px-2 py-1 border rounded text-right" value="12.4" step="0.5" onchange="updateFromInput('3pl')">
-                            <span class="text-gray-500">%</span>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">3PL Fee Rate</label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="param-3pl" class="slider flex-1" min="5" max="20" step="0.5" value="12.4" oninput="updateGlobalParam('3pl')">
+                            <input type="number" id="param-3pl-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="12.4" step="0.5" onchange="updateGlobalParamFromInput('3pl')">
+                            <span class="text-gray-500 text-sm">%</span>
                         </div>
                     </div>
                 </div>
@@ -139,24 +147,24 @@
                 </div>
             </div>
 
-            <!-- Comparison to Baseline -->
+            <!-- Comparison -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow p-6 mb-6">
                 <h2 class="text-lg font-semibold mb-4">📈 Scenario Comparison</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="text-center">
                         <div class="text-sm text-gray-600 mb-1">Baseline (Brent Model)</div>
                         <div class="text-3xl font-bold text-gray-700">$5,268,136</div>
-                        <div class="text-sm text-gray-500">Current assumptions</div>
+                        <div class="text-sm text-gray-500">Original assumptions</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-sm text-gray-600 mb-1">Your Scenario</div>
+                        <div class="text-sm text-gray-600 mb-1">This Scenario</div>
                         <div id="comparison-scenario" class="text-3xl font-bold text-bass-red">$0</div>
                         <div id="comparison-delta" class="text-sm">—</div>
                     </div>
                     <div class="text-center">
                         <div class="text-sm text-gray-600 mb-1">Net Income Impact</div>
                         <div id="comparison-net" class="text-3xl font-bold">$0</div>
-                        <div class="text-sm text-gray-500">After COGS, tariffs, 3PL</div>
+                        <div class="text-sm text-gray-500">After COGS, tariffs, 3PL, OpEx</div>
                     </div>
                 </div>
             </div>
@@ -164,10 +172,16 @@
             <!-- Product Table -->
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">📦 Product Assumptions</h2>
+                    <h2 class="text-lg font-semibold">📦 Product Assumptions <span class="text-sm font-normal text-gray-500">(click cells to edit)</span></h2>
                     <div class="flex gap-2 no-print">
+                        <button onclick="applyGlobalDiscount()" class="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200">
+                            Apply Global Discount
+                        </button>
                         <button onclick="applyGrowthToAll()" class="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200">
-                            Apply Growth to All
+                            Apply Growth to Rates
+                        </button>
+                        <button onclick="resetProducts()" class="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200">
+                            Reset to Defaults
                         </button>
                     </div>
                 </div>
@@ -175,44 +189,60 @@
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b bg-gray-50">
-                                <th class="text-left py-3 px-3 font-semibold">Product</th>
-                                <th class="text-right py-3 px-3 font-semibold">MAP</th>
-                                <th class="text-right py-3 px-3 font-semibold">Channel Price</th>
-                                <th class="text-right py-3 px-3 font-semibold">COGS</th>
-                                <th class="text-right py-3 px-3 font-semibold w-24 no-print">Run Rate</th>
-                                <th class="text-right py-3 px-3 font-semibold">Units/Yr</th>
-                                <th class="text-right py-3 px-3 font-semibold">Revenue</th>
-                                <th class="text-right py-3 px-3 font-semibold">Margin</th>
+                                <th class="text-left py-3 px-2 font-semibold">Product</th>
+                                <th class="text-right py-3 px-2 font-semibold bg-blue-50">MAP</th>
+                                <th class="text-right py-3 px-2 font-semibold bg-blue-50">Discount %</th>
+                                <th class="text-right py-3 px-2 font-semibold">Channel $</th>
+                                <th class="text-right py-3 px-2 font-semibold bg-blue-50">COGS</th>
+                                <th class="text-right py-3 px-2 font-semibold bg-blue-50">Run Rate</th>
+                                <th class="text-right py-3 px-2 font-semibold">Units/Yr</th>
+                                <th class="text-right py-3 px-2 font-semibold">Revenue</th>
+                                <th class="text-right py-3 px-2 font-semibold">Unit Margin</th>
+                                <th class="text-right py-3 px-2 font-semibold">Total Margin</th>
                             </tr>
                         </thead>
                         <tbody id="product-table"></tbody>
                         <tfoot>
                             <tr class="border-t-2 bg-gray-100 font-semibold">
-                                <td class="py-3 px-3">TOTALS</td>
-                                <td class="py-3 px-3"></td>
-                                <td class="py-3 px-3"></td>
-                                <td class="py-3 px-3"></td>
-                                <td class="py-3 px-3 no-print"></td>
-                                <td id="total-units" class="py-3 px-3 text-right">0</td>
-                                <td id="total-revenue" class="py-3 px-3 text-right">$0</td>
-                                <td id="total-margin" class="py-3 px-3 text-right">$0</td>
+                                <td class="py-3 px-2">TOTALS</td>
+                                <td colspan="5" class="py-3 px-2"></td>
+                                <td id="total-units" class="py-3 px-2 text-right">0</td>
+                                <td id="total-revenue" class="py-3 px-2 text-right">$0</td>
+                                <td class="py-3 px-2"></td>
+                                <td id="total-margin" class="py-3 px-2 text-right">$0</td>
                             </tr>
                         </tfoot>
                     </table>
+                </div>
+                <div class="mt-3 text-xs text-gray-500">
+                    <span class="inline-block w-3 h-3 bg-blue-50 border mr-1"></span> Editable cells (click to change)
+                    <span class="inline-block w-3 h-3 bg-yellow-100 border ml-4 mr-1"></span> Modified from default
                 </div>
             </div>
         </main>
 
         <footer class="bg-bass-dark text-gray-400 py-4 px-6 mt-8 no-print">
             <div class="max-w-7xl mx-auto text-center text-sm">
-                <p>BASSBOSS Scenario Modeler • Confidential • Based on Brent Projection Model</p>
+                <p>BASSBOSS Scenario Modeler • Confidential • Scenarios saved in browser</p>
             </div>
         </footer>
     </div>
 
+    <!-- Rename Modal -->
+    <div id="rename-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-80">
+            <h3 class="font-semibold mb-4">Rename Scenario</h3>
+            <input type="text" id="rename-input" class="w-full px-3 py-2 border rounded mb-4" placeholder="Scenario name">
+            <div class="flex gap-2 justify-end">
+                <button onclick="closeRenameModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancel</button>
+                <button onclick="confirmRename()" class="px-4 py-2 bg-bass-red text-white rounded hover:bg-red-700">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // SKU Data with defaults
-        const SKU_DATA = [
+        // Base product data (defaults)
+        const BASE_PRODUCTS = [
             { sku: 'SSP118-MK3', map: 3995, cogs: 873.43, baseRunRate: 10 },
             { sku: 'VS21-MK3', map: 4995, cogs: 1167.20, baseRunRate: 9 },
             { sku: 'AT212-MK3', map: 4995, cogs: 1112.34, baseRunRate: 5 },
@@ -233,91 +263,221 @@
             { sku: 'SUBLIM8-MK3', map: 7995, cogs: 1925.28, baseRunRate: 8 },
         ];
 
-        // State
-        let params = {
-            discount: 42.73,
-            growth: 5,
-            tariff: 19,
-            '3pl': 12.4
-        };
-        let runRates = {};
         const BASELINE_REVENUE = 5268136;
         const EXISTING_OPEX = 1352452;
         const NEW_OPEX_PAYROLL = 400000;
+        const STORAGE_KEY = 'bassboss-scenarios';
+
+        // State
+        let scenarios = {};
+        let currentScenarioId = null;
+        let renameTargetId = null;
+
+        function getDefaultScenario(name = 'Baseline') {
+            return {
+                name,
+                globalParams: { discount: 42.73, growth: 5, tariff: 19, '3pl': 12.4 },
+                products: BASE_PRODUCTS.map(p => ({
+                    sku: p.sku,
+                    map: p.map,
+                    discount: null, // null = use global
+                    cogs: p.cogs,
+                    runRate: p.baseRunRate
+                }))
+            };
+        }
 
         function authenticate(e) {
             e.preventDefault();
             if (document.getElementById('password').value === 'bassboss') {
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
-                initializeModel();
+                loadScenarios();
             } else {
                 document.getElementById('auth-error').classList.remove('hidden');
             }
         }
 
-        function initializeModel() {
-            // Set default run rates
-            SKU_DATA.forEach(p => {
-                runRates[p.sku] = p.baseRunRate;
+        function loadScenarios() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                scenarios = JSON.parse(saved);
+            }
+            if (Object.keys(scenarios).length === 0) {
+                const id = 'scenario-' + Date.now();
+                scenarios[id] = getDefaultScenario('Baseline');
+                currentScenarioId = id;
+            } else {
+                currentScenarioId = Object.keys(scenarios)[0];
+            }
+            saveScenarios();
+            renderTabs();
+            loadScenario(currentScenarioId);
+        }
+
+        function saveScenarios() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(scenarios));
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('scenario-tabs');
+            container.innerHTML = Object.entries(scenarios).map(([id, s]) => `
+                <div class="flex items-center">
+                    <button onclick="loadScenario('${id}')" 
+                        class="scenario-tab px-3 py-1.5 rounded-l border text-sm ${id === currentScenarioId ? 'active' : ''}"
+                        ondblclick="startRename('${id}')">
+                        ${s.name}
+                    </button>
+                    <button onclick="duplicateScenario('${id}')" 
+                        class="px-2 py-1.5 border-t border-b text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-xs"
+                        title="Duplicate">📋</button>
+                    ${Object.keys(scenarios).length > 1 ? `
+                        <button onclick="deleteScenario('${id}')" 
+                            class="px-2 py-1.5 border rounded-r text-gray-400 hover:text-red-600 hover:bg-red-50 text-xs"
+                            title="Delete">✕</button>
+                    ` : '<span class="px-2 py-1.5 border rounded-r text-gray-200 text-xs">✕</span>'}
+                </div>
+            `).join('');
+        }
+
+        function loadScenario(id) {
+            currentScenarioId = id;
+            const s = scenarios[id];
+            
+            // Load global params
+            Object.entries(s.globalParams).forEach(([key, val]) => {
+                document.getElementById(`param-${key}`).value = val;
+                document.getElementById(`param-${key}-val`).value = val;
             });
+            
+            renderTabs();
             renderProductTable();
             calculate();
         }
 
-        function updateFromSlider(param) {
-            const val = document.getElementById(`param-${param}`).value;
-            document.getElementById(`param-${param}-val`).value = val;
-            params[param] = parseFloat(val);
-            calculate();
+        function createScenario() {
+            const id = 'scenario-' + Date.now();
+            const num = Object.keys(scenarios).length + 1;
+            scenarios[id] = getDefaultScenario(`Scenario ${num}`);
+            saveScenarios();
+            loadScenario(id);
         }
 
-        function updateFromInput(param) {
-            const val = document.getElementById(`param-${param}-val`).value;
-            document.getElementById(`param-${param}`).value = val;
-            params[param] = parseFloat(val);
-            calculate();
+        function duplicateScenario(id) {
+            const newId = 'scenario-' + Date.now();
+            scenarios[newId] = JSON.parse(JSON.stringify(scenarios[id]));
+            scenarios[newId].name = scenarios[id].name + ' (copy)';
+            saveScenarios();
+            loadScenario(newId);
         }
 
-        function updateRunRate(sku, value) {
-            runRates[sku] = parseFloat(value) || 0;
-            const input = document.getElementById(`runrate-${sku}`);
-            const baseRate = SKU_DATA.find(p => p.sku === sku).baseRunRate;
-            if (runRates[sku] !== baseRate) {
-                input.classList.add('changed');
-            } else {
-                input.classList.remove('changed');
+        function deleteScenario(id) {
+            if (Object.keys(scenarios).length <= 1) return;
+            if (!confirm(`Delete "${scenarios[id].name}"?`)) return;
+            delete scenarios[id];
+            saveScenarios();
+            currentScenarioId = Object.keys(scenarios)[0];
+            loadScenario(currentScenarioId);
+        }
+
+        function startRename(id) {
+            renameTargetId = id;
+            document.getElementById('rename-input').value = scenarios[id].name;
+            document.getElementById('rename-modal').classList.remove('hidden');
+            document.getElementById('rename-modal').classList.add('flex');
+            document.getElementById('rename-input').focus();
+        }
+
+        function closeRenameModal() {
+            document.getElementById('rename-modal').classList.add('hidden');
+            document.getElementById('rename-modal').classList.remove('flex');
+            renameTargetId = null;
+        }
+
+        function confirmRename() {
+            if (renameTargetId) {
+                scenarios[renameTargetId].name = document.getElementById('rename-input').value || 'Untitled';
+                saveScenarios();
+                renderTabs();
             }
+            closeRenameModal();
+        }
+
+        function getCurrentScenario() {
+            return scenarios[currentScenarioId];
+        }
+
+        function updateGlobalParam(param) {
+            const val = parseFloat(document.getElementById(`param-${param}`).value);
+            document.getElementById(`param-${param}-val`).value = val;
+            getCurrentScenario().globalParams[param] = val;
+            saveScenarios();
+            calculate();
+        }
+
+        function updateGlobalParamFromInput(param) {
+            const val = parseFloat(document.getElementById(`param-${param}-val`).value);
+            document.getElementById(`param-${param}`).value = val;
+            getCurrentScenario().globalParams[param] = val;
+            saveScenarios();
+            calculate();
+        }
+
+        function updateProduct(sku, field, value) {
+            const scenario = getCurrentScenario();
+            const product = scenario.products.find(p => p.sku === sku);
+            if (product) {
+                if (field === 'discount' && value === '') {
+                    product[field] = null; // Use global
+                } else {
+                    product[field] = parseFloat(value) || 0;
+                }
+                saveScenarios();
+                calculate();
+            }
+        }
+
+        function getProductValue(sku, field) {
+            const product = getCurrentScenario().products.find(p => p.sku === sku);
+            return product ? product[field] : null;
+        }
+
+        function getEffectiveDiscount(sku) {
+            const product = getCurrentScenario().products.find(p => p.sku === sku);
+            return product.discount !== null ? product.discount : getCurrentScenario().globalParams.discount;
+        }
+
+        function applyGlobalDiscount() {
+            const scenario = getCurrentScenario();
+            scenario.products.forEach(p => { p.discount = null; });
+            saveScenarios();
+            renderProductTable();
             calculate();
         }
 
         function applyGrowthToAll() {
-            const growthFactor = 1 + (params.growth / 100);
-            SKU_DATA.forEach(p => {
-                runRates[p.sku] = Math.round(p.baseRunRate * growthFactor);
-                const input = document.getElementById(`runrate-${p.sku}`);
-                if (input) {
-                    input.value = runRates[p.sku];
-                    input.classList.add('changed');
-                }
+            const scenario = getCurrentScenario();
+            const growthFactor = 1 + (scenario.globalParams.growth / 100);
+            scenario.products.forEach(p => {
+                const base = BASE_PRODUCTS.find(b => b.sku === p.sku);
+                p.runRate = Math.round(base.baseRunRate * growthFactor);
             });
+            saveScenarios();
+            renderProductTable();
             calculate();
         }
 
-        function resetToDefaults() {
-            params = { discount: 42.73, growth: 5, tariff: 19, '3pl': 12.4 };
-            Object.keys(params).forEach(p => {
-                document.getElementById(`param-${p}`).value = params[p];
-                document.getElementById(`param-${p}-val`).value = params[p];
-            });
-            SKU_DATA.forEach(p => {
-                runRates[p.sku] = p.baseRunRate;
-                const input = document.getElementById(`runrate-${p.sku}`);
-                if (input) {
-                    input.value = p.baseRunRate;
-                    input.classList.remove('changed');
-                }
-            });
+        function resetProducts() {
+            const scenario = getCurrentScenario();
+            scenario.products = BASE_PRODUCTS.map(p => ({
+                sku: p.sku,
+                map: p.map,
+                discount: null,
+                cogs: p.cogs,
+                runRate: p.baseRunRate
+            }));
+            saveScenarios();
+            renderProductTable();
             calculate();
         }
 
@@ -325,93 +485,168 @@
             return '$' + Math.round(num).toLocaleString();
         }
 
+        function formatCurrencyShort(num) {
+            if (num >= 1000000) return '$' + (num/1000000).toFixed(1) + 'M';
+            if (num >= 1000) return '$' + (num/1000).toFixed(0) + 'K';
+            return '$' + Math.round(num);
+        }
+
+        function isChanged(sku, field) {
+            const product = getCurrentScenario().products.find(p => p.sku === sku);
+            const base = BASE_PRODUCTS.find(b => b.sku === sku);
+            if (field === 'discount') return product.discount !== null;
+            return product[field] !== base[field === 'runRate' ? 'baseRunRate' : field];
+        }
+
         function renderProductTable() {
+            const scenario = getCurrentScenario();
             const tbody = document.getElementById('product-table');
-            tbody.innerHTML = SKU_DATA.map(p => {
-                const channelPrice = p.map * (1 - params.discount / 100);
+            
+            tbody.innerHTML = scenario.products.map(p => {
+                const base = BASE_PRODUCTS.find(b => b.sku === p.sku);
+                const effectiveDiscount = p.discount !== null ? p.discount : scenario.globalParams.discount;
+                const channelPrice = p.map * (1 - effectiveDiscount / 100);
+                const unitMargin = channelPrice - p.cogs;
+                const annualUnits = p.runRate * 12;
+                const revenue = channelPrice * annualUnits;
+                const totalMargin = unitMargin * annualUnits;
+
                 return `
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="py-2 px-3 font-medium">${p.sku}</td>
-                        <td class="py-2 px-3 text-right">${formatCurrency(p.map)}</td>
-                        <td class="py-2 px-3 text-right" id="price-${p.sku}">${formatCurrency(channelPrice)}</td>
-                        <td class="py-2 px-3 text-right">${formatCurrency(p.cogs)}</td>
-                        <td class="py-2 px-3 text-right no-print">
-                            <input type="number" id="runrate-${p.sku}" 
-                                class="w-16 px-2 py-1 border rounded text-right" 
-                                value="${runRates[p.sku] || p.baseRunRate}" 
-                                min="0" max="100"
-                                onchange="updateRunRate('${p.sku}', this.value)">
+                        <td class="py-2 px-2 font-medium">${p.sku}</td>
+                        <td class="py-2 px-2 text-right bg-blue-50">
+                            <input type="number" value="${p.map}" 
+                                class="editable-cell w-20 px-1 py-0.5 border rounded text-right ${isChanged(p.sku, 'map') ? 'changed' : ''}"
+                                onchange="updateProduct('${p.sku}', 'map', this.value)">
                         </td>
-                        <td class="py-2 px-3 text-right" id="units-${p.sku}">0</td>
-                        <td class="py-2 px-3 text-right" id="revenue-${p.sku}">$0</td>
-                        <td class="py-2 px-3 text-right" id="margin-${p.sku}">$0</td>
+                        <td class="py-2 px-2 text-right bg-blue-50">
+                            <input type="number" value="${p.discount !== null ? p.discount : ''}" 
+                                placeholder="${scenario.globalParams.discount}"
+                                class="editable-cell w-16 px-1 py-0.5 border rounded text-right ${isChanged(p.sku, 'discount') ? 'changed' : ''}"
+                                onchange="updateProduct('${p.sku}', 'discount', this.value)">
+                        </td>
+                        <td class="py-2 px-2 text-right text-gray-600">${formatCurrency(channelPrice)}</td>
+                        <td class="py-2 px-2 text-right bg-blue-50">
+                            <input type="number" value="${p.cogs.toFixed(2)}" step="0.01"
+                                class="editable-cell w-20 px-1 py-0.5 border rounded text-right ${isChanged(p.sku, 'cogs') ? 'changed' : ''}"
+                                onchange="updateProduct('${p.sku}', 'cogs', this.value)">
+                        </td>
+                        <td class="py-2 px-2 text-right bg-blue-50">
+                            <input type="number" value="${p.runRate}" min="0" max="200"
+                                class="editable-cell w-14 px-1 py-0.5 border rounded text-right ${isChanged(p.sku, 'runRate') ? 'changed' : ''}"
+                                onchange="updateProduct('${p.sku}', 'runRate', this.value)">
+                        </td>
+                        <td class="py-2 px-2 text-right">${annualUnits}</td>
+                        <td class="py-2 px-2 text-right">${formatCurrency(revenue)}</td>
+                        <td class="py-2 px-2 text-right ${unitMargin < 0 ? 'text-red-600' : ''}">${formatCurrency(unitMargin)}</td>
+                        <td class="py-2 px-2 text-right ${totalMargin < 0 ? 'text-red-600' : ''}">${formatCurrency(totalMargin)}</td>
                     </tr>
                 `;
             }).join('');
         }
 
         function calculate() {
+            const scenario = getCurrentScenario();
             let totalRevenue = 0;
             let totalCOGS = 0;
             let totalUnits = 0;
+            let totalMargin = 0;
 
-            SKU_DATA.forEach(p => {
-                const channelPrice = p.map * (1 - params.discount / 100);
-                const runRate = runRates[p.sku] || p.baseRunRate;
-                const annualUnits = runRate * 12;
+            scenario.products.forEach(p => {
+                const effectiveDiscount = p.discount !== null ? p.discount : scenario.globalParams.discount;
+                const channelPrice = p.map * (1 - effectiveDiscount / 100);
+                const annualUnits = p.runRate * 12;
                 const revenue = channelPrice * annualUnits;
                 const cogs = p.cogs * annualUnits;
                 const margin = revenue - cogs;
 
-                document.getElementById(`price-${p.sku}`).textContent = formatCurrency(channelPrice);
-                document.getElementById(`units-${p.sku}`).textContent = annualUnits;
-                document.getElementById(`revenue-${p.sku}`).textContent = formatCurrency(revenue);
-                document.getElementById(`margin-${p.sku}`).textContent = formatCurrency(margin);
-
                 totalRevenue += revenue;
                 totalCOGS += cogs;
                 totalUnits += annualUnits;
+                totalMargin += margin;
             });
 
-            const tariffCost = totalCOGS * (params.tariff / 100);
-            const threePLFees = totalRevenue * (params['3pl'] / 100);
+            const tariffCost = totalCOGS * (scenario.globalParams.tariff / 100);
+            const threePLFees = totalRevenue * (scenario.globalParams['3pl'] / 100);
             const grossMargin = totalRevenue - totalCOGS - tariffCost - threePLFees;
-            const marginPct = (grossMargin / totalRevenue * 100).toFixed(1);
+            const marginPct = totalRevenue > 0 ? (grossMargin / totalRevenue * 100).toFixed(1) : 0;
 
             // Update totals
             document.getElementById('total-units').textContent = totalUnits.toLocaleString();
             document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
-            document.getElementById('total-margin').textContent = formatCurrency(totalRevenue - totalCOGS);
+            document.getElementById('total-margin').textContent = formatCurrency(totalMargin);
 
             // Update summary cards
-            document.getElementById('summary-revenue').textContent = formatCurrency(totalRevenue);
-            document.getElementById('summary-cogs').textContent = formatCurrency(totalCOGS);
-            document.getElementById('summary-tariff').textContent = formatCurrency(tariffCost);
-            document.getElementById('summary-3pl').textContent = formatCurrency(threePLFees);
-            document.getElementById('summary-margin').textContent = formatCurrency(grossMargin);
+            document.getElementById('summary-revenue').textContent = formatCurrencyShort(totalRevenue);
+            document.getElementById('summary-cogs').textContent = formatCurrencyShort(totalCOGS);
+            document.getElementById('summary-tariff').textContent = formatCurrencyShort(tariffCost);
+            document.getElementById('summary-3pl').textContent = formatCurrencyShort(threePLFees);
+            document.getElementById('summary-margin').textContent = formatCurrencyShort(grossMargin);
             document.getElementById('summary-margin-pct').textContent = marginPct + '% margin';
+            document.getElementById('summary-margin').className = grossMargin >= 0 
+                ? 'text-2xl font-bold text-green-600' 
+                : 'text-2xl font-bold text-red-600';
 
-            // Update comparison
-            document.getElementById('comparison-scenario').textContent = formatCurrency(totalRevenue);
+            // Comparison
+            document.getElementById('comparison-scenario').textContent = formatCurrencyShort(totalRevenue);
             const delta = totalRevenue - BASELINE_REVENUE;
             const deltaPct = (delta / BASELINE_REVENUE * 100).toFixed(1);
             document.getElementById('comparison-delta').innerHTML = delta >= 0 
-                ? `<span class="text-green-600">+${formatCurrency(delta)} (+${deltaPct}%)</span>`
-                : `<span class="text-red-600">${formatCurrency(delta)} (${deltaPct}%)</span>`;
+                ? `<span class="text-green-600">+${formatCurrencyShort(delta)} (+${deltaPct}%)</span>`
+                : `<span class="text-red-600">${formatCurrencyShort(delta)} (${deltaPct}%)</span>`;
 
-            // Net income estimate
             const netIncome = totalRevenue - totalCOGS - tariffCost - threePLFees - EXISTING_OPEX - NEW_OPEX_PAYROLL;
-            document.getElementById('comparison-net').textContent = formatCurrency(netIncome);
+            document.getElementById('comparison-net').textContent = formatCurrencyShort(netIncome);
             document.getElementById('comparison-net').className = netIncome >= 0 
                 ? 'text-3xl font-bold text-green-600' 
                 : 'text-3xl font-bold text-red-600';
+
+            // Re-render table to update calculated columns
+            renderProductTable();
         }
+
+        function exportScenarios() {
+            const data = JSON.stringify(scenarios, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bassboss-scenarios-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importScenarios(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    scenarios = { ...scenarios, ...imported };
+                    saveScenarios();
+                    renderTabs();
+                    loadScenario(currentScenarioId);
+                    alert('Scenarios imported!');
+                } catch (err) {
+                    alert('Error importing file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // Keyboard shortcut for rename modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && renameTargetId) confirmRename();
+            if (e.key === 'Escape' && renameTargetId) closeRenameModal();
+        });
 
         // Dev mode
         if (window.location.hash === '#dev') {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
-            initializeModel();
+            loadScenarios();
         }
     </script>
 </body>
