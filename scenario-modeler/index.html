@@ -27,8 +27,13 @@
         .scenario-tab { transition: all 0.2s; }
         .scenario-tab.active { background: #E31937; color: white; }
         .scenario-tab:not(.active):hover { background: #f3f4f6; }
-        .editable-cell { min-width: 70px; }
+        .view-tab { transition: all 0.2s; border-bottom: 3px solid transparent; }
+        .view-tab.active { border-bottom-color: #E31937; color: #E31937; font-weight: 600; }
+        .editable-cell { min-width: 50px; }
         .editable-cell:focus { outline: 2px solid #E31937; outline-offset: -2px; }
+        .positive { color: #059669; }
+        .negative { color: #dc2626; }
+        .month-cell { min-width: 60px; }
         @media print { .no-print { display: none !important; } }
     </style>
 </head>
@@ -69,8 +74,22 @@
             </div>
         </header>
 
+        <!-- View Tabs -->
+        <div class="bg-white border-b no-print">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex gap-8">
+                    <button onclick="showView('scenario')" id="view-scenario" class="view-tab py-4 px-2 active">
+                        📊 Scenario Builder
+                    </button>
+                    <button onclick="showView('monthly')" id="view-monthly" class="view-tab py-4 px-2">
+                        📅 Monthly Tracker
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Scenario Tabs -->
-        <div class="bg-white border-b shadow-sm no-print">
+        <div class="bg-gray-50 border-b shadow-sm no-print">
             <div class="max-w-7xl mx-auto px-6 py-3">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-sm text-gray-500 mr-2">Scenarios:</span>
@@ -82,145 +101,225 @@
             </div>
         </div>
 
-        <main class="max-w-7xl mx-auto px-6 py-6">
-            <!-- Global Parameters -->
-            <div class="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 class="text-lg font-semibold mb-4">📊 Global Parameters <span class="text-sm font-normal text-gray-500">(affect all products unless overridden)</span></h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Default MAP Discount</label>
-                        <div class="flex items-center gap-2">
-                            <input type="range" id="param-discount" class="slider flex-1" min="0" max="60" step="0.5" value="42.73" oninput="updateGlobalParam('discount')">
-                            <input type="number" id="param-discount-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="42.73" step="0.5" min="0" max="100" onchange="updateGlobalParamFromInput('discount')">
-                            <span class="text-gray-500 text-sm">%</span>
+        <!-- SCENARIO VIEW -->
+        <div id="content-scenario">
+            <main class="max-w-7xl mx-auto px-6 py-6">
+                <!-- Global Parameters -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h2 class="text-lg font-semibold mb-4">📊 Global Parameters</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Default MAP Discount</label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="param-discount" class="slider flex-1" min="0" max="60" step="0.5" value="42.73" oninput="updateGlobalParam('discount')">
+                                <input type="number" id="param-discount-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="42.73" step="0.5" onchange="updateGlobalParamFromInput('discount')">
+                                <span class="text-gray-500 text-sm">%</span>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Growth Rate <span class="text-xs text-gray-400">(auto-applies)</span></label>
-                        <div class="flex items-center gap-2">
-                            <input type="range" id="param-growth" class="slider flex-1" min="-50" max="50" step="1" value="5" oninput="updateGrowthRate()">
-                            <input type="number" id="param-growth-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="5" step="1" onchange="updateGrowthRateFromInput()">
-                            <span class="text-gray-500 text-sm">%</span>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Growth Rate <span class="text-xs text-gray-400">(auto-applies)</span></label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="param-growth" class="slider flex-1" min="-50" max="50" step="1" value="5" oninput="updateGrowthRate()">
+                                <input type="number" id="param-growth-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="5" step="1" onchange="updateGrowthRateFromInput()">
+                                <span class="text-gray-500 text-sm">%</span>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Tariff Rate</label>
-                        <div class="flex items-center gap-2">
-                            <input type="range" id="param-tariff" class="slider flex-1" min="0" max="50" step="1" value="19" oninput="updateGlobalParam('tariff')">
-                            <input type="number" id="param-tariff-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="19" step="1" min="0" onchange="updateGlobalParamFromInput('tariff')">
-                            <span class="text-gray-500 text-sm">%</span>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tariff Rate</label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="param-tariff" class="slider flex-1" min="0" max="50" step="1" value="19" oninput="updateGlobalParam('tariff')">
+                                <input type="number" id="param-tariff-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="19" step="1" onchange="updateGlobalParamFromInput('tariff')">
+                                <span class="text-gray-500 text-sm">%</span>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">3PL Fee Rate</label>
-                        <div class="flex items-center gap-2">
-                            <input type="range" id="param-3pl" class="slider flex-1" min="0" max="25" step="0.5" value="12.4" oninput="updateGlobalParam('3pl')">
-                            <input type="number" id="param-3pl-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="12.4" step="0.5" min="0" onchange="updateGlobalParamFromInput('3pl')">
-                            <span class="text-gray-500 text-sm">%</span>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">3PL Fee Rate</label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="param-3pl" class="slider flex-1" min="0" max="25" step="0.5" value="12.4" oninput="updateGlobalParam('3pl')">
+                                <input type="number" id="param-3pl-val" class="w-16 px-2 py-1 border rounded text-right text-sm" value="12.4" step="0.5" onchange="updateGlobalParamFromInput('3pl')">
+                                <span class="text-gray-500 text-sm">%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-sm text-gray-500">Channel Revenue</div>
-                    <div id="summary-revenue" class="text-2xl font-bold text-green-600">$0</div>
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm text-gray-500">Channel Revenue</div>
+                        <div id="summary-revenue" class="text-2xl font-bold text-green-600">$0</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm text-gray-500">Total COGS</div>
+                        <div id="summary-cogs" class="text-2xl font-bold">$0</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm text-gray-500">Tariff Cost</div>
+                        <div id="summary-tariff" class="text-2xl font-bold text-red-600">$0</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm text-gray-500">3PL Fees</div>
+                        <div id="summary-3pl" class="text-2xl font-bold text-orange-600">$0</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm text-gray-500">Gross Margin</div>
+                        <div id="summary-margin" class="text-2xl font-bold">$0</div>
+                        <div id="summary-margin-pct" class="text-sm text-gray-500">0%</div>
+                    </div>
                 </div>
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-sm text-gray-500">Total COGS</div>
-                    <div id="summary-cogs" class="text-2xl font-bold">$0</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-sm text-gray-500">Tariff Cost</div>
-                    <div id="summary-tariff" class="text-2xl font-bold text-red-600">$0</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-sm text-gray-500">3PL Fees</div>
-                    <div id="summary-3pl" class="text-2xl font-bold text-orange-600">$0</div>
-                </div>
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-sm text-gray-500">Gross Margin</div>
-                    <div id="summary-margin" class="text-2xl font-bold">$0</div>
-                    <div id="summary-margin-pct" class="text-sm text-gray-500">0%</div>
-                </div>
-            </div>
 
-            <!-- Comparison -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow p-6 mb-6">
-                <h2 class="text-lg font-semibold mb-4">📈 Scenario Comparison</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="text-center">
-                        <div class="text-sm text-gray-600 mb-1">Baseline (Brent Model)</div>
-                        <div class="text-3xl font-bold text-gray-700">$5,268,136</div>
-                        <div class="text-sm text-gray-500">Original assumptions</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-sm text-gray-600 mb-1">This Scenario</div>
-                        <div id="comparison-scenario" class="text-3xl font-bold text-bass-red">$0</div>
-                        <div id="comparison-delta" class="text-sm">—</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-sm text-gray-600 mb-1">Net Income Impact</div>
-                        <div id="comparison-net" class="text-3xl font-bold">$0</div>
-                        <div class="text-sm text-gray-500">After COGS, tariffs, 3PL, OpEx</div>
+                <!-- Comparison -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow p-6 mb-6">
+                    <h2 class="text-lg font-semibold mb-4">📈 Scenario Comparison</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="text-sm text-gray-600 mb-1">Baseline (Brent)</div>
+                            <div class="text-3xl font-bold text-gray-700">$5,268,136</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm text-gray-600 mb-1">This Scenario</div>
+                            <div id="comparison-scenario" class="text-3xl font-bold text-bass-red">$0</div>
+                            <div id="comparison-delta" class="text-sm">—</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm text-gray-600 mb-1">Net Income Impact</div>
+                            <div id="comparison-net" class="text-3xl font-bold">$0</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Product Table -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">📦 Product Assumptions <span class="text-sm font-normal text-gray-500">(click cells to edit)</span></h2>
-                    <div class="flex gap-2 no-print">
-                        <button onclick="applyGlobalDiscount()" class="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200">
-                            Apply Global Discount
-                        </button>
-                        <button onclick="resetProducts()" class="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200">
-                            Reset to Defaults
-                        </button>
+                <!-- Product Table -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">📦 Product Assumptions</h2>
+                        <div class="flex gap-2 no-print">
+                            <button onclick="applyGlobalDiscount()" class="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200">Apply Global Discount</button>
+                            <button onclick="resetProducts()" class="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200">Reset</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-2 px-2 font-semibold">Product</th>
+                                    <th class="text-right py-2 px-2 font-semibold bg-blue-50">MAP</th>
+                                    <th class="text-right py-2 px-2 font-semibold bg-blue-50">Disc%</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Ch.$</th>
+                                    <th class="text-right py-2 px-2 font-semibold bg-blue-50">COGS</th>
+                                    <th class="text-right py-2 px-2 font-semibold bg-blue-50">Rate</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Units</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Revenue</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Margin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-table"></tbody>
+                            <tfoot>
+                                <tr class="border-t-2 bg-gray-100 font-semibold">
+                                    <td class="py-2 px-2">TOTALS</td>
+                                    <td colspan="5"></td>
+                                    <td id="total-units" class="py-2 px-2 text-right">0</td>
+                                    <td id="total-revenue" class="py-2 px-2 text-right">$0</td>
+                                    <td id="total-margin" class="py-2 px-2 text-right">$0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b bg-gray-50">
-                                <th class="text-left py-3 px-2 font-semibold">Product</th>
-                                <th class="text-right py-3 px-2 font-semibold bg-blue-50">MAP</th>
-                                <th class="text-right py-3 px-2 font-semibold bg-blue-50">Discount %</th>
-                                <th class="text-right py-3 px-2 font-semibold">Channel $</th>
-                                <th class="text-right py-3 px-2 font-semibold bg-blue-50">COGS</th>
-                                <th class="text-right py-3 px-2 font-semibold bg-blue-50">Run Rate</th>
-                                <th class="text-right py-3 px-2 font-semibold">Units/Yr</th>
-                                <th class="text-right py-3 px-2 font-semibold">Revenue</th>
-                                <th class="text-right py-3 px-2 font-semibold">Unit Margin</th>
-                                <th class="text-right py-3 px-2 font-semibold">Total Margin</th>
-                            </tr>
-                        </thead>
-                        <tbody id="product-table"></tbody>
-                        <tfoot>
-                            <tr class="border-t-2 bg-gray-100 font-semibold">
-                                <td class="py-3 px-2">TOTALS</td>
-                                <td colspan="5" class="py-3 px-2"></td>
-                                <td id="total-units" class="py-3 px-2 text-right">0</td>
-                                <td id="total-revenue" class="py-3 px-2 text-right">$0</td>
-                                <td class="py-3 px-2"></td>
-                                <td id="total-margin" class="py-3 px-2 text-right">$0</td>
-                            </tr>
-                        </tfoot>
-                    </table>
+            </main>
+        </div>
+
+        <!-- MONTHLY TRACKER VIEW -->
+        <div id="content-monthly" class="hidden">
+            <main class="max-w-7xl mx-auto px-6 py-6">
+                <!-- Monthly Summary Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm text-gray-500">2026 Projected (YTD)</div>
+                        <div id="monthly-projected-ytd" class="text-2xl font-bold">0</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm text-gray-500">2026 Actual (YTD)</div>
+                        <div id="monthly-actual-ytd" class="text-2xl font-bold text-bass-red">0</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm text-gray-500">Variance</div>
+                        <div id="monthly-variance-ytd" class="text-2xl font-bold">0</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm text-gray-500">% to Plan</div>
+                        <div id="monthly-pct-ytd" class="text-2xl font-bold">0%</div>
+                    </div>
                 </div>
-                <div class="mt-3 text-xs text-gray-500">
-                    <span class="inline-block w-3 h-3 bg-blue-50 border mr-1"></span> Editable cells (click to change)
-                    <span class="inline-block w-3 h-3 bg-yellow-100 border ml-4 mr-1"></span> Modified from default
+
+                <!-- Monthly Table -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">📅 Monthly Unit Sales Tracker</h2>
+                        <div class="flex gap-4 text-sm">
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-gray-200 rounded"></span> 2025 Actual</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-100 rounded"></span> 2026 Projected</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-100 border-2 border-green-300 rounded"></span> 2026 Actual (editable)</span>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-2 px-2 font-semibold sticky left-0 bg-gray-50 z-10">Product</th>
+                                    <th class="text-center py-2 px-1 font-semibold">Row</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Jan</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Feb</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Mar</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Apr</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">May</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Jun</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Jul</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Aug</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Sep</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Oct</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Nov</th>
+                                    <th class="text-right py-2 px-1 font-semibold month-cell">Dec</th>
+                                    <th class="text-right py-2 px-2 font-semibold bg-gray-100">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthly-table"></tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </main>
+
+                <!-- Monthly Revenue Summary -->
+                <div class="bg-white rounded-lg shadow p-6 mt-6">
+                    <h2 class="text-lg font-semibold mb-4">💰 Monthly Revenue (2026 Actual)</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b bg-gray-50">
+                                    <th class="text-left py-2 px-2 font-semibold">Metric</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Jan</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Feb</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Mar</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Apr</th>
+                                    <th class="text-right py-2 px-2 font-semibold">May</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Jun</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Jul</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Aug</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Sep</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Oct</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Nov</th>
+                                    <th class="text-right py-2 px-2 font-semibold">Dec</th>
+                                    <th class="text-right py-2 px-2 font-semibold bg-gray-100">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthly-revenue-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
 
         <footer class="bg-bass-dark text-gray-400 py-4 px-6 mt-8 no-print">
             <div class="max-w-7xl mx-auto text-center text-sm">
-                <p>BASSBOSS Scenario Modeler • Confidential • Scenarios saved in browser</p>
+                <p>BASSBOSS Scenario Modeler • Scenarios saved in browser</p>
             </div>
         </footer>
     </div>
@@ -229,7 +328,7 @@
     <div id="rename-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg p-6 w-80">
             <h3 class="font-semibold mb-4">Rename Scenario</h3>
-            <input type="text" id="rename-input" class="w-full px-3 py-2 border rounded mb-4" placeholder="Scenario name">
+            <input type="text" id="rename-input" class="w-full px-3 py-2 border rounded mb-4">
             <div class="flex gap-2 justify-end">
                 <button onclick="closeRenameModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancel</button>
                 <button onclick="confirmRename()" class="px-4 py-2 bg-bass-red text-white rounded hover:bg-red-700">Save</button>
@@ -238,48 +337,51 @@
     </div>
 
     <script>
-        // Base product data (defaults)
+        const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        
+        // Base product data with 2025 historical
         const BASE_PRODUCTS = [
-            { sku: 'SSP118-MK3', map: 3995, cogs: 873.43, baseRunRate: 10 },
-            { sku: 'VS21-MK3', map: 4995, cogs: 1167.20, baseRunRate: 9 },
-            { sku: 'AT212-MK3', map: 4995, cogs: 1112.34, baseRunRate: 5 },
-            { sku: 'MAKARA-MK3', map: 7995, cogs: 2083.47, baseRunRate: 5 },
-            { sku: 'KRAKEN-MK3', map: 17995, cogs: 3432.51, baseRunRate: 1 },
-            { sku: 'CCM12-MK3', map: 2295, cogs: 614.26, baseRunRate: 15 },
-            { sku: 'MFLA-MK3', map: 6995, cogs: 1947.32, baseRunRate: 3 },
-            { sku: 'DIAMON-MK3', map: 2795, cogs: 593.28, baseRunRate: 8 },
-            { sku: 'ZV28-MK3', map: 5995, cogs: 1752.82, baseRunRate: 6 },
-            { sku: 'AT312-MK3', map: 5495, cogs: 1243.41, baseRunRate: 3 },
-            { sku: 'DV12-MK3', map: 3495, cogs: 946.08, baseRunRate: 18 },
-            { sku: 'SSP218-MK3', map: 5995, cogs: 1562.04, baseRunRate: 5 },
-            { sku: 'DJ18S-MK3', map: 3495, cogs: 838.14, baseRunRate: 8 },
-            { sku: 'SSP215-MK3', map: 5495, cogs: 1541.86, baseRunRate: 2 },
-            { sku: 'KRAKATOA-MK3', map: 17995, cogs: 3724.15, baseRunRate: 1 },
-            { sku: 'BB15-MK3', map: 2995, cogs: 734.91, baseRunRate: 15 },
-            { sku: 'SV9-MK3', map: 1595, cogs: 549.16, baseRunRate: 25 },
-            { sku: 'SUBLIM8-MK3', map: 7995, cogs: 1925.28, baseRunRate: 8 },
+            { sku: 'SSP118-MK3', map: 3995, cogs: 873.43, baseRunRate: 10, hist2025: [11,6,6,8,18,14,6,3,16,8,11,8] },
+            { sku: 'VS21-MK3', map: 4995, cogs: 1167.20, baseRunRate: 9, hist2025: [7,10,16,5,15,9,2,9,12,8,12,3] },
+            { sku: 'AT212-MK3', map: 4995, cogs: 1112.34, baseRunRate: 5, hist2025: [2,3,6,-1,6,11,3,5,8,9,5,4] },
+            { sku: 'MAKARA-MK3', map: 7995, cogs: 2083.47, baseRunRate: 5, hist2025: [6,4,2,4,12,9,3,1,11,5,9,3] },
+            { sku: 'KRAKEN-MK3', map: 17995, cogs: 3432.51, baseRunRate: 1, hist2025: [0,0,0,2,1,1,0,1,2,2,1,0] },
+            { sku: 'CCM12-MK3', map: 2295, cogs: 614.26, baseRunRate: 15, hist2025: [22,1,8,1,36,12,5,6,19,11,13,4] },
+            { sku: 'MFLA-MK3', map: 6995, cogs: 1947.32, baseRunRate: 3, hist2025: [3,0,6,0,12,8,3,2,6,3,6,2] },
+            { sku: 'DIAMON-MK3', map: 2795, cogs: 593.28, baseRunRate: 8, hist2025: [4,2,8,3,16,8,6,3,8,4,4,2] },
+            { sku: 'ZV28-MK3', map: 5995, cogs: 1752.82, baseRunRate: 6, hist2025: [7,0,7,3,15,10,7,2,19,7,9,4] },
+            { sku: 'AT312-MK3', map: 5495, cogs: 1243.41, baseRunRate: 3, hist2025: [2,0,4,0,5,5,3,1,4,2,3,3] },
+            { sku: 'DV12-MK3', map: 3495, cogs: 946.08, baseRunRate: 18, hist2025: [21,4,12,3,33,16,10,12,31,16,22,8] },
+            { sku: 'SSP218-MK3', map: 5995, cogs: 1562.04, baseRunRate: 5, hist2025: [2,1,2,0,7,7,3,5,8,5,8,2] },
+            { sku: 'DJ18S-MK3', map: 3495, cogs: 838.14, baseRunRate: 8, hist2025: [8,2,8,4,12,14,7,5,8,4,10,2] },
+            { sku: 'SSP215-MK3', map: 5495, cogs: 1541.86, baseRunRate: 2, hist2025: [1,0,1,0,2,0,0,0,1,0,1,0] },
+            { sku: 'KRAKATOA-MK3', map: 17995, cogs: 3724.15, baseRunRate: 1, hist2025: [0,0,0,0,0,1,0,0,1,1,0,0] },
+            { sku: 'BB15-MK3', map: 2995, cogs: 734.91, baseRunRate: 15, hist2025: [12,6,11,3,29,18,13,10,25,14,22,8] },
+            { sku: 'SV9-MK3', map: 1595, cogs: 549.16, baseRunRate: 25, hist2025: [23,13,17,8,42,32,22,23,56,32,49,28] },
+            { sku: 'SUBLIM8-MK3', map: 7995, cogs: 1925.28, baseRunRate: 8, hist2025: [5,2,4,2,8,6,4,5,10,6,9,5] },
         ];
 
         const BASELINE_REVENUE = 5268136;
         const EXISTING_OPEX = 1352452;
         const NEW_OPEX_PAYROLL = 400000;
-        const STORAGE_KEY = 'bassboss-scenarios';
+        const STORAGE_KEY = 'bassboss-scenarios-v2';
 
-        // State
         let scenarios = {};
         let currentScenarioId = null;
         let renameTargetId = null;
+        let currentView = 'scenario';
 
         function getDefaultScenario(name = 'Baseline') {
             return {
                 name,
-                globalParams: { discount: 42.73, growth: 5, tariff: 19, '3pl': 12.4 },
+                globalParams: { discount: 42.73, growth: 0, tariff: 19, '3pl': 12.4 },
                 products: BASE_PRODUCTS.map(p => ({
                     sku: p.sku,
                     map: p.map,
-                    discount: null, // null = use global
+                    discount: null,
                     cogs: p.cogs,
-                    runRate: p.baseRunRate
+                    runRate: p.baseRunRate,
+                    actuals2026: [0,0,0,0,0,0,0,0,0,0,0,0]
                 }))
             };
         }
@@ -295,10 +397,25 @@
             }
         }
 
+        function showView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('view-' + view).classList.add('active');
+            document.getElementById('content-scenario').classList.toggle('hidden', view !== 'scenario');
+            document.getElementById('content-monthly').classList.toggle('hidden', view !== 'monthly');
+            if (view === 'monthly') renderMonthlyTracker();
+        }
+
         function loadScenarios() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 scenarios = JSON.parse(saved);
+                // Migrate old scenarios
+                Object.values(scenarios).forEach(s => {
+                    s.products.forEach(p => {
+                        if (!p.actuals2026) p.actuals2026 = [0,0,0,0,0,0,0,0,0,0,0,0];
+                    });
+                });
             }
             if (Object.keys(scenarios).length === 0) {
                 const id = 'scenario-' + Date.now();
@@ -325,14 +442,8 @@
                         ondblclick="startRename('${id}')">
                         ${s.name}
                     </button>
-                    <button onclick="duplicateScenario('${id}')" 
-                        class="px-2 py-1.5 border-t border-b text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-xs"
-                        title="Duplicate">📋</button>
-                    ${Object.keys(scenarios).length > 1 ? `
-                        <button onclick="deleteScenario('${id}')" 
-                            class="px-2 py-1.5 border rounded-r text-gray-400 hover:text-red-600 hover:bg-red-50 text-xs"
-                            title="Delete">✕</button>
-                    ` : '<span class="px-2 py-1.5 border rounded-r text-gray-200 text-xs">✕</span>'}
+                    <button onclick="duplicateScenario('${id}')" class="px-2 py-1.5 border-t border-b text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-xs" title="Duplicate">📋</button>
+                    ${Object.keys(scenarios).length > 1 ? `<button onclick="deleteScenario('${id}')" class="px-2 py-1.5 border rounded-r text-gray-400 hover:text-red-600 hover:bg-red-50 text-xs" title="Delete">✕</button>` : '<span class="px-2 py-1.5 border rounded-r text-gray-200 text-xs">✕</span>'}
                 </div>
             `).join('');
         }
@@ -340,22 +451,21 @@
         function loadScenario(id) {
             currentScenarioId = id;
             const s = scenarios[id];
-            
-            // Load global params
             Object.entries(s.globalParams).forEach(([key, val]) => {
-                document.getElementById(`param-${key}`).value = val;
-                document.getElementById(`param-${key}-val`).value = val;
+                const slider = document.getElementById(`param-${key}`);
+                const input = document.getElementById(`param-${key}-val`);
+                if (slider) slider.value = val;
+                if (input) input.value = val;
             });
-            
             renderTabs();
             renderProductTable();
             calculate();
+            if (currentView === 'monthly') renderMonthlyTracker();
         }
 
         function createScenario() {
             const id = 'scenario-' + Date.now();
-            const num = Object.keys(scenarios).length + 1;
-            scenarios[id] = getDefaultScenario(`Scenario ${num}`);
+            scenarios[id] = getDefaultScenario(`Scenario ${Object.keys(scenarios).length + 1}`);
             saveScenarios();
             loadScenario(id);
         }
@@ -363,7 +473,7 @@
         function duplicateScenario(id) {
             const newId = 'scenario-' + Date.now();
             scenarios[newId] = JSON.parse(JSON.stringify(scenarios[id]));
-            scenarios[newId].name = scenarios[id].name + ' (copy)';
+            scenarios[newId].name += ' (copy)';
             saveScenarios();
             loadScenario(newId);
         }
@@ -373,8 +483,7 @@
             if (!confirm(`Delete "${scenarios[id].name}"?`)) return;
             delete scenarios[id];
             saveScenarios();
-            currentScenarioId = Object.keys(scenarios)[0];
-            loadScenario(currentScenarioId);
+            loadScenario(Object.keys(scenarios)[0]);
         }
 
         function startRename(id) {
@@ -388,7 +497,6 @@
         function closeRenameModal() {
             document.getElementById('rename-modal').classList.add('hidden');
             document.getElementById('rename-modal').classList.remove('flex');
-            renameTargetId = null;
         }
 
         function confirmRename() {
@@ -400,9 +508,7 @@
             closeRenameModal();
         }
 
-        function getCurrentScenario() {
-            return scenarios[currentScenarioId];
-        }
+        function getCurrentScenario() { return scenarios[currentScenarioId]; }
 
         function updateGlobalParam(param) {
             const val = parseFloat(document.getElementById(`param-${param}`).value);
@@ -435,10 +541,10 @@
         function applyGrowthToRunRates(growthPct) {
             const scenario = getCurrentScenario();
             scenario.globalParams.growth = growthPct;
-            const growthFactor = 1 + (growthPct / 100);
+            const factor = 1 + (growthPct / 100);
             scenario.products.forEach(p => {
                 const base = BASE_PRODUCTS.find(b => b.sku === p.sku);
-                p.runRate = Math.max(0, Math.round(base.baseRunRate * growthFactor));
+                p.runRate = Math.max(0, Math.round(base.baseRunRate * factor));
             });
             saveScenarios();
             renderProductTable();
@@ -446,214 +552,241 @@
         }
 
         function updateProduct(sku, field, value) {
-            const scenario = getCurrentScenario();
-            const product = scenario.products.find(p => p.sku === sku);
+            const product = getCurrentScenario().products.find(p => p.sku === sku);
             if (product) {
-                if (field === 'discount' && value === '') {
-                    product[field] = null; // Use global
-                } else {
-                    product[field] = parseFloat(value) || 0;
-                }
+                product[field] = field === 'discount' && value === '' ? null : parseFloat(value) || 0;
                 saveScenarios();
                 calculate();
             }
         }
 
-        function getProductValue(sku, field) {
+        function updateActual(sku, monthIdx, value) {
             const product = getCurrentScenario().products.find(p => p.sku === sku);
-            return product ? product[field] : null;
-        }
-
-        function getEffectiveDiscount(sku) {
-            const product = getCurrentScenario().products.find(p => p.sku === sku);
-            return product.discount !== null ? product.discount : getCurrentScenario().globalParams.discount;
+            if (product) {
+                product.actuals2026[monthIdx] = parseInt(value) || 0;
+                saveScenarios();
+                renderMonthlyTracker();
+            }
         }
 
         function applyGlobalDiscount() {
-            const scenario = getCurrentScenario();
-            scenario.products.forEach(p => { p.discount = null; });
+            getCurrentScenario().products.forEach(p => { p.discount = null; });
             saveScenarios();
             renderProductTable();
             calculate();
         }
 
         function resetProducts() {
-            const scenario = getCurrentScenario();
-            scenario.products = BASE_PRODUCTS.map(p => ({
-                sku: p.sku,
-                map: p.map,
-                discount: null,
-                cogs: p.cogs,
-                runRate: p.baseRunRate
+            const s = getCurrentScenario();
+            s.products = BASE_PRODUCTS.map(p => ({
+                sku: p.sku, map: p.map, discount: null, cogs: p.cogs, runRate: p.baseRunRate,
+                actuals2026: s.products.find(x => x.sku === p.sku)?.actuals2026 || [0,0,0,0,0,0,0,0,0,0,0,0]
             }));
             saveScenarios();
             renderProductTable();
             calculate();
         }
 
-        function formatCurrency(num) {
-            return '$' + Math.round(num).toLocaleString();
-        }
-
-        function formatCurrencyShort(num) {
-            if (num >= 1000000) return '$' + (num/1000000).toFixed(1) + 'M';
-            if (num >= 1000) return '$' + (num/1000).toFixed(0) + 'K';
-            return '$' + Math.round(num);
+        function formatCurrency(n) { return '$' + Math.round(n).toLocaleString(); }
+        function formatShort(n) {
+            if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+            if (Math.abs(n) >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+            return '$' + Math.round(n);
         }
 
         function isChanged(sku, field) {
-            const product = getCurrentScenario().products.find(p => p.sku === sku);
-            const base = BASE_PRODUCTS.find(b => b.sku === sku);
-            if (field === 'discount') return product.discount !== null;
-            return product[field] !== base[field === 'runRate' ? 'baseRunRate' : field];
+            const p = getCurrentScenario().products.find(x => x.sku === sku);
+            const b = BASE_PRODUCTS.find(x => x.sku === sku);
+            if (field === 'discount') return p.discount !== null;
+            return p[field] !== b[field === 'runRate' ? 'baseRunRate' : field];
         }
 
         function renderProductTable() {
-            const scenario = getCurrentScenario();
-            const tbody = document.getElementById('product-table');
-            
-            tbody.innerHTML = scenario.products.map(p => {
-                const base = BASE_PRODUCTS.find(b => b.sku === p.sku);
-                const effectiveDiscount = p.discount !== null ? p.discount : scenario.globalParams.discount;
-                const channelPrice = p.map * (1 - effectiveDiscount / 100);
-                const unitMargin = channelPrice - p.cogs;
-                const annualUnits = p.runRate * 12;
-                const revenue = channelPrice * annualUnits;
-                const totalMargin = unitMargin * annualUnits;
-
-                return `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="py-2 px-2 font-medium">${p.sku}</td>
-                        <td class="py-2 px-2 text-right bg-blue-50">
-                            <input type="number" value="${p.map}" 
-                                class="editable-cell w-20 px-1 py-0.5 border rounded text-right ${isChanged(p.sku, 'map') ? 'changed' : ''}"
-                                onchange="updateProduct('${p.sku}', 'map', this.value)">
-                        </td>
-                        <td class="py-2 px-2 text-right bg-blue-50">
-                            <input type="number" value="${p.discount !== null ? p.discount : ''}" 
-                                placeholder="${scenario.globalParams.discount}"
-                                class="editable-cell w-16 px-1 py-0.5 border rounded text-right ${isChanged(p.sku, 'discount') ? 'changed' : ''}"
-                                onchange="updateProduct('${p.sku}', 'discount', this.value)">
-                        </td>
-                        <td class="py-2 px-2 text-right text-gray-600">${formatCurrency(channelPrice)}</td>
-                        <td class="py-2 px-2 text-right bg-blue-50">
-                            <input type="number" value="${p.cogs.toFixed(2)}" step="0.01"
-                                class="editable-cell w-20 px-1 py-0.5 border rounded text-right ${isChanged(p.sku, 'cogs') ? 'changed' : ''}"
-                                onchange="updateProduct('${p.sku}', 'cogs', this.value)">
-                        </td>
-                        <td class="py-2 px-2 text-right bg-blue-50">
-                            <input type="number" value="${p.runRate}" min="0" max="200"
-                                class="editable-cell w-14 px-1 py-0.5 border rounded text-right ${isChanged(p.sku, 'runRate') ? 'changed' : ''}"
-                                onchange="updateProduct('${p.sku}', 'runRate', this.value)">
-                        </td>
-                        <td class="py-2 px-2 text-right">${annualUnits}</td>
-                        <td class="py-2 px-2 text-right">${formatCurrency(revenue)}</td>
-                        <td class="py-2 px-2 text-right ${unitMargin < 0 ? 'text-red-600' : ''}">${formatCurrency(unitMargin)}</td>
-                        <td class="py-2 px-2 text-right ${totalMargin < 0 ? 'text-red-600' : ''}">${formatCurrency(totalMargin)}</td>
-                    </tr>
-                `;
+            const s = getCurrentScenario();
+            document.getElementById('product-table').innerHTML = s.products.map(p => {
+                const disc = p.discount !== null ? p.discount : s.globalParams.discount;
+                const chPrice = p.map * (1 - disc / 100);
+                const units = p.runRate * 12;
+                const rev = chPrice * units;
+                const margin = (chPrice - p.cogs) * units;
+                return `<tr class="border-b hover:bg-gray-50">
+                    <td class="py-1 px-2 font-medium">${p.sku}</td>
+                    <td class="py-1 px-2 text-right bg-blue-50"><input type="number" value="${p.map}" class="editable-cell w-16 px-1 border rounded text-right ${isChanged(p.sku,'map')?'changed':''}" onchange="updateProduct('${p.sku}','map',this.value)"></td>
+                    <td class="py-1 px-2 text-right bg-blue-50"><input type="number" value="${p.discount!==null?p.discount:''}" placeholder="${s.globalParams.discount}" class="editable-cell w-12 px-1 border rounded text-right ${isChanged(p.sku,'discount')?'changed':''}" onchange="updateProduct('${p.sku}','discount',this.value)"></td>
+                    <td class="py-1 px-2 text-right text-gray-600">${formatCurrency(chPrice)}</td>
+                    <td class="py-1 px-2 text-right bg-blue-50"><input type="number" value="${p.cogs.toFixed(2)}" step="0.01" class="editable-cell w-16 px-1 border rounded text-right ${isChanged(p.sku,'cogs')?'changed':''}" onchange="updateProduct('${p.sku}','cogs',this.value)"></td>
+                    <td class="py-1 px-2 text-right bg-blue-50"><input type="number" value="${p.runRate}" class="editable-cell w-12 px-1 border rounded text-right ${isChanged(p.sku,'runRate')?'changed':''}" onchange="updateProduct('${p.sku}','runRate',this.value)"></td>
+                    <td class="py-1 px-2 text-right">${units}</td>
+                    <td class="py-1 px-2 text-right">${formatCurrency(rev)}</td>
+                    <td class="py-1 px-2 text-right ${margin<0?'negative':''}">${formatCurrency(margin)}</td>
+                </tr>`;
             }).join('');
         }
 
         function calculate() {
-            const scenario = getCurrentScenario();
-            let totalRevenue = 0;
-            let totalCOGS = 0;
-            let totalUnits = 0;
-            let totalMargin = 0;
+            const s = getCurrentScenario();
+            let totRev = 0, totCOGS = 0, totUnits = 0, totMargin = 0;
+            s.products.forEach(p => {
+                const disc = p.discount !== null ? p.discount : s.globalParams.discount;
+                const chPrice = p.map * (1 - disc / 100);
+                const units = p.runRate * 12;
+                totRev += chPrice * units;
+                totCOGS += p.cogs * units;
+                totUnits += units;
+                totMargin += (chPrice - p.cogs) * units;
+            });
+            const tariff = totCOGS * s.globalParams.tariff / 100;
+            const tpl = totRev * s.globalParams['3pl'] / 100;
+            const gross = totRev - totCOGS - tariff - tpl;
+            const pct = totRev > 0 ? (gross / totRev * 100).toFixed(1) : 0;
 
-            scenario.products.forEach(p => {
-                const effectiveDiscount = p.discount !== null ? p.discount : scenario.globalParams.discount;
-                const channelPrice = p.map * (1 - effectiveDiscount / 100);
-                const annualUnits = p.runRate * 12;
-                const revenue = channelPrice * annualUnits;
-                const cogs = p.cogs * annualUnits;
-                const margin = revenue - cogs;
+            document.getElementById('total-units').textContent = totUnits.toLocaleString();
+            document.getElementById('total-revenue').textContent = formatCurrency(totRev);
+            document.getElementById('total-margin').textContent = formatCurrency(totMargin);
+            document.getElementById('summary-revenue').textContent = formatShort(totRev);
+            document.getElementById('summary-cogs').textContent = formatShort(totCOGS);
+            document.getElementById('summary-tariff').textContent = formatShort(tariff);
+            document.getElementById('summary-3pl').textContent = formatShort(tpl);
+            document.getElementById('summary-margin').textContent = formatShort(gross);
+            document.getElementById('summary-margin').className = `text-2xl font-bold ${gross >= 0 ? 'text-green-600' : 'text-red-600'}`;
+            document.getElementById('summary-margin-pct').textContent = pct + '% margin';
 
-                totalRevenue += revenue;
-                totalCOGS += cogs;
-                totalUnits += annualUnits;
-                totalMargin += margin;
+            document.getElementById('comparison-scenario').textContent = formatShort(totRev);
+            const delta = totRev - BASELINE_REVENUE;
+            document.getElementById('comparison-delta').innerHTML = delta >= 0 
+                ? `<span class="positive">+${formatShort(delta)} (+${(delta/BASELINE_REVENUE*100).toFixed(1)}%)</span>`
+                : `<span class="negative">${formatShort(delta)} (${(delta/BASELINE_REVENUE*100).toFixed(1)}%)</span>`;
+            const net = totRev - totCOGS - tariff - tpl - EXISTING_OPEX - NEW_OPEX_PAYROLL;
+            document.getElementById('comparison-net').textContent = formatShort(net);
+            document.getElementById('comparison-net').className = `text-3xl font-bold ${net >= 0 ? 'text-green-600' : 'text-red-600'}`;
+        }
+
+        function renderMonthlyTracker() {
+            const s = getCurrentScenario();
+            let html = '';
+            let totProj = Array(12).fill(0), totActual = Array(12).fill(0), tot2025 = Array(12).fill(0);
+
+            s.products.forEach(p => {
+                const base = BASE_PRODUCTS.find(b => b.sku === p.sku);
+                const proj = Array(12).fill(p.runRate);
+                const h25 = base.hist2025;
+                const a26 = p.actuals2026;
+
+                // 2025 row
+                html += `<tr class="border-b bg-gray-50"><td class="py-1 px-2 font-medium sticky left-0 bg-gray-50">${p.sku}</td><td class="py-1 px-1 text-center text-gray-400">2025</td>`;
+                let sum25 = 0;
+                h25.forEach((v,i) => { html += `<td class="py-1 px-1 text-right text-gray-500">${v}</td>`; sum25 += v; tot2025[i] += v; });
+                html += `<td class="py-1 px-2 text-right bg-gray-100 font-medium">${sum25}</td></tr>`;
+
+                // 2026 Projected row
+                html += `<tr class="border-b bg-blue-50/50"><td class="py-1 px-2 sticky left-0 bg-blue-50/50"></td><td class="py-1 px-1 text-center text-blue-600">Proj</td>`;
+                let sumProj = 0;
+                proj.forEach((v,i) => { html += `<td class="py-1 px-1 text-right text-blue-600">${v}</td>`; sumProj += v; totProj[i] += v; });
+                html += `<td class="py-1 px-2 text-right bg-blue-100 font-medium text-blue-700">${sumProj}</td></tr>`;
+
+                // 2026 Actual row (editable)
+                html += `<tr class="border-b"><td class="py-1 px-2 sticky left-0 bg-white"></td><td class="py-1 px-1 text-center text-green-600 font-medium">Actual</td>`;
+                let sumActual = 0;
+                a26.forEach((v,i) => {
+                    const variance = v - proj[i];
+                    const varClass = v > 0 ? (variance >= 0 ? 'bg-green-100' : 'bg-red-50') : '';
+                    html += `<td class="py-1 px-1 text-right ${varClass}"><input type="number" value="${v||''}" placeholder="0" class="w-12 px-1 border border-green-300 rounded text-right text-sm" onchange="updateActual('${p.sku}',${i},this.value)"></td>`;
+                    sumActual += v;
+                    totActual[i] += v;
+                });
+                html += `<td class="py-1 px-2 text-right bg-gray-100 font-medium">${sumActual}</td></tr>`;
             });
 
-            const tariffCost = totalCOGS * (scenario.globalParams.tariff / 100);
-            const threePLFees = totalRevenue * (scenario.globalParams['3pl'] / 100);
-            const grossMargin = totalRevenue - totalCOGS - tariffCost - threePLFees;
-            const marginPct = totalRevenue > 0 ? (grossMargin / totalRevenue * 100).toFixed(1) : 0;
+            // Totals rows
+            html += `<tr class="border-t-2 bg-gray-200 font-semibold"><td class="py-2 px-2 sticky left-0 bg-gray-200">TOTALS</td><td class="py-2 px-1 text-center">2025</td>`;
+            tot2025.forEach(v => html += `<td class="py-2 px-1 text-right">${v}</td>`);
+            html += `<td class="py-2 px-2 text-right bg-gray-300">${tot2025.reduce((a,b)=>a+b,0)}</td></tr>`;
 
-            // Update totals
-            document.getElementById('total-units').textContent = totalUnits.toLocaleString();
-            document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
-            document.getElementById('total-margin').textContent = formatCurrency(totalMargin);
+            html += `<tr class="bg-blue-100 font-semibold"><td class="py-2 px-2 sticky left-0 bg-blue-100"></td><td class="py-2 px-1 text-center text-blue-700">Proj</td>`;
+            totProj.forEach(v => html += `<td class="py-2 px-1 text-right text-blue-700">${v}</td>`);
+            html += `<td class="py-2 px-2 text-right bg-blue-200 text-blue-800">${totProj.reduce((a,b)=>a+b,0)}</td></tr>`;
 
-            // Update summary cards
-            document.getElementById('summary-revenue').textContent = formatCurrencyShort(totalRevenue);
-            document.getElementById('summary-cogs').textContent = formatCurrencyShort(totalCOGS);
-            document.getElementById('summary-tariff').textContent = formatCurrencyShort(tariffCost);
-            document.getElementById('summary-3pl').textContent = formatCurrencyShort(threePLFees);
-            document.getElementById('summary-margin').textContent = formatCurrencyShort(grossMargin);
-            document.getElementById('summary-margin-pct').textContent = marginPct + '% margin';
-            document.getElementById('summary-margin').className = grossMargin >= 0 
-                ? 'text-2xl font-bold text-green-600' 
-                : 'text-2xl font-bold text-red-600';
+            html += `<tr class="bg-green-100 font-semibold"><td class="py-2 px-2 sticky left-0 bg-green-100"></td><td class="py-2 px-1 text-center text-green-700">Actual</td>`;
+            totActual.forEach(v => html += `<td class="py-2 px-1 text-right text-green-700">${v}</td>`);
+            html += `<td class="py-2 px-2 text-right bg-green-200 text-green-800">${totActual.reduce((a,b)=>a+b,0)}</td></tr>`;
 
-            // Comparison
-            document.getElementById('comparison-scenario').textContent = formatCurrencyShort(totalRevenue);
-            const delta = totalRevenue - BASELINE_REVENUE;
-            const deltaPct = (delta / BASELINE_REVENUE * 100).toFixed(1);
-            document.getElementById('comparison-delta').innerHTML = delta >= 0 
-                ? `<span class="text-green-600">+${formatCurrencyShort(delta)} (+${deltaPct}%)</span>`
-                : `<span class="text-red-600">${formatCurrencyShort(delta)} (${deltaPct}%)</span>`;
+            document.getElementById('monthly-table').innerHTML = html;
 
-            const netIncome = totalRevenue - totalCOGS - tariffCost - threePLFees - EXISTING_OPEX - NEW_OPEX_PAYROLL;
-            document.getElementById('comparison-net').textContent = formatCurrencyShort(netIncome);
-            document.getElementById('comparison-net').className = netIncome >= 0 
-                ? 'text-3xl font-bold text-green-600' 
-                : 'text-3xl font-bold text-red-600';
+            // Summary cards
+            const ytdProj = totProj.reduce((a,b)=>a+b,0);
+            const ytdActual = totActual.reduce((a,b)=>a+b,0);
+            const variance = ytdActual - ytdProj;
+            const pct = ytdProj > 0 ? (ytdActual / ytdProj * 100).toFixed(0) : 0;
+            document.getElementById('monthly-projected-ytd').textContent = ytdProj.toLocaleString() + ' units';
+            document.getElementById('monthly-actual-ytd').textContent = ytdActual.toLocaleString() + ' units';
+            document.getElementById('monthly-variance-ytd').textContent = (variance >= 0 ? '+' : '') + variance.toLocaleString();
+            document.getElementById('monthly-variance-ytd').className = `text-2xl font-bold ${variance >= 0 ? 'positive' : 'negative'}`;
+            document.getElementById('monthly-pct-ytd').textContent = pct + '%';
+            document.getElementById('monthly-pct-ytd').className = `text-2xl font-bold ${pct >= 100 ? 'positive' : pct >= 80 ? 'text-yellow-600' : 'negative'}`;
 
-            // Re-render table to update calculated columns
-            renderProductTable();
+            // Revenue table
+            renderMonthlyRevenue(s, totActual);
+        }
+
+        function renderMonthlyRevenue(s, totActualUnits) {
+            let revByMonth = Array(12).fill(0);
+            let cogsByMonth = Array(12).fill(0);
+            s.products.forEach(p => {
+                const disc = p.discount !== null ? p.discount : s.globalParams.discount;
+                const chPrice = p.map * (1 - disc / 100);
+                p.actuals2026.forEach((units, i) => {
+                    revByMonth[i] += chPrice * units;
+                    cogsByMonth[i] += p.cogs * units;
+                });
+            });
+            const marginByMonth = revByMonth.map((r, i) => r - cogsByMonth[i]);
+
+            let html = `<tr class="border-b"><td class="py-2 px-2 font-medium">Revenue</td>`;
+            revByMonth.forEach(v => html += `<td class="py-2 px-2 text-right">${formatShort(v)}</td>`);
+            html += `<td class="py-2 px-2 text-right bg-gray-100 font-semibold">${formatShort(revByMonth.reduce((a,b)=>a+b,0))}</td></tr>`;
+
+            html += `<tr class="border-b"><td class="py-2 px-2 font-medium">COGS</td>`;
+            cogsByMonth.forEach(v => html += `<td class="py-2 px-2 text-right text-gray-600">${formatShort(v)}</td>`);
+            html += `<td class="py-2 px-2 text-right bg-gray-100 font-semibold">${formatShort(cogsByMonth.reduce((a,b)=>a+b,0))}</td></tr>`;
+
+            html += `<tr class="bg-gray-50 font-semibold"><td class="py-2 px-2">Gross Margin</td>`;
+            marginByMonth.forEach(v => html += `<td class="py-2 px-2 text-right ${v<0?'negative':'positive'}">${formatShort(v)}</td>`);
+            html += `<td class="py-2 px-2 text-right bg-gray-200">${formatShort(marginByMonth.reduce((a,b)=>a+b,0))}</td></tr>`;
+
+            document.getElementById('monthly-revenue-table').innerHTML = html;
         }
 
         function exportScenarios() {
-            const data = JSON.stringify(scenarios, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+            const blob = new Blob([JSON.stringify(scenarios, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(blob);
             a.download = `bassboss-scenarios-${new Date().toISOString().split('T')[0]}.json`;
             a.click();
-            URL.revokeObjectURL(url);
         }
 
-        function importScenarios(event) {
-            const file = event.target.files[0];
+        function importScenarios(e) {
+            const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = (ev) => {
                 try {
-                    const imported = JSON.parse(e.target.result);
+                    const imported = JSON.parse(ev.target.result);
                     scenarios = { ...scenarios, ...imported };
                     saveScenarios();
-                    renderTabs();
                     loadScenario(currentScenarioId);
-                    alert('Scenarios imported!');
-                } catch (err) {
-                    alert('Error importing file: ' + err.message);
-                }
+                    alert('Imported!');
+                } catch (err) { alert('Error: ' + err.message); }
             };
             reader.readAsText(file);
-            event.target.value = '';
+            e.target.value = '';
         }
 
-        // Keyboard shortcut for rename modal
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', e => {
             if (e.key === 'Enter' && renameTargetId) confirmRename();
-            if (e.key === 'Escape' && renameTargetId) closeRenameModal();
+            if (e.key === 'Escape') closeRenameModal();
         });
 
-        // Dev mode
-        if (window.location.hash === '#dev') {
+        if (location.hash === '#dev') {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
             loadScenarios();
