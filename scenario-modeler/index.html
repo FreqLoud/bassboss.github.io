@@ -66,6 +66,7 @@
                     <p class="text-gray-400 text-sm">2026 Revenue Projections</p>
                 </div>
                 <div class="flex gap-3">
+                    <button onclick="toggleHelp()" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-500 text-sm">❓ Help</button>
                     <button onclick="exportScenarios()" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-500 text-sm">📥 Export</button>
                     <button onclick="document.getElementById('import-file').click()" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-500 text-sm">📤 Import</button>
                     <input type="file" id="import-file" class="hidden" accept=".json" onchange="importScenarios(event)">
@@ -324,6 +325,89 @@
         </footer>
     </div>
 
+    <!-- Help Modal -->
+    <div id="help-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg p-6 max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="text-xl font-bold">📖 Scenario Modeler Guide</h2>
+                <button onclick="toggleHelp()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-6 text-sm">
+                <section>
+                    <h3 class="font-semibold text-bass-red mb-2">🎯 Overview</h3>
+                    <p class="text-gray-600">Model different 2026 revenue scenarios by adjusting pricing, discounts, costs, and sales volumes. Compare against the Brent baseline ($5.27M) and track actual performance monthly.</p>
+                </section>
+
+                <section>
+                    <h3 class="font-semibold text-bass-red mb-2">📊 Scenario Builder Tab</h3>
+                    <table class="w-full text-xs border-collapse">
+                        <tr class="border-b"><td class="py-2 font-medium w-1/3">Global Parameters</td><td class="py-2 text-gray-600">Sliders affect all products (unless overridden per-product)</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">MAP Discount</td><td class="py-2 text-gray-600">Channel buys at MAP minus this % (e.g., 43% discount = 57% of MAP)</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Growth Rate</td><td class="py-2 text-gray-600">Auto-scales all run rates from baseline (drag slider to see impact)</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Tariff Rate</td><td class="py-2 text-gray-600">Applied to total COGS as import tariff cost</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">3PL Fee Rate</td><td class="py-2 text-gray-600">Applied to revenue as fulfillment cost</td></tr>
+                    </table>
+                </section>
+
+                <section>
+                    <h3 class="font-semibold text-bass-red mb-2">📦 Product Table (Editable Fields)</h3>
+                    <table class="w-full text-xs border-collapse">
+                        <tr class="border-b"><td class="py-2 font-medium w-1/3">MAP</td><td class="py-2 text-gray-600">Minimum Advertised Price — edit to model price changes</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Discount %</td><td class="py-2 text-gray-600">Per-product override — leave blank to use global discount</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">COGS</td><td class="py-2 text-gray-600">Cost of goods sold per unit — edit to model cost changes</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Run Rate</td><td class="py-2 text-gray-600">Expected units sold per month — annual = rate × 12</td></tr>
+                    </table>
+                    <p class="text-gray-500 mt-2">💡 Yellow highlight = changed from default. Click "Reset" to restore baseline values.</p>
+                </section>
+
+                <section>
+                    <h3 class="font-semibold text-bass-red mb-2">📅 Monthly Tracker Tab</h3>
+                    <p class="text-gray-600 mb-2">Track actual sales against projections. For each product:</p>
+                    <table class="w-full text-xs border-collapse">
+                        <tr class="border-b bg-gray-50"><td class="py-2 font-medium w-1/3">2025 Row</td><td class="py-2 text-gray-600">Historical sales (read-only reference from last year)</td></tr>
+                        <tr class="border-b bg-blue-50"><td class="py-2 font-medium">Proj Row</td><td class="py-2 text-gray-600">2026 projected units based on your run rate</td></tr>
+                        <tr class="border-b bg-green-50"><td class="py-2 font-medium">Actual Row</td><td class="py-2 text-gray-600">Enter real sales as they come in (editable)</td></tr>
+                    </table>
+                    <p class="text-gray-500 mt-2">💡 Green cells = at/above plan. Red cells = below plan. Revenue auto-calculates from actuals.</p>
+                </section>
+
+                <section>
+                    <h3 class="font-semibold text-bass-red mb-2">🗂️ Managing Scenarios</h3>
+                    <table class="w-full text-xs border-collapse">
+                        <tr class="border-b"><td class="py-2 font-medium w-1/3">Create New</td><td class="py-2 text-gray-600">Click "+ New" to add a scenario</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Switch</td><td class="py-2 text-gray-600">Click scenario tabs to switch between them</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Rename</td><td class="py-2 text-gray-600">Double-click the tab name</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Duplicate</td><td class="py-2 text-gray-600">Click 📋 to copy a scenario</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Delete</td><td class="py-2 text-gray-600">Click ✕ (can't delete last one)</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Export</td><td class="py-2 text-gray-600">Download all scenarios as JSON file</td></tr>
+                        <tr class="border-b"><td class="py-2 font-medium">Import</td><td class="py-2 text-gray-600">Load scenarios from a JSON file</td></tr>
+                    </table>
+                </section>
+
+                <section>
+                    <h3 class="font-semibold text-bass-red mb-2">💾 Data Storage</h3>
+                    <p class="text-gray-600">All scenarios are saved in your browser's localStorage. They persist across page refreshes and browser restarts. Use Export to back up your work or share with others.</p>
+                </section>
+
+                <section class="bg-gray-50 p-4 rounded">
+                    <h3 class="font-semibold mb-2">🔢 Key Formulas</h3>
+                    <ul class="text-xs text-gray-600 space-y-1 font-mono">
+                        <li>Channel Price = MAP × (1 - Discount%)</li>
+                        <li>Annual Units = Run Rate × 12</li>
+                        <li>Revenue = Channel Price × Units</li>
+                        <li>Gross Margin = Revenue - COGS - Tariffs - 3PL</li>
+                        <li>Net Income = Gross Margin - OpEx ($1.75M)</li>
+                    </ul>
+                </section>
+            </div>
+
+            <div class="mt-6 pt-4 border-t text-center">
+                <button onclick="toggleHelp()" class="bg-bass-red text-white px-6 py-2 rounded hover:bg-red-700">Got it!</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Rename Modal -->
     <div id="rename-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg p-6 w-80">
@@ -497,6 +581,12 @@
         function closeRenameModal() {
             document.getElementById('rename-modal').classList.add('hidden');
             document.getElementById('rename-modal').classList.remove('flex');
+        }
+
+        function toggleHelp() {
+            const modal = document.getElementById('help-modal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
         }
 
         function confirmRename() {
@@ -783,7 +873,11 @@
 
         document.addEventListener('keydown', e => {
             if (e.key === 'Enter' && renameTargetId) confirmRename();
-            if (e.key === 'Escape') closeRenameModal();
+            if (e.key === 'Escape') {
+                closeRenameModal();
+                document.getElementById('help-modal').classList.add('hidden');
+                document.getElementById('help-modal').classList.remove('flex');
+            }
         });
 
         if (location.hash === '#dev') {
